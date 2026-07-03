@@ -199,6 +199,8 @@ Commits:
 
 ## Phase 7 - Unified Content Graph
 
+Trang thai: `DONE`
+
 Muc tieu:
 
 - Ket noi Page/Post/Product/Term/Menu/Media thanh graph de theme truy cap de dang.
