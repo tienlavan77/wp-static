@@ -9,7 +9,9 @@ export default function createBuildManifest(sitePlan, buildResult, options = {})
     pages: sitePlan.pages.length,
     assets: {
       copiedPublicAssets: buildResult.copiedPublicAssets,
-      copiedThemeAssets: buildResult.copiedThemeAssets
+      copiedThemeAssets: buildResult.copiedThemeAssets,
+      downloaded: buildResult.assetsDownloaded ?? 0,
+      manifestPath: buildResult.assetManifestPath ?? null
     },
     theme: sitePlan.theme?.metadata ?? null,
     seo: {

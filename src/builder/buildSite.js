@@ -3,6 +3,7 @@ import path from "node:path";
 import copyPublicAssets from "./copyPublicAssets.js";
 import createBuildManifest from "./createBuildManifest.js";
 import { BuildError } from "../shared/errors.js";
+import processAssetPipeline from "../assets/processAssetPipeline.js";
 import generateRobotsTxt from "../seo/generateRobotsTxt.js";
 import generateSitemap from "../seo/generateSitemap.js";
 
@@ -18,11 +19,15 @@ export default async function buildSite(sitePlan, options = {}) {
 
   const copiedPublicAssets = await copyPublicAssets(options.publicDir, outputDir);
   const copiedThemeAssets = await copyPublicAssets(options.themeAssetsDir, path.join(outputDir, "theme"));
+  const assetPipeline = await processAssetPipeline(sitePlan, {
+    cacheDir: options.assetCacheDir,
+    outputDir
+  });
 
   for (const page of sitePlan.pages) {
     const filePath = path.join(outputDir, page.route.outputPath);
     await mkdir(path.dirname(filePath), { recursive: true });
-    await writeFile(filePath, page.html, "utf8");
+    await writeFile(filePath, assetPipeline.rewriteHtml(page.html), "utf8");
   }
 
   const seoOutputs = await writeSeoOutputs(sitePlan, outputDir, options);
@@ -30,6 +35,9 @@ export default async function buildSite(sitePlan, options = {}) {
   const buildResult = {
     copiedPublicAssets,
     copiedThemeAssets,
+    assetManifestPath: path.join(outputDir, ".wpsc", "assets.json"),
+    assetsDownloaded: assetPipeline.entries.length,
+    assetPipeline,
     manifestPath: path.join(outputDir, ".wpsc", "manifest.json"),
     pagesWritten: sitePlan.pages.length,
     seoOutputs,
@@ -38,6 +46,10 @@ export default async function buildSite(sitePlan, options = {}) {
   const manifest = createBuildManifest(sitePlan, buildResult, options);
 
   await mkdir(path.dirname(buildResult.manifestPath), { recursive: true });
+  await writeFile(buildResult.assetManifestPath, `${JSON.stringify({
+    version: 1,
+    assets: assetPipeline.entries
+  }, null, 2)}\n`, "utf8");
   await writeFile(buildResult.manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
 
   return buildResult;

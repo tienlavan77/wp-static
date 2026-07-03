@@ -196,6 +196,7 @@ function printBuildSummary(config, sitePlan, result, activeLogger) {
   activeLogger.info(`Pages: ${result.pagesWritten}`);
   activeLogger.info(`Assets copied: ${result.copiedPublicAssets ? "yes" : "no"}`);
   activeLogger.info(`Theme assets copied: ${result.copiedThemeAssets ? "yes" : "no"}`);
+  activeLogger.info(`Remote assets downloaded: ${result.assetsDownloaded ?? 0}`);
   activeLogger.info(`Output: ${result.outputDir}`);
   activeLogger.info(`Manifest: ${result.manifestPath}`);
   activeLogger.info(`SEO outputs: ${(result.seoOutputs ?? []).join(", ") || "none"}`);
