@@ -173,6 +173,8 @@ rank_math_twitter_image
 
 ## Phase 6 - WooCommerce Data Adapter
 
+Trang thai: `DONE`
+
 Muc tieu:
 
 - Lay san pham WooCommerce that.

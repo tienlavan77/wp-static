@@ -1,0 +1,45 @@
+{
+  "id": 44,
+  "name": "Áo thun <strong>basic</strong>",
+  "slug": "ao-thun-basic",
+  "sku": "TS-BASIC-WHT",
+  "price": "249000",
+  "regular_price": "299000",
+  "sale_price": "249000",
+  "stock_status": "instock",
+  "stock_quantity": 12,
+  "manage_stock": true,
+  "description": "<p>Áo thun cotton</p>",
+  "short_description": "<p>Dễ mặc hằng ngày</p>",
+  "average_rating": "4.8",
+  "categories": [
+    {
+      "id": 7,
+      "name": "Thời trang",
+      "slug": "thoi-trang"
+    }
+  ],
+  "tags": [
+    {
+      "id": 8,
+      "name": "Basic",
+      "slug": "basic"
+    }
+  ],
+  "images": [
+    {
+      "id": 21,
+      "src": "https://example.com/ao.jpg",
+      "name": "Áo thun",
+      "alt": "Áo thun trắng"
+    }
+  ],
+  "acf": {
+    "material": "Cotton"
+  },
+  "meta": {
+    "rank_math_title": "SEO Product Title",
+    "rank_math_description": "SEO Product Description",
+    "rank_math_facebook_image": "https://example.com/og-product.jpg"
+  }
+}
