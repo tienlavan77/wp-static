@@ -1,6 +1,7 @@
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import createMockAdapter from "../adapters/mockAdapter.js";
+import createWordPressAdapter from "../adapters/wordpress/wordpressAdapter.js";
 import createRoutes from "../router/createRoutes.js";
 import renderPage from "../renderer/renderPage.js";
 
@@ -23,6 +24,10 @@ export default async function compile(config, options = {}) {
 
 function createAdapter(config, projectDir) {
   if (config.adapter?.type !== "mock") {
+    if (config.adapter?.type === "wordpress") {
+      return createWordPressAdapter(config.adapter);
+    }
+
     throw new Error(`Unsupported adapter type "${config.adapter?.type}".`);
   }
 
