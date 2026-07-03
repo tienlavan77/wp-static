@@ -283,20 +283,20 @@ Tieu chi hoan thanh:
 ## Checklist
 
 ```text
-[ ] 021 chore: initialize git repository
-[ ] 022 feat(cli): add help and version flags
-[ ] 023 feat(cli): support build default project
-[ ] 024 feat(core): add config loader
-[ ] 025 feat(builder): copy public assets
-[ ] 026 feat(example): add browser-ready shop styles
-[ ] 027 feat(template): add basic shop template
-[ ] 028 feat(cli): add create command
-[ ] 029 feat(wordpress): add wordpress client draft
-[ ] 030 feat(wordpress): add repository and normalizer draft
-[ ] 031 feat(adapter): wire wordpress adapter behind config
-[ ] 032 docs: add deployment guide for nginx static hosting
-[ ] 033 test: add cli smoke tests
-[ ] 034 chore: prepare phase 2 complete status
+[x] 021 chore: initialize git repository
+[x] 022 feat(cli): add help and version flags
+[x] 023 feat(cli): support build default project
+[x] 024 feat(core): add config loader
+[x] 025 feat(builder): copy public assets
+[x] 026 feat(example): add browser-ready shop styles
+[x] 027 feat(template): add basic shop template
+[x] 028 feat(cli): add create command
+[x] 029 feat(wordpress): add wordpress client draft
+[x] 030 feat(wordpress): add repository and normalizer draft
+[x] 031 feat(adapter): wire wordpress adapter behind config
+[x] 032 docs: add deployment guide for nginx static hosting
+[x] 033 test: add cli smoke tests
+[x] 034 chore: prepare phase 2 complete status
 ```
 
 ## Moc nhin thay thanh qua
