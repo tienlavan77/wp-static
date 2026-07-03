@@ -17,6 +17,7 @@ export default async function buildSite(sitePlan, options = {}) {
   }
 
   const copiedPublicAssets = await copyPublicAssets(options.publicDir, outputDir);
+  const copiedThemeAssets = await copyPublicAssets(options.themeAssetsDir, path.join(outputDir, "theme"));
 
   for (const page of sitePlan.pages) {
     const filePath = path.join(outputDir, page.route.outputPath);
@@ -28,6 +29,7 @@ export default async function buildSite(sitePlan, options = {}) {
 
   const buildResult = {
     copiedPublicAssets,
+    copiedThemeAssets,
     manifestPath: path.join(outputDir, ".wpsc", "manifest.json"),
     pagesWritten: sitePlan.pages.length,
     seoOutputs,

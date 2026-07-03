@@ -8,8 +8,10 @@ export default function createBuildManifest(sitePlan, buildResult, options = {})
     outputDir: buildResult.outputDir,
     pages: sitePlan.pages.length,
     assets: {
-      copiedPublicAssets: buildResult.copiedPublicAssets
+      copiedPublicAssets: buildResult.copiedPublicAssets,
+      copiedThemeAssets: buildResult.copiedThemeAssets
     },
+    theme: sitePlan.theme?.metadata ?? null,
     seo: {
       outputs: buildResult.seoOutputs ?? []
     },

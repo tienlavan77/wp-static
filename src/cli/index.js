@@ -79,7 +79,8 @@ async function buildProject(projectArg) {
     config,
     outputDir: config._paths.outputDir,
     publicDir: config._paths.publicDir ?? undefined,
-    site: config.site
+    site: config.site,
+    themeAssetsDir: sitePlan.theme?.assetsDir ?? undefined
   });
 
   printBuildSummary(config, sitePlan, result, logger);
@@ -194,6 +195,7 @@ function printBuildSummary(config, sitePlan, result, activeLogger) {
   activeLogger.info(`Project: ${config.name}`);
   activeLogger.info(`Pages: ${result.pagesWritten}`);
   activeLogger.info(`Assets copied: ${result.copiedPublicAssets ? "yes" : "no"}`);
+  activeLogger.info(`Theme assets copied: ${result.copiedThemeAssets ? "yes" : "no"}`);
   activeLogger.info(`Output: ${result.outputDir}`);
   activeLogger.info(`Manifest: ${result.manifestPath}`);
   activeLogger.info(`SEO outputs: ${(result.seoOutputs ?? []).join(", ") || "none"}`);
