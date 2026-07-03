@@ -29,7 +29,7 @@ test("cli builds a project", async () => {
 
   assert.match(result.stdout, /Project: Basic Shop/);
   assert.match(result.stdout, /Pages: 4/);
-  assert.match(result.stdout, /\/iphone-15 -> iphone-15\/index\.html/);
+  assert.match(result.stdout, /\/iphone-15 -> iphone-15\.html/);
 });
 
 test("cli doctors a project", async () => {

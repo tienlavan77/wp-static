@@ -12,7 +12,7 @@ test("createRoutes maps homepage and normal slugs", () => {
   assert.equal(routes[0].path, "/");
   assert.equal(routes[0].outputPath, "index.html");
   assert.equal(routes[1].path, "/iphone-15");
-  assert.equal(routes[1].outputPath, "iphone-15/index.html");
+  assert.equal(routes[1].outputPath, "iphone-15.html");
 });
 
 test("createRoutes fails on duplicate route paths", () => {

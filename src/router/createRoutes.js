@@ -25,7 +25,7 @@ function createRoute(content, homepage) {
 
   return {
     path: `/${slug}`,
-    outputPath: `${slug}/index.html`,
+    outputPath: `${slug}.html`,
     content
   };
 }

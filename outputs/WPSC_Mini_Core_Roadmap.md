@@ -157,7 +157,7 @@ Tieu chi hoan thanh:
 
 - Slug `home` hoac config homepage sinh route `/`.
 - Slug `iphone-15` sinh route `/iphone-15`.
-- Route co output path tuong ung `iphone-15/index.html`.
+- Route co output path tuong ung `iphone-15.html`.
 
 ### Commit 007 - feat(router): fail on duplicate routes
 
@@ -269,7 +269,7 @@ src/builder/buildSite.js
 Tieu chi hoan thanh:
 
 - Build tao `examples/basic-shop/dist/index.html`.
-- Product tao `examples/basic-shop/dist/iphone-15/index.html`.
+- Product tao `examples/basic-shop/dist/iphone-15.html`.
 - Builder la noi duy nhat ghi file output.
 
 ### Commit 013 - feat(cli): add wpsc build command

@@ -145,7 +145,7 @@ Minimum shape:
 ```js
 {
   path: "/iphone-15",
-  outputPath: "iphone-15/index.html",
+  outputPath: "iphone-15.html",
   content: content
 }
 ```
@@ -197,7 +197,7 @@ A Content model with slug `iphone-15` creates:
 
 ```text
 /iphone-15
-iphone-15/index.html
+iphone-15.html
 ```
 
 ### Duplicate Routes

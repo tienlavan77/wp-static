@@ -35,10 +35,10 @@ Public route khong con dau `/` cuoi slug:
 /ao-thun-basic
 ```
 
-Static output van giu dang:
+Static output dung dang file HTML de Nginx khong redirect them `/`:
 
 ```text
-iphone-15/index.html
-gioi-thieu/index.html
-ao-thun-basic/index.html
+iphone-15.html
+gioi-thieu.html
+ao-thun-basic.html
 ```
