@@ -17,6 +17,14 @@ node src/cli/index.js --help
 node src/cli/index.js --version
 ```
 
+Useful project commands:
+
+```bash
+node src/cli/index.js clean --project examples/basic-shop
+node src/cli/index.js doctor --project examples/basic-shop
+node src/cli/index.js serve --project examples/basic-shop --port 8080
+```
+
 The command reads:
 
 ```text

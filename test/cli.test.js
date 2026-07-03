@@ -10,6 +10,7 @@ test("cli prints help", async () => {
 
   assert.match(result.stdout, /wpsc build/);
   assert.match(result.stdout, /wpsc create/);
+  assert.match(result.stdout, /wpsc doctor/);
 });
 
 test("cli prints version", async () => {
@@ -26,5 +27,19 @@ test("cli builds a project", async () => {
     "examples/basic-shop"
   ]);
 
-  assert.match(result.stdout, /Built 4 pages/);
+  assert.match(result.stdout, /Project: Basic Shop/);
+  assert.match(result.stdout, /Pages: 4/);
+  assert.match(result.stdout, /\/iphone-15 -> iphone-15\/index\.html/);
+});
+
+test("cli doctors a project", async () => {
+  const result = await execFileAsync("node", [
+    "src/cli/index.js",
+    "doctor",
+    "--project",
+    "examples/basic-shop"
+  ]);
+
+  assert.match(result.stdout, /OK Node.js >= 20/);
+  assert.match(result.stdout, /OK Config file/);
 });

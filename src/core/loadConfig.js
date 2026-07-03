@@ -1,6 +1,7 @@
 import { access } from "node:fs/promises";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
+import validateConfig from "./validateConfig.js";
 
 export default async function loadConfig(projectDir) {
   const configPath = path.resolve(projectDir, "wpsc.config.js");
@@ -13,5 +14,5 @@ export default async function loadConfig(projectDir) {
 
   const module = await import(`${pathToFileURL(configPath).href}?t=${Date.now()}`);
 
-  return module.default;
+  return validateConfig(module.default);
 }

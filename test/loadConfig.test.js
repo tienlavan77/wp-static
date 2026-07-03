@@ -9,7 +9,18 @@ test("loadConfig loads wpsc.config.js from project dir", async () => {
   const projectDir = await mkdtemp(path.join(os.tmpdir(), "wpsc-config-"));
   await writeFile(
     path.join(projectDir, "wpsc.config.js"),
-    "export default { name: 'Test Shop', homepage: 'home' };",
+    `export default {
+      name: 'Test Shop',
+      homepage: 'home',
+      outputDir: './dist',
+      adapter: {
+        type: 'mock',
+        source: './content.json'
+      },
+      theme: {
+        layout: './theme/layout.js'
+      }
+    };`,
     "utf8"
   );
 
