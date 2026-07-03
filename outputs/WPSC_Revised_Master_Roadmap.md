@@ -81,6 +81,8 @@ dist/.wpsc/manifest.json
 
 ## Phase 5 - WordPress Data Adapter
 
+Trang thai: `DONE`
+
 Muc tieu:
 
 - Lay du lieu WordPress thuc te ngay tu dau.

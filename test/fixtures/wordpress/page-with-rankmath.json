@@ -1,0 +1,56 @@
+{
+  "id": 12,
+  "type": "page",
+  "slug": "gioi-thieu",
+  "date": "2026-07-03T00:00:00",
+  "modified": "2026-07-03T01:00:00",
+  "link": "https://example.com/gioi-thieu",
+  "title": {
+    "rendered": "Giới <strong>thiệu</strong>"
+  },
+  "excerpt": {
+    "rendered": "<p>Xin chào</p>"
+  },
+  "content": {
+    "rendered": "<p>Nội dung</p>"
+  },
+  "acf": {
+    "hero_title": "Hero ACF"
+  },
+  "meta": {
+    "rank_math_title": "SEO Title",
+    "rank_math_description": "SEO Description",
+    "rank_math_focus_keyword": "demo",
+    "rank_math_canonical_url": "https://example.com/gioi-thieu",
+    "rank_math_robots": "index,follow",
+    "rank_math_facebook_title": "Facebook Title",
+    "rank_math_facebook_description": "Facebook Description",
+    "rank_math_facebook_image": "https://example.com/og.jpg",
+    "rank_math_twitter_title": "Twitter Title",
+    "rank_math_twitter_description": "Twitter Description",
+    "rank_math_twitter_image": "https://example.com/twitter.jpg"
+  },
+  "_embedded": {
+    "wp:featuredmedia": [
+      {
+        "id": 9,
+        "source_url": "https://example.com/image.jpg",
+        "alt_text": "Alt text",
+        "mime_type": "image/jpeg",
+        "title": {
+          "rendered": "Image title"
+        }
+      }
+    ],
+    "wp:term": [
+      [
+        {
+          "id": 3,
+          "name": "Tin tức",
+          "slug": "tin-tuc",
+          "taxonomy": "category"
+        }
+      ]
+    ]
+  }
+}

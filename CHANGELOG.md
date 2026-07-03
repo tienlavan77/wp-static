@@ -14,5 +14,6 @@
 - Removed trailing slashes from public slug routes.
 - Added config validation, build summaries, clean, doctor, and static serve commands.
 - Added typed WPSC errors, quiet/verbose logging, normalized config paths, build manifests, pipeline integration tests, and public API draft docs.
+- Expanded the WordPress adapter draft with paginated collection fetching, pages/posts/CPT repository support, ACF fields, embedded media/terms, and Rank Math SEO normalization.
 
 Status: Mini core prototype complete, architecture remains `DRAFT`.
