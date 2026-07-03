@@ -7,8 +7,12 @@ export default function renderPage(route, layout, options = {}) {
   }
 
   const body = layout({
+    components: options.components ?? {},
     content: route.content,
+    graph: options.graph,
     route,
+    site: options.site ?? {},
+    theme: options.theme ?? {},
     html
   });
 

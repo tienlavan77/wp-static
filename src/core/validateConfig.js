@@ -10,6 +10,8 @@ export default function validateConfig(config) {
   requireString(config, "outputDir");
   requireString(config.adapter, "adapter.type");
   requireString(config.theme, "theme.layout");
+  requireOptionalString(config.theme, "theme.assets");
+  requireOptionalString(config.theme, "theme.components");
 
   if (config.adapter.type === "mock") {
     requireString(config.adapter, "adapter.source");
@@ -32,6 +34,15 @@ function requireString(object, fieldPath) {
 
   if (typeof value !== "string" || value.trim() === "") {
     throw new ConfigError(`Config field "${fieldPath}" is required.`);
+  }
+}
+
+function requireOptionalString(object, fieldPath) {
+  const fieldName = fieldPath.split(".").at(-1);
+  const value = object?.[fieldName];
+
+  if (value !== undefined && (typeof value !== "string" || value.trim() === "")) {
+    throw new ConfigError(`Config field "${fieldPath}" must be a non-empty string when provided.`);
   }
 }
 

@@ -24,6 +24,7 @@ export { default as renderSeoTags } from "./seo/renderSeoTags.js";
 export { default as createSeoMetadata } from "./seo/createSeoMetadata.js";
 export { default as generateRobotsTxt } from "./seo/generateRobotsTxt.js";
 export { default as generateSitemap } from "./seo/generateSitemap.js";
+export { default as resolveTheme } from "./theme/resolveTheme.js";
 export { default as serveStatic } from "./dev-server/serveStatic.js";
 export { default as validateConfig } from "./core/validateConfig.js";
 export {

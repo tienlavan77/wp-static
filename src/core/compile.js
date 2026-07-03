@@ -1,11 +1,10 @@
-import path from "node:path";
-import { pathToFileURL } from "node:url";
 import createMockAdapter from "../adapters/mockAdapter.js";
 import createWordPressAdapter from "../adapters/wordpress/wordpressAdapter.js";
 import createWooCommerceAdapter from "../adapters/woocommerce/woocommerceAdapter.js";
 import createContentGraph from "../content/createContentGraph.js";
 import createRoutes from "../router/createRoutes.js";
 import renderPage from "../renderer/renderPage.js";
+import resolveTheme from "../theme/resolveTheme.js";
 
 export default async function compile(config, options = {}) {
   const projectDir = config._paths?.projectDir ?? options.projectDir ?? process.cwd();
@@ -21,17 +20,21 @@ export default async function compile(config, options = {}) {
     terms: collections.terms
   });
   const routes = createRoutes(contents, config);
-  const layout = await loadLayout(config, projectDir);
+  const theme = await resolveTheme(config, projectDir);
   const pages = routes.map((route) => ({
     route,
-    html: renderPage(route, layout, {
-      site: config.site
+    html: renderPage(route, theme.resolveLayout(route.content), {
+      components: theme.components,
+      graph,
+      site: config.site,
+      theme: theme.metadata
     })
   }));
 
   return {
     routes,
     graph,
+    theme,
     pages
   };
 }
@@ -53,17 +56,4 @@ function createAdapter(config, projectDir) {
     source: config.adapter.source,
     baseDir: config._paths?.projectDir ?? projectDir
   });
-}
-
-async function loadLayout(config, projectDir) {
-  const layoutPath = config.theme?.layout;
-
-  if (typeof layoutPath !== "string" || layoutPath.trim() === "") {
-    throw new Error('Config field "theme.layout" is required.');
-  }
-
-  const absolutePath = config._paths?.themeLayout ?? path.resolve(projectDir, layoutPath);
-  const module = await import(pathToFileURL(absolutePath).href);
-
-  return module.default;
 }
