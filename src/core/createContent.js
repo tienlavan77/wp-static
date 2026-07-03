@@ -25,10 +25,27 @@ export default function createContent(rawContent) {
     title: rawContent.title.trim(),
     slug: rawContent.slug.trim(),
     domain: rawContent.domain.trim(),
-    data: structuredClone(rawContent.data)
+    data: structuredClone(rawContent.data),
+    ...cloneOptionalFields(rawContent)
   };
 
   return deepFreeze(content);
+}
+
+function cloneOptionalFields(rawContent) {
+  const optionalFields = {};
+
+  for (const fieldName of ["seo"]) {
+    if (Object.hasOwn(rawContent, fieldName)) {
+      if (!isJsonLikeValue(rawContent[fieldName])) {
+        throw new Error(`Content field "${fieldName}" must be JSON-like data.`);
+      }
+
+      optionalFields[fieldName] = structuredClone(rawContent[fieldName]);
+    }
+  }
+
+  return optionalFields;
 }
 
 function assertRequiredString(rawContent, fieldName) {

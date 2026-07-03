@@ -4,13 +4,20 @@ import createWordPressRepository from "./wordpressRepository.js";
 
 export default function createWordPressAdapter(options = {}) {
   const client = createWordPressClient(options);
-  const repository = createWordPressRepository(client);
+  const repository = createWordPressRepository(client, options);
 
   return {
     async getContents() {
       const contentInputs = await repository.getContents();
 
       return contentInputs.map(createContent);
+    },
+    async getCollections() {
+      return {
+        media: await repository.getMedia(),
+        menus: await repository.getMenus(),
+        terms: await repository.getTerms()
+      };
     }
   };
 }
