@@ -156,7 +156,7 @@ src/router/createRoutes.js
 Tieu chi hoan thanh:
 
 - Slug `home` hoac config homepage sinh route `/`.
-- Slug `iphone-15` sinh route `/iphone-15/`.
+- Slug `iphone-15` sinh route `/iphone-15`.
 - Route co output path tuong ung `iphone-15/index.html`.
 
 ### Commit 007 - feat(router): fail on duplicate routes

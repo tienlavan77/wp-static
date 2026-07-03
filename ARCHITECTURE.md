@@ -144,7 +144,7 @@ Minimum shape:
 
 ```js
 {
-  path: "/iphone-15/",
+  path: "/iphone-15",
   outputPath: "iphone-15/index.html",
   content: content
 }
@@ -196,7 +196,7 @@ index.html
 A Content model with slug `iphone-15` creates:
 
 ```text
-/iphone-15/
+/iphone-15
 iphone-15/index.html
 ```
 
@@ -216,7 +216,7 @@ The error should include:
 Example:
 
 ```text
-Duplicate route "/iphone-15/" for content "product-iphone-15" and "page-iphone-15".
+Duplicate route "/iphone-15" for content "product-iphone-15" and "page-iphone-15".
 ```
 
 There is no silent override and no automatic prefix fallback in the mini core.
