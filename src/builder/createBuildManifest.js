@@ -10,6 +10,12 @@ export default function createBuildManifest(sitePlan, buildResult, options = {})
     assets: {
       copiedPublicAssets: buildResult.copiedPublicAssets
     },
+    graph: {
+      contentCount: sitePlan.graph?.contents.items.length ?? 0,
+      mediaCount: sitePlan.graph?.media.items.length ?? 0,
+      menuCount: sitePlan.graph?.menus.items.length ?? 0,
+      termCount: sitePlan.graph?.terms.items.length ?? 0
+    },
     routes: sitePlan.pages.map((page) => ({
       path: page.route.path,
       outputPath: page.route.outputPath,
