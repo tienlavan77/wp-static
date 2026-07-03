@@ -1,0 +1,56 @@
+[
+  {
+    "id": "page-home",
+    "type": "page",
+    "title": "Trang chủ",
+    "slug": "home",
+    "domain": "shop",
+    "data": {
+      "headline": "Cửa hàng tĩnh cho sản phẩm chọn lọc",
+      "description": "Ví dụ WPSC Mini Core dùng dữ liệu mock để sinh website thương mại tĩnh.",
+      "featuredProductIds": [
+        "product-iphone-15",
+        "product-ao-thun-basic"
+      ]
+    }
+  },
+  {
+    "id": "page-gioi-thieu",
+    "type": "page",
+    "title": "Giới thiệu",
+    "slug": "gioi-thieu",
+    "domain": "shop",
+    "data": {
+      "headline": "Một demo nhỏ, kiến trúc rõ",
+      "description": "Trang này dùng để kiểm tra route page thường, không phụ thuộc WordPress hay WooCommerce."
+    }
+  },
+  {
+    "id": "product-iphone-15",
+    "type": "product",
+    "title": "iPhone 15",
+    "slug": "iphone-15",
+    "domain": "shop",
+    "data": {
+      "price": 19900000,
+      "currency": "VND",
+      "sku": "IP15-128-BLK",
+      "description": "Điện thoại Apple với thiết kế gọn, hiệu năng mạnh và camera linh hoạt.",
+      "inStock": true
+    }
+  },
+  {
+    "id": "product-ao-thun-basic",
+    "type": "product",
+    "title": "Áo thun basic",
+    "slug": "ao-thun-basic",
+    "domain": "shop",
+    "data": {
+      "price": 249000,
+      "currency": "VND",
+      "sku": "TS-BASIC-WHT",
+      "description": "Áo thun cotton đơn giản, dễ phối đồ, phù hợp dùng hằng ngày.",
+      "inStock": true
+    }
+  }
+]

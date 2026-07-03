@@ -1,0 +1,22 @@
+{
+  "name": "wpsc",
+  "version": "0.0.0",
+  "private": true,
+  "description": "WPSC Mini Core prototype for static commerce builds.",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "node src/cli/index.js build",
+    "build:example": "node src/cli/index.js build --project examples/basic-shop",
+    "test": "node --test"
+  },
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "bin": {
+    "wpsc": "./src/cli/index.js"
+  },
+  "license": "UNLICENSED"
+}
