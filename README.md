@@ -13,6 +13,8 @@ Or run the CLI directly:
 
 ```bash
 node src/cli/index.js build --project examples/basic-shop
+node src/cli/index.js --help
+node src/cli/index.js --version
 ```
 
 The command reads:
@@ -48,6 +50,8 @@ src/index.js
 - SEO-first slug routing.
 - Plain JavaScript layout rendering.
 - Static HTML builder.
+- Public asset copying.
+- Project template creation.
 
 Not included yet:
 
@@ -56,6 +60,13 @@ Not included yet:
 - Dev server.
 - Plugin system.
 - Incremental build cache.
+
+## Create A Project
+
+```bash
+node src/cli/index.js create work/my-shop
+node src/cli/index.js build --project work/my-shop
+```
 
 ## Test
 

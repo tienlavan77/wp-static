@@ -6,6 +6,7 @@ export { default as createRoutes } from "./router/createRoutes.js";
 export { default as deepFreeze } from "./shared/deepFreeze.js";
 export { default as escapeHtml } from "./shared/escapeHtml.js";
 export { default as html } from "./renderer/html.js";
+export { default as loadConfig } from "./core/loadConfig.js";
 export { default as renderPage } from "./renderer/renderPage.js";
 
 export const version = "0.0.0";

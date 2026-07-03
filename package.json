@@ -10,6 +10,7 @@
   "scripts": {
     "build": "node src/cli/index.js build",
     "build:example": "node src/cli/index.js build --project examples/basic-shop",
+    "wpsc": "node src/cli/index.js",
     "test": "node --test"
   },
   "exports": {

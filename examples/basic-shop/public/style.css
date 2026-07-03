@@ -1,0 +1,100 @@
+:root {
+  color-scheme: light;
+  --ink: #162019;
+  --muted: #5f6f64;
+  --line: #d8dfd8;
+  --paper: #fbfbf7;
+  --accent: #0f7a5f;
+  --accent-strong: #0a5c48;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  background: var(--paper);
+  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+a {
+  color: inherit;
+}
+
+.site-shell {
+  width: min(960px, calc(100% - 32px));
+  margin: 0 auto;
+}
+
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 24px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.brand {
+  font-size: 18px;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.nav {
+  display: flex;
+  gap: 14px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.nav a {
+  text-decoration: none;
+}
+
+.product-view,
+.page-view {
+  display: grid;
+  gap: 18px;
+  padding: 56px 0;
+}
+
+.eyebrow {
+  width: fit-content;
+  margin: 0;
+  padding: 5px 9px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+h1 {
+  max-width: 780px;
+  margin: 0;
+  font-size: clamp(40px, 7vw, 72px);
+  line-height: 0.98;
+}
+
+.description {
+  max-width: 680px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1.7;
+}
+
+.price {
+  margin: 4px 0 0;
+  color: var(--accent-strong);
+  font-size: 28px;
+  font-weight: 800;
+}
+
+.meta {
+  color: var(--muted);
+  font-size: 13px;
+}

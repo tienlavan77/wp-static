@@ -1,0 +1,28 @@
+[
+  {
+    "id": "page-home",
+    "type": "page",
+    "title": "Trang chủ",
+    "slug": "home",
+    "domain": "shop",
+    "data": {
+      "headline": "Cửa hàng tĩnh cho sản phẩm chọn lọc",
+      "description": "Website được tạo từ WPSC.",
+      "featuredProductIds": []
+    }
+  },
+  {
+    "id": "product-demo",
+    "type": "product",
+    "title": "Sản phẩm demo",
+    "slug": "san-pham-demo",
+    "domain": "shop",
+    "data": {
+      "price": 99000,
+      "currency": "VND",
+      "sku": "DEMO-001",
+      "description": "Sản phẩm mẫu trong project mới.",
+      "inStock": true
+    }
+  }
+]
