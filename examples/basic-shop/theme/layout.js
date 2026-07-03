@@ -1,24 +1,10 @@
-export default function layout({ content, route, html }) {
-  const price = formatPrice(content.data.price, content.data.currency);
-
+export default function layout({ components, content, route, html }) {
   return html`
-    <main class="${content.type === "product" ? "product-view" : "page-view"}">
-      <p class="eyebrow">${content.type}</p>
+    <main class="fallback-view">
+      <p class="eyebrow">${components.label(content.type)}</p>
       <h1>${content.title}</h1>
       <p class="description">${content.data.headline ?? content.data.description ?? ""}</p>
-      <p class="price">${price}</p>
       <small class="meta">${route.path}</small>
     </main>
   `;
-}
-
-function formatPrice(price, currency) {
-  if (typeof price !== "number") {
-    return "";
-  }
-
-  return new Intl.NumberFormat("vi-VN", {
-    style: "currency",
-    currency: currency ?? "VND"
-  }).format(price);
 }
