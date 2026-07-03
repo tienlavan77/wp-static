@@ -359,40 +359,301 @@ Ket qua:
 WPSC v0.1.0 usable framework
 ```
 
-## Phase 14 - Real Project Battle Test
+## Phase 14 - Real Source Integration And Source Auth
 
 Muc tieu:
 
 - Dung mot WordPress/WooCommerce site that de build static.
-- Ghi lai missing cases.
-- Khong them abstraction neu chua gap case that.
+- Kiem tra endpoint that: Rank Math, ACF, menu, media, CPT, taxonomy, WooCommerce.
+- Ho tro authentication giua WPSC va source data.
+- Khong hardcode secret vao config.
 
 Commits:
 
 ```text
 129 test(real): add real project checklist
-130 fix(wp): handle real WordPress edge cases
-131 fix(woo): handle real WooCommerce edge cases
-132 docs: add real project migration notes
+130 feat(auth): load source credentials from env
+131 feat(wp): support WordPress application password auth
+132 feat(wp): support bearer token auth
+133 feat(woo): support WooCommerce API credentials from env
+134 fix(wp): handle real WordPress edge cases
+135 fix(woo): handle real WooCommerce edge cases
+136 docs: add real source integration guide
 ```
 
-## Phase 15 - Performance And Cache
+## Phase 15 - Private Data And Preview Safety
 
 Muc tieu:
 
-- Build nhanh voi site lon.
+- Build preview/draft/private data mot cach an toan.
+- Khong publish private data ra static output ngoai y muon.
+- Tach ro public build va preview build.
 
 Commits:
 
 ```text
-133 feat(cache): add content cache
-134 feat(cache): add media cache
-135 feat(build): add incremental build
-136 feat(build): add parallel rendering
-137 test(perf): add large catalog benchmark
+137 feat(preview): add preview build mode
+138 feat(preview): support draft and private source items
+139 feat(preview): add preview token guard
+140 feat(build): exclude private content from public output
+141 test(preview): add private data safety tests
+142 docs(preview): add preview workflow guide
 ```
 
-## Phase 16 - Advanced Commerce
+## Phase 16 - Customer Auth Strategy
+
+Muc tieu:
+
+- Chot chien luoc dang nhap nguoi dung cho website.
+- Tach static core voi runtime auth/session.
+- Khong expose WooCommerce/WordPress secret ra frontend.
+
+Commits:
+
+```text
+143 docs(auth): define customer auth architecture
+144 docs(auth): compare no-login, headless WooCommerce, and custom backend modes
+145 docs(auth): define token, cookie, CORS, and CSRF rules
+146 test(auth): add auth boundary contract tests
+```
+
+## Phase 17 - Runtime Commerce API
+
+Muc tieu:
+
+- Them runtime API rieng cho cart, checkout, order, account neu site can login.
+- Proxy WooCommerce an toan.
+- Quan ly session/cookie/JWT phia server.
+
+Commits:
+
+```text
+147 feat(runtime): scaffold commerce API service
+148 feat(runtime): add cart endpoints
+149 feat(runtime): add checkout proxy endpoint
+150 feat(runtime): add customer session middleware
+151 feat(runtime): add order lookup endpoint
+152 test(runtime): add commerce API tests
+153 docs(runtime): add runtime deployment guide
+```
+
+## Phase 18 - Customer Account UI
+
+Muc tieu:
+
+- Them UI login/account neu runtime auth duoc bat.
+- Khong bat buoc cho static catalog thuong.
+
+Commits:
+
+```text
+154 feat(account): add login and logout views
+155 feat(account): add account dashboard route
+156 feat(account): add order history view
+157 feat(account): add address book view
+158 test(account): add customer account UI tests
+```
+
+## Phase 19 - Taxonomy And Archive Pages
+
+Muc tieu:
+
+- Sinh page cho category, tag, product category, taxonomy archive.
+- Ho tro pagination/archive.
+- Dua archive vao sitemap va content graph.
+
+Commits:
+
+```text
+159 feat(taxonomy): add archive route generation
+160 feat(taxonomy): add category and tag layouts
+161 feat(taxonomy): add product category archives
+162 feat(taxonomy): add archive pagination
+163 feat(seo): include taxonomy archives in sitemap
+164 test(taxonomy): add archive route tests
+165 docs(taxonomy): add archive authoring guide
+```
+
+## Phase 20 - Webhook Rebuild Workflow
+
+Muc tieu:
+
+- Gan voi workflow content team.
+- WordPress/WooCommerce save post/product/page/term/menu thi goi webhook build.
+- Queue rebuild de tranh chay chong.
+
+Commits:
+
+```text
+166 feat(webhook): define rebuild webhook payload
+167 feat(webhook): add webhook receiver example
+168 feat(webhook): add rebuild queue guard
+169 feat(webhook): map source events to changed items
+170 feat(report): add content validation report
+171 docs(webhook): add editor workflow guide
+```
+
+## Phase 21 - Incremental Build Engine
+
+Muc tieu:
+
+- Sua cai nao thi build lai cai do va cac phan lien quan.
+- Full build chi dung cho build dau tien hoac doi lon.
+- Dung dependency graph de tinh route bi anh huong.
+
+Commits:
+
+```text
+172 feat(incremental): add route dependency graph
+173 feat(incremental): track input hashes
+174 feat(incremental): add changed item parser
+175 feat(incremental): rebuild changed product dependencies
+176 feat(incremental): rebuild changed post dependencies
+177 feat(incremental): rebuild changed taxonomy dependencies
+178 feat(incremental): rebuild menu and theme dependencies
+179 feat(incremental): update sitemap, assets, and manifest incrementally
+180 test(incremental): add changed item build tests
+181 docs(incremental): add incremental build guide
+```
+
+Lenh mong muon:
+
+```bash
+wpsc build --changed product:123
+wpsc build --changed post:88
+wpsc build --changed term:product_cat:iphone
+wpsc build --changed menu:primary
+```
+
+## Phase 22 - Performance And Cache
+
+Muc tieu:
+
+- Build nhanh voi site lon.
+- Cache content/media/asset va parallel rendering.
+
+Commits:
+
+```text
+182 feat(cache): add content cache
+183 feat(cache): add media cache
+184 feat(cache): add route render cache
+185 feat(build): add parallel rendering
+186 test(perf): add large catalog benchmark
+```
+
+## Phase 23 - Block Schema System
+
+Muc tieu:
+
+- Nen tang cho giao dien keo tha.
+- Dinh nghia block, props schema, data binding schema.
+
+Commits:
+
+```text
+187 feat(block): define block schema
+188 feat(block): add props validation
+189 feat(block): add data binding schema
+190 feat(block): add core commerce blocks
+191 test(block): add block schema tests
+192 docs(block): add block authoring guide
+```
+
+## Phase 24 - Visual Builder Data Model
+
+Muc tieu:
+
+- Luu layout keo tha thanh JSON.
+- Layout theo content type: page, post, product, category.
+- Ho tro section/component nesting va responsive settings.
+
+Commits:
+
+```text
+193 feat(builder): add layout JSON model
+194 feat(builder): add content type layout documents
+195 feat(builder): add nested sections and blocks
+196 feat(builder): add responsive settings model
+197 test(builder): add layout model tests
+```
+
+## Phase 25 - Visual Builder Renderer
+
+Muc tieu:
+
+- Render layout JSON thanh HTML static.
+- Mapping block voi content graph.
+- Fallback an toan khi thieu data.
+
+Commits:
+
+```text
+198 feat(builder): render layout JSON
+199 feat(builder): bind blocks to content graph
+200 feat(builder): support product blocks
+201 feat(builder): support taxonomy blocks
+202 feat(builder): add missing data fallbacks
+203 test(builder): add visual renderer tests
+```
+
+## Phase 26 - Builder UI Prototype
+
+Muc tieu:
+
+- Prototype UI keo tha dung duoc.
+- Preview live va save layout JSON.
+- Chua can dep, uu tien workflow that.
+
+Commits:
+
+```text
+204 feat(builder-ui): scaffold builder app
+205 feat(builder-ui): add block palette
+206 feat(builder-ui): add drag and drop canvas
+207 feat(builder-ui): add props panel
+208 feat(builder-ui): add live preview
+209 feat(builder-ui): save layout JSON
+210 test(builder-ui): add builder smoke tests
+```
+
+## Phase 27 - Theme And Builder Integration
+
+Muc tieu:
+
+- Theme cung cap block library.
+- Project co the override block.
+- Builder dung component that cua theme.
+
+Commits:
+
+```text
+211 feat(theme): expose theme block library
+212 feat(builder): load theme blocks
+213 feat(builder): support project block overrides
+214 feat(builder): preview theme components
+215 test(builder): add theme block integration tests
+```
+
+## Phase 28 - Production Builder
+
+Muc tieu:
+
+- Builder san sang dung cho editor.
+- Co auth, revision, draft/publish layout.
+- Layout doi thi trigger rebuild.
+
+Commits:
+
+```text
+216 feat(builder): add editor auth guard
+217 feat(builder): add layout revisions
+218 feat(builder): add draft and publish flow
+219 feat(builder): trigger rebuild on layout publish
+220 docs(builder): add production builder guide
+```
+
+## Phase 29 - Advanced Commerce
 
 Muc tieu:
 
@@ -401,14 +662,13 @@ Muc tieu:
 Commits:
 
 ```text
-138 feat(commerce): support product variants pages
-139 feat(commerce): support sale and stock filters
-140 feat(commerce): generate category listing pages
-141 feat(commerce): generate related product data
-142 docs(commerce): add advanced commerce guide
+221 feat(commerce): support product variants pages
+222 feat(commerce): support sale and stock filters
+223 feat(commerce): generate related product data
+224 docs(commerce): add advanced commerce guide
 ```
 
-## Phase 17 - Deployment Integrations
+## Phase 30 - Deployment Integrations
 
 Muc tieu:
 
@@ -417,28 +677,13 @@ Muc tieu:
 Commits:
 
 ```text
-143 feat(deploy): add rsync deploy helper
-144 feat(deploy): add Cloudflare Pages guide
-145 feat(deploy): add S3/R2 guide
-146 feat(deploy): add GitHub Actions guide
+225 feat(deploy): add rsync deploy helper
+226 feat(deploy): add Cloudflare Pages guide
+227 feat(deploy): add S3/R2 guide
+228 feat(deploy): add GitHub Actions guide
 ```
 
-## Phase 18 - Preview And Webhook Workflow
-
-Muc tieu:
-
-- Gan voi workflow content team.
-
-Commits:
-
-```text
-147 feat(preview): add draft preview mode
-148 feat(webhook): add rebuild webhook example
-149 feat(report): add content validation report
-150 docs(preview): add editor workflow guide
-```
-
-## Phase 19 - API Stabilization
+## Phase 31 - API Stabilization
 
 Muc tieu:
 
@@ -447,13 +692,13 @@ Muc tieu:
 Commits:
 
 ```text
-151 docs(api): mark stable public APIs
-152 docs(api): add migration policy
-153 test(api): add API compatibility tests
-154 chore: add deprecation policy
+229 docs(api): mark stable public APIs
+230 docs(api): add migration policy
+231 test(api): add API compatibility tests
+232 chore: add deprecation policy
 ```
 
-## Phase 20 - v1.0 Release
+## Phase 32 - v1.0 Release
 
 Muc tieu:
 
@@ -462,11 +707,11 @@ Muc tieu:
 Commits:
 
 ```text
-155 chore: freeze v1 plugin API
-156 chore: freeze v1 theme API
-157 chore: freeze v1 adapter API
-158 docs: add v1 documentation set
-159 chore: prepare v1.0.0 release
+233 chore: freeze v1 plugin API
+234 chore: freeze v1 theme API
+235 chore: freeze v1 adapter API
+236 docs: add v1 documentation set
+237 chore: prepare v1.0.0 release
 ```
 
 Ket qua:
