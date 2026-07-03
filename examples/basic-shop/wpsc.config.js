@@ -13,6 +13,17 @@ export default {
     description: "Cửa hàng tĩnh tạo bởi WPSC"
   },
   theme: {
-    layout: "./theme/layout.js"
+    layout: "./theme/layout.js",
+    layouts: {
+      page: "./theme/layouts/page.js",
+      product: "./theme/layouts/product.js"
+    },
+    components: "./theme/components/index.js",
+    assets: "./theme/assets",
+    meta: {
+      name: "Basic Commerce Theme",
+      version: "0.1.0",
+      description: "Theme ví dụ cho WPSC"
+    }
   }
 };
