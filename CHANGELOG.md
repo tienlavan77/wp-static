@@ -13,5 +13,6 @@
 - Added config loader, public asset copying, styled Basic Shop output, project template creation, WordPress adapter draft, Nginx deployment notes, and CLI smoke tests.
 - Removed trailing slashes from public slug routes.
 - Added config validation, build summaries, clean, doctor, and static serve commands.
+- Added typed WPSC errors, quiet/verbose logging, normalized config paths, build manifests, pipeline integration tests, and public API draft docs.
 
 Status: Mini core prototype complete, architecture remains `DRAFT`.

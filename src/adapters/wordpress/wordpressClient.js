@@ -1,6 +1,8 @@
+import { AdapterError } from "../../shared/errors.js";
+
 export default function createWordPressClient(options = {}) {
   if (typeof options.baseUrl !== "string" || options.baseUrl.trim() === "") {
-    throw new Error('WordPress adapter option "baseUrl" is required.');
+    throw new AdapterError('WordPress adapter option "baseUrl" is required.');
   }
 
   const baseUrl = options.baseUrl.replace(/\/+$/, "");
@@ -10,7 +12,7 @@ export default function createWordPressClient(options = {}) {
       const response = await fetch(`${baseUrl}${pathname}`);
 
       if (!response.ok) {
-        throw new Error(`WordPress request failed: ${response.status} ${response.statusText}`);
+        throw new AdapterError(`WordPress request failed: ${response.status} ${response.statusText}`);
       }
 
       return response.json();

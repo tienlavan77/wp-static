@@ -54,6 +54,8 @@ Muc tieu:
 
 ## Phase 4 - Core Hardening
 
+Trang thai: `DONE`
+
 Muc tieu:
 
 - Lam core chac truoc khi noi data WordPress that.

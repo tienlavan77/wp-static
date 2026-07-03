@@ -6,7 +6,7 @@ import createRoutes from "../router/createRoutes.js";
 import renderPage from "../renderer/renderPage.js";
 
 export default async function compile(config, options = {}) {
-  const projectDir = options.projectDir ?? process.cwd();
+  const projectDir = config._paths?.projectDir ?? options.projectDir ?? process.cwd();
   const adapter = createAdapter(config, projectDir);
   const contents = await adapter.getContents();
   const routes = createRoutes(contents, config);
@@ -33,7 +33,7 @@ function createAdapter(config, projectDir) {
 
   return createMockAdapter({
     source: config.adapter.source,
-    baseDir: projectDir
+    baseDir: config._paths?.projectDir ?? projectDir
   });
 }
 
@@ -44,7 +44,7 @@ async function loadLayout(config, projectDir) {
     throw new Error('Config field "theme.layout" is required.');
   }
 
-  const absolutePath = path.resolve(projectDir, layoutPath);
+  const absolutePath = config._paths?.themeLayout ?? path.resolve(projectDir, layoutPath);
   const module = await import(pathToFileURL(absolutePath).href);
 
   return module.default;

@@ -9,8 +9,13 @@ import doctorProject from "../core/doctorProject.js";
 import loadConfig from "../core/loadConfig.js";
 import serveStatic from "../dev-server/serveStatic.js";
 import { getPackageInfo } from "../index.js";
+import createLogger from "../shared/createLogger.js";
 
 const args = process.argv.slice(2);
+const logger = createLogger({
+  quiet: args.includes("--quiet"),
+  verbose: args.includes("--verbose")
+});
 
 try {
   await main(args);
@@ -71,11 +76,12 @@ async function buildProject(projectArg) {
   const config = await loadConfig(projectDir);
   const sitePlan = await compile(config, { projectDir });
   const result = await buildSite(sitePlan, {
-    outputDir: path.resolve(projectDir, config.outputDir),
-    publicDir: config.publicDir ? path.resolve(projectDir, config.publicDir) : undefined
+    config,
+    outputDir: config._paths.outputDir,
+    publicDir: config._paths.publicDir ?? undefined
   });
 
-  printBuildSummary(config, sitePlan, result);
+  printBuildSummary(config, sitePlan, result, logger);
 }
 
 function readProjectArg(cliArgs) {
@@ -116,7 +122,7 @@ async function cleanProject(projectArg) {
   const outputDir = path.resolve(projectDir, config.outputDir);
 
   await cleanOutput(outputDir);
-  console.log(`Cleaned ${outputDir}`);
+  logger.info(`Cleaned ${outputDir}`);
 }
 
 async function doctor(projectArg) {
@@ -125,7 +131,7 @@ async function doctor(projectArg) {
   const failed = checks.filter((check) => !check.ok);
 
   for (const check of checks) {
-    console.log(`${check.ok ? "OK" : "FAIL"} ${check.name}: ${check.detail}`);
+    logger.info(`${check.ok ? "OK" : "FAIL"} ${check.name}: ${check.detail}`);
   }
 
   if (failed.length > 0) {
@@ -139,7 +145,7 @@ async function serveProject(projectArg, port) {
   const outputDir = path.resolve(projectDir, config.outputDir);
   const server = serveStatic(outputDir, { port });
 
-  console.log(`Serving ${outputDir} at http://localhost:${port}`);
+  logger.info(`Serving ${outputDir} at http://localhost:${port}`);
 
   const close = () => server.close(() => process.exit(0));
   process.on("SIGINT", close);
@@ -169,7 +175,7 @@ async function createProject(projectName) {
     force: false
   });
 
-  console.log(`Created project at ${targetDir}`);
+  logger.info(`Created project at ${targetDir}`);
 }
 
 function printHelp() {
@@ -183,14 +189,17 @@ function printHelp() {
   wpsc --version`);
 }
 
-function printBuildSummary(config, sitePlan, result) {
-  console.log(`Project: ${config.name}`);
-  console.log(`Pages: ${result.pagesWritten}`);
-  console.log(`Assets copied: ${result.copiedPublicAssets ? "yes" : "no"}`);
-  console.log(`Output: ${result.outputDir}`);
-  console.log("Routes:");
+function printBuildSummary(config, sitePlan, result, activeLogger) {
+  activeLogger.info(`Project: ${config.name}`);
+  activeLogger.info(`Pages: ${result.pagesWritten}`);
+  activeLogger.info(`Assets copied: ${result.copiedPublicAssets ? "yes" : "no"}`);
+  activeLogger.info(`Output: ${result.outputDir}`);
+  activeLogger.info(`Manifest: ${result.manifestPath}`);
+  activeLogger.info("Routes:");
 
   for (const page of sitePlan.pages) {
-    console.log(`  ${page.route.path} -> ${page.route.outputPath}`);
+    activeLogger.info(`  ${page.route.path} -> ${page.route.outputPath}`);
   }
+
+  activeLogger.verbose(`Project dir: ${config._paths.projectDir}`);
 }

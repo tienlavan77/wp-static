@@ -1,6 +1,8 @@
+import { ConfigError } from "../shared/errors.js";
+
 export default function validateConfig(config) {
   if (!isPlainObject(config)) {
-    throw new Error("Config must export a plain object.");
+    throw new ConfigError("Config must export a plain object.");
   }
 
   requireString(config, "name");
@@ -25,7 +27,7 @@ function requireString(object, fieldPath) {
   const value = object?.[fieldName];
 
   if (typeof value !== "string" || value.trim() === "") {
-    throw new Error(`Config field "${fieldPath}" is required.`);
+    throw new ConfigError(`Config field "${fieldPath}" is required.`);
   }
 }
 

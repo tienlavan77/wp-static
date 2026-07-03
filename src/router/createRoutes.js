@@ -1,6 +1,8 @@
+import { RouteError } from "../shared/errors.js";
+
 export default function createRoutes(contents, config = {}) {
   if (!Array.isArray(contents)) {
-    throw new Error("Router contents must be an array.");
+    throw new RouteError("Router contents must be an array.");
   }
 
   const homepage = config.homepage ?? "home";
@@ -32,7 +34,7 @@ function createRoute(content, homepage) {
 
 function normalizeSlug(slug) {
   if (typeof slug !== "string" || slug.trim() === "") {
-    throw new Error("Route content slug must be a non-empty string.");
+    throw new RouteError("Route content slug must be a non-empty string.");
   }
 
   return slug.trim().replace(/^\/+|\/+$/g, "");
@@ -45,7 +47,7 @@ function assertUniqueRoutePaths(routes) {
     const existingRoute = routeByPath.get(route.path);
 
     if (existingRoute) {
-      throw new Error(
+      throw new RouteError(
         `Duplicate route "${route.path}" for content "${existingRoute.content.id}" and "${route.content.id}".`
       );
     }
