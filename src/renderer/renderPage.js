@@ -1,7 +1,7 @@
 import html from "./html.js";
-import escapeHtml from "../shared/escapeHtml.js";
+import renderSeoTags from "../seo/renderSeoTags.js";
 
-export default function renderPage(route, layout) {
+export default function renderPage(route, layout, options = {}) {
   if (typeof layout !== "function") {
     throw new Error("Renderer layout must be a function.");
   }
@@ -18,7 +18,7 @@ export default function renderPage(route, layout) {
     "  <head>",
     '    <meta charset="utf-8">',
     '    <meta name="viewport" content="width=device-width, initial-scale=1">',
-    `    <title>${escapeHtml(route.content.title)}</title>`,
+    renderSeoTags(route.content, route, options),
     '    <link rel="stylesheet" href="/style.css">',
     "  </head>",
     "  <body>",

@@ -10,6 +10,9 @@ export default function createBuildManifest(sitePlan, buildResult, options = {})
     assets: {
       copiedPublicAssets: buildResult.copiedPublicAssets
     },
+    seo: {
+      outputs: buildResult.seoOutputs ?? []
+    },
     graph: {
       contentCount: sitePlan.graph?.contents.items.length ?? 0,
       mediaCount: sitePlan.graph?.media.items.length ?? 0,

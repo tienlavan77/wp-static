@@ -24,7 +24,9 @@ export default async function compile(config, options = {}) {
   const layout = await loadLayout(config, projectDir);
   const pages = routes.map((route) => ({
     route,
-    html: renderPage(route, layout)
+    html: renderPage(route, layout, {
+      site: config.site
+    })
   }));
 
   return {

@@ -20,6 +20,10 @@ export { default as doctorProject } from "./core/doctorProject.js";
 export { default as loadConfig } from "./core/loadConfig.js";
 export { default as normalizeConfigPaths } from "./core/normalizeConfigPaths.js";
 export { default as renderPage } from "./renderer/renderPage.js";
+export { default as renderSeoTags } from "./seo/renderSeoTags.js";
+export { default as createSeoMetadata } from "./seo/createSeoMetadata.js";
+export { default as generateRobotsTxt } from "./seo/generateRobotsTxt.js";
+export { default as generateSitemap } from "./seo/generateSitemap.js";
 export { default as serveStatic } from "./dev-server/serveStatic.js";
 export { default as validateConfig } from "./core/validateConfig.js";
 export {

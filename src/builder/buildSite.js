@@ -3,6 +3,8 @@ import path from "node:path";
 import copyPublicAssets from "./copyPublicAssets.js";
 import createBuildManifest from "./createBuildManifest.js";
 import { BuildError } from "../shared/errors.js";
+import generateRobotsTxt from "../seo/generateRobotsTxt.js";
+import generateSitemap from "../seo/generateSitemap.js";
 
 export default async function buildSite(sitePlan, options = {}) {
   const outputDir = options.outputDir ?? "dist";
@@ -22,10 +24,13 @@ export default async function buildSite(sitePlan, options = {}) {
     await writeFile(filePath, page.html, "utf8");
   }
 
+  const seoOutputs = await writeSeoOutputs(sitePlan, outputDir, options);
+
   const buildResult = {
     copiedPublicAssets,
     manifestPath: path.join(outputDir, ".wpsc", "manifest.json"),
     pagesWritten: sitePlan.pages.length,
+    seoOutputs,
     outputDir
   };
   const manifest = createBuildManifest(sitePlan, buildResult, options);
@@ -34,4 +39,20 @@ export default async function buildSite(sitePlan, options = {}) {
   await writeFile(buildResult.manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
 
   return buildResult;
+}
+
+async function writeSeoOutputs(sitePlan, outputDir, options) {
+  const outputs = [];
+  const sitemap = generateSitemap(sitePlan, options);
+
+  if (sitemap) {
+    await writeFile(path.join(outputDir, "sitemap.xml"), `${sitemap}\n`, "utf8");
+    outputs.push("sitemap.xml");
+  }
+
+  const robotsTxt = generateRobotsTxt(options);
+  await writeFile(path.join(outputDir, "robots.txt"), robotsTxt, "utf8");
+  outputs.push("robots.txt");
+
+  return outputs;
 }

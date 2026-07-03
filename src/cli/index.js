@@ -78,7 +78,8 @@ async function buildProject(projectArg) {
   const result = await buildSite(sitePlan, {
     config,
     outputDir: config._paths.outputDir,
-    publicDir: config._paths.publicDir ?? undefined
+    publicDir: config._paths.publicDir ?? undefined,
+    site: config.site
   });
 
   printBuildSummary(config, sitePlan, result, logger);
@@ -195,6 +196,7 @@ function printBuildSummary(config, sitePlan, result, activeLogger) {
   activeLogger.info(`Assets copied: ${result.copiedPublicAssets ? "yes" : "no"}`);
   activeLogger.info(`Output: ${result.outputDir}`);
   activeLogger.info(`Manifest: ${result.manifestPath}`);
+  activeLogger.info(`SEO outputs: ${(result.seoOutputs ?? []).join(", ") || "none"}`);
   activeLogger.info("Routes:");
 
   for (const page of sitePlan.pages) {
