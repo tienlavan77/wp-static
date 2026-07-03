@@ -5,6 +5,8 @@ export { default as createBuildManifest } from "./builder/createBuildManifest.js
 export { default as createContent } from "./core/createContent.js";
 export { default as createLogger } from "./shared/createLogger.js";
 export { default as createMockAdapter } from "./adapters/mockAdapter.js";
+export { default as createWooCommerceAdapter } from "./adapters/woocommerce/woocommerceAdapter.js";
+export { default as createWooCommerceClient } from "./adapters/woocommerce/woocommerceClient.js";
 export { default as createRoutes } from "./router/createRoutes.js";
 export { default as deepFreeze } from "./shared/deepFreeze.js";
 export { default as escapeHtml } from "./shared/escapeHtml.js";

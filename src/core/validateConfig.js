@@ -19,6 +19,10 @@ export default function validateConfig(config) {
     requireString(config.adapter, "adapter.baseUrl");
   }
 
+  if (config.adapter.type === "woocommerce") {
+    requireString(config.adapter, "adapter.baseUrl");
+  }
+
   return config;
 }
 
