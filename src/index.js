@@ -22,6 +22,8 @@ export { default as normalizeConfigPaths } from "./core/normalizeConfigPaths.js"
 export { default as renderPage } from "./renderer/renderPage.js";
 export { default as renderSeoTags } from "./seo/renderSeoTags.js";
 export { default as createSeoMetadata } from "./seo/createSeoMetadata.js";
+export { default as collectAssetUrls } from "./assets/collectAssetUrls.js";
+export { default as processAssetPipeline } from "./assets/processAssetPipeline.js";
 export { default as generateRobotsTxt } from "./seo/generateRobotsTxt.js";
 export { default as generateSitemap } from "./seo/generateSitemap.js";
 export { default as resolveTheme } from "./theme/resolveTheme.js";
