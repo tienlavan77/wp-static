@@ -244,6 +244,8 @@ Commits:
 
 ## Phase 9 - Theme System
 
+Trang thai: DONE
+
 Muc tieu:
 
 - Luc nay moi dau tu layout/theme.
