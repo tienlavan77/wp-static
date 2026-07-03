@@ -19,5 +19,6 @@
 - Added a unified content graph with content, term, media, and menu lookup services.
 - Added SEO output rendering for metadata, canonical, robots, Open Graph, Twitter Cards, sitemap.xml, and robots.txt.
 - Added a theme resolver with content type layouts, fallback layout, components, theme metadata, and theme asset copying.
+- Added a remote image asset pipeline with download cache, HTML URL rewriting, and asset manifests.
 
 Status: Mini core prototype complete, architecture remains `DRAFT`.

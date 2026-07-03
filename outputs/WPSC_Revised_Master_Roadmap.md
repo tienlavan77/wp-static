@@ -266,6 +266,8 @@ Commits:
 
 ## Phase 10 - Asset And Image Pipeline
 
+Trang thai: DONE
+
 Muc tieu:
 
 - Tai anh tu WordPress/WooCommerce ve static.
