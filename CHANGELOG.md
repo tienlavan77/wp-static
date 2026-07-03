@@ -17,5 +17,6 @@
 - Expanded the WordPress adapter draft with paginated collection fetching, pages/posts/CPT repository support, ACF fields, embedded media/terms, and Rank Math SEO normalization.
 - Added a WooCommerce adapter draft with paginated product fetching, categories, tags, variations, product normalization, and Rank Math product SEO normalization.
 - Added a unified content graph with content, term, media, and menu lookup services.
+- Added SEO output rendering for metadata, canonical, robots, Open Graph, Twitter Cards, sitemap.xml, and robots.txt.
 
 Status: Mini core prototype complete, architecture remains `DRAFT`.

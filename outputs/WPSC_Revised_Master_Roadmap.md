@@ -220,6 +220,8 @@ Commits:
 
 ## Phase 8 - SEO Output System
 
+Trang thai: `DONE`
+
 Muc tieu:
 
 - Render SEO tu `content.seo`.
