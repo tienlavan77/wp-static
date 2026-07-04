@@ -1,9 +1,12 @@
 {
   "name": "wpsc",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "description": "WPSC Mini Core prototype for static commerce builds.",
   "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
   "engines": {
     "node": ">=20"
   },
@@ -14,7 +17,14 @@
     "test": "node --test"
   },
   "exports": {
-    ".": "./src/index.js"
+    ".": "./src/index.js",
+    "./adapters": "./packages/adapters/src/index.js",
+    "./builder": "./packages/builder/src/index.js",
+    "./cli": "./packages/cli/src/index.js",
+    "./core": "./packages/core/src/index.js",
+    "./renderer": "./packages/renderer/src/index.js",
+    "./router": "./packages/router/src/index.js",
+    "./shared": "./packages/shared/src/index.js"
   },
   "bin": {
     "wpsc": "./src/cli/index.js"
