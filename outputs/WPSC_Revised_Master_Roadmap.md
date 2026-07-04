@@ -570,10 +570,13 @@ Commits:
 
 ## Phase 23 - Block Schema System
 
+Trang thai: DONE
+
 Muc tieu:
 
 - Nen tang cho giao dien keo tha.
 - Dinh nghia block, props schema, data binding schema.
+- Demo homepage dung block `commerce/archive-links` de co the xem truc tiep.
 
 Commits:
 
