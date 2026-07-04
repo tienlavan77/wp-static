@@ -29,5 +29,6 @@
 - Added a runtime commerce API scaffold with session-backed cart, checkout proxy, and order lookup handlers.
 - Added customer account UI helpers for login, logout, dashboard, orders, and addresses.
 - Added taxonomy archive route generation, archive pagination, and sitemap coverage for category/tag/product archives using the `domain/slug` URL contract.
+- Added a guarded webhook rebuild receiver, source event normalization, rebuild queue, and validation report.
 
 Status: Mini core prototype complete, architecture remains `DRAFT`.

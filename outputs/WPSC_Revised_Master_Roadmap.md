@@ -492,11 +492,14 @@ Commits:
 
 ## Phase 20 - Webhook Rebuild Workflow
 
+Trang thai: DONE
+
 Muc tieu:
 
 - Gan voi workflow content team.
 - WordPress/WooCommerce save post/product/page/term/menu thi goi webhook build.
 - Queue rebuild de tranh chay chong.
+- Webhook payload chi dua route hint dang `slug`, khong them taxonomy base vao public URL.
 
 Commits:
 
