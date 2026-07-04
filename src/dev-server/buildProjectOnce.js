@@ -14,6 +14,7 @@ export default async function buildProjectOnce(projectArg, options = {}) {
   assertPreviewAccess(config, options);
   const sitePlan = await compile(config, {
     cacheBust,
+    cacheDir: path.join(projectDir, ".wpsc", "cache"),
     preview: options.preview,
     projectDir
   });

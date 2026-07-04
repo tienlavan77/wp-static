@@ -3,6 +3,7 @@ export { default as cleanOutput } from "./builder/cleanOutput.js";
 export { default as compile } from "./core/compile.js";
 export { resolveWooCommerceCredentials, resolveWordPressAuth } from "./auth/sourceCredentials.js";
 export { default as createBuildManifest } from "./builder/createBuildManifest.js";
+export { createCacheKey, default as createJsonFileCache } from "./cache/createJsonFileCache.js";
 export { default as createContent } from "./core/createContent.js";
 export { default as createContentCollection } from "./content/createContentCollection.js";
 export { default as createContentGraph } from "./content/createContentGraph.js";
@@ -41,9 +42,12 @@ export { default as generateRobotsTxt } from "./seo/generateRobotsTxt.js";
 export { default as generateSitemap } from "./seo/generateSitemap.js";
 export { default as createContentValidationReport } from "./report/createContentValidationReport.js";
 export { default as createInputHash } from "./incremental/createInputHash.js";
+export { default as createRouteRenderCache } from "./cache/createRouteRenderCache.js";
 export { default as createRouteDependencyGraph } from "./incremental/createRouteDependencyGraph.js";
 export { default as resolveTheme } from "./theme/resolveTheme.js";
 export { default as mapWebhookChanges } from "./webhook/mapWebhookChanges.js";
+export { default as readThroughCache } from "./cache/readThroughCache.js";
+export { default as runLimitedParallel } from "./performance/runLimitedParallel.js";
 export { runPluginEvent, runPluginHook } from "./plugins/runPluginHook.js";
 export {
   assertNoFrontendSecrets,

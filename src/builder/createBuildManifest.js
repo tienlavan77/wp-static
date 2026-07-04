@@ -21,7 +21,14 @@ export default function createBuildManifest(sitePlan, buildResult, options = {})
       copiedPublicAssets: buildResult.copiedPublicAssets,
       copiedThemeAssets: buildResult.copiedThemeAssets,
       downloaded: buildResult.assetsDownloaded ?? 0,
-      manifestPath: buildResult.assetManifestPath ?? null
+      manifestPath: buildResult.assetManifestPath ?? null,
+      stats: buildResult.assetStats ?? null
+    },
+    cache: {
+      collectionCacheHit: sitePlan.cache?.collectionCacheHit ?? false,
+      contentCacheHit: sitePlan.cache?.contentCacheHit ?? false,
+      routeRenderCacheHits: sitePlan.cache?.routeRenderCacheHits ?? 0,
+      routeRenderCacheMisses: sitePlan.cache?.routeRenderCacheMisses ?? 0
     },
     theme: sitePlan.theme?.metadata ?? null,
     seo: {

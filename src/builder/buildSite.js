@@ -39,6 +39,7 @@ export default async function buildSite(sitePlan, options = {}) {
   const copiedPublicAssets = await copyPublicAssets(options.publicDir, outputDir);
   const copiedThemeAssets = await copyPublicAssets(options.themeAssetsDir, path.join(outputDir, "theme"));
   const assetPipeline = await processAssetPipeline(sitePlan, {
+    assetConcurrency: options.assetConcurrency,
     cacheDir: options.assetCacheDir,
     outputDir
   });
@@ -56,6 +57,7 @@ export default async function buildSite(sitePlan, options = {}) {
     copiedThemeAssets,
     assetManifestPath: path.join(outputDir, ".wpsc", "assets.json"),
     assetsDownloaded: assetPipeline.entries.length,
+    assetStats: assetPipeline.stats,
     assetPipeline,
     changedRoutes: incremental?.changedRoutes ?? [],
     fullBuild: incremental?.fullBuild !== false,
@@ -71,7 +73,8 @@ export default async function buildSite(sitePlan, options = {}) {
   await mkdir(path.dirname(buildResult.manifestPath), { recursive: true });
   await writeFile(buildResult.assetManifestPath, `${JSON.stringify({
     version: 1,
-    assets: assetPipeline.entries
+    assets: assetPipeline.entries,
+    stats: assetPipeline.stats
   }, null, 2)}\n`, "utf8");
   await writeFile(buildResult.manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
   await runPluginEvent(plugins, "buildEnd", {
