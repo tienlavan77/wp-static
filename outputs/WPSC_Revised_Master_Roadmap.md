@@ -412,6 +412,8 @@ Commits:
 
 ## Phase 16 - Customer Auth Strategy
 
+Trang thai: DONE
+
 Muc tieu:
 
 - Chot chien luoc dang nhap nguoi dung cho website.

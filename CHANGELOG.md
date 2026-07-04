@@ -25,5 +25,6 @@
 - Prepared v0.1.0 workspace package boundaries and getting started documentation.
 - Added real source auth support for WordPress and WooCommerce using environment-backed credentials.
 - Added preview build safety with draft/private filtering and token guarded preview builds.
+- Added customer auth strategy contracts for static/runtime boundaries and frontend secret safety.
 
 Status: Mini core prototype complete, architecture remains `DRAFT`.
