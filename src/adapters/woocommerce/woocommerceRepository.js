@@ -3,7 +3,9 @@ import normalizeWooCommerceProduct from "./normalizeWooCommerceProduct.js";
 export default function createWooCommerceRepository(client, options = {}) {
   return {
     async getContents() {
-      const products = await client.getCollection("/wp-json/wc/v3/products");
+      const products = await client.getCollection("/wp-json/wc/v3/products", {
+        status: "publish"
+      });
       const variationsByProduct = options.includeVariations === true
         ? await fetchVariationsByProduct(client, products)
         : new Map();

@@ -64,7 +64,8 @@ export default function createWordPressRepository(client, options = {}) {
 
 async function fetchContentCollection(client, pathname, type) {
   const items = await client.getCollection(pathname, {
-    _embed: true
+    _embed: true,
+    status: "publish"
   });
 
   return items.map((item) => normalizeWordPressContent(item, type));
