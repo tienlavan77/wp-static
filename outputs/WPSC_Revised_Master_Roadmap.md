@@ -453,6 +453,8 @@ Commits:
 
 ## Phase 18 - Customer Account UI
 
+Trang thai: DONE
+
 Muc tieu:
 
 - Them UI login/account neu runtime auth duoc bat.

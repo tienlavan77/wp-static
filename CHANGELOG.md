@@ -27,5 +27,6 @@
 - Added preview build safety with draft/private filtering and token guarded preview builds.
 - Added customer auth strategy contracts for static/runtime boundaries and frontend secret safety.
 - Added a runtime commerce API scaffold with session-backed cart, checkout proxy, and order lookup handlers.
+- Added customer account UI helpers for login, logout, dashboard, orders, and addresses.
 
 Status: Mini core prototype complete, architecture remains `DRAFT`.
