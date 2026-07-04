@@ -6,6 +6,9 @@ export { default as createBuildManifest } from "../../../src/builder/createBuild
 export { default as createBlockRegistry } from "../../../src/blocks/createBlockRegistry.js";
 export { default as createBlockSchema } from "../../../src/blocks/createBlockSchema.js";
 export { createCacheKey, default as createJsonFileCache } from "../../../src/cache/createJsonFileCache.js";
+export { default as createContentTypeLayoutIndex } from "../../../src/visual-builder/createContentTypeLayoutIndex.js";
+export { default as createLayoutDocument, validateLayoutDocument } from "../../../src/visual-builder/createLayoutDocument.js";
+export { default as createLayoutNode } from "../../../src/visual-builder/createLayoutNode.js";
 export { default as createInputHash } from "../../../src/incremental/createInputHash.js";
 export { default as createRouteRenderCache } from "../../../src/cache/createRouteRenderCache.js";
 export { default as createRouteDependencyGraph } from "../../../src/incremental/createRouteDependencyGraph.js";
@@ -17,4 +20,5 @@ export { default as readThroughCache } from "../../../src/cache/readThroughCache
 export { default as renderBlock } from "../../../src/blocks/renderBlock.js";
 export { default as resolveBlockBindings } from "../../../src/blocks/resolveBlockBindings.js";
 export { default as runLimitedParallel } from "../../../src/performance/runLimitedParallel.js";
+export { RESPONSIVE_BREAKPOINTS, default as normalizeResponsiveSettings } from "../../../src/visual-builder/normalizeResponsiveSettings.js";
 export { default as validateBlockProps } from "../../../src/blocks/validateBlockProps.js";
