@@ -10,6 +10,9 @@ import buildProjectOnce from "../src/dev-server/buildProjectOnce.js";
 test("buildProjectOnce reuses content and route render caches", async () => {
   const projectDir = await mkdtemp(path.join(os.tmpdir(), "wpsc-cache-"));
   await cp("examples/basic-shop", projectDir, {
+    filter(source) {
+      return !source.includes(`${path.sep}dist`) && !source.includes(`${path.sep}.wpsc`);
+    },
     recursive: true
   });
 
