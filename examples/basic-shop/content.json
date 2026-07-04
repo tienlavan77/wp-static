@@ -11,6 +11,16 @@
       "featuredProductIds": [
         "product-iphone-15",
         "product-ao-thun-basic"
+      ],
+      "archiveLinks": [
+        {
+          "href": "/dien-thoai",
+          "label": "Điện thoại"
+        },
+        {
+          "href": "/thoi-trang",
+          "label": "Thời trang"
+        }
       ]
     }
   },

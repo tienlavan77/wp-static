@@ -54,6 +54,22 @@ a {
   text-decoration: none;
 }
 
+.archive-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.archive-links a {
+  padding: 8px 11px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--accent-strong);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
 .product-view,
 .page-view {
   display: grid;

@@ -1,5 +1,7 @@
 import escapeHtml from "../shared/escapeHtml.js";
 
+const RAW_HTML = Symbol("rawHtml");
+
 export default function html(strings, ...values) {
   let output = "";
 
@@ -14,9 +16,20 @@ export default function html(strings, ...values) {
   return output;
 }
 
+html.raw = function raw(value) {
+  return {
+    [RAW_HTML]: true,
+    value: String(value ?? "")
+  };
+};
+
 function escapeTemplateValue(value) {
   if (Array.isArray(value)) {
     return value.map(escapeTemplateValue).join("");
+  }
+
+  if (value?.[RAW_HTML]) {
+    return value.value;
   }
 
   if (value === null || value === undefined) {
