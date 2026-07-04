@@ -314,6 +314,8 @@ wpsc dev --project examples/basic-shop --port 8080
 
 ## Phase 12 - Plugin System
 
+Trang thai: DONE
+
 Muc tieu:
 
 - Mo rong framework ma khong sua core.

@@ -21,5 +21,6 @@
 - Added a theme resolver with content type layouts, fallback layout, components, theme metadata, and theme asset copying.
 - Added a remote image asset pipeline with download cache, HTML URL rewriting, and asset manifests.
 - Added a dev server workflow with watch targets, rebuild support, and live reload injection.
+- Added a plugin system with data, route, render, and build hooks.
 
 Status: Mini core prototype complete, architecture remains `DRAFT`.
