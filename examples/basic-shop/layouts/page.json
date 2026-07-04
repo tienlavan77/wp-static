@@ -1,0 +1,41 @@
+{
+  "contentTypes": [
+    "page"
+  ],
+  "id": "page-default",
+  "name": "Default Page",
+  "sections": [
+    {
+      "children": [
+        {
+          "blockName": "core/heading",
+          "bindings": {
+            "text": {
+              "path": "title",
+              "source": "content"
+            }
+          },
+          "id": "page-heading",
+          "type": "block"
+        },
+        {
+          "blockName": "core/content-text",
+          "bindings": {
+            "text": {
+              "path": "content",
+              "source": "content"
+            }
+          },
+          "id": "page-content",
+          "type": "block"
+        }
+      ],
+      "id": "page-main",
+      "settings": {
+        "width": "content"
+      },
+      "type": "section"
+    }
+  ],
+  "version": 1
+}

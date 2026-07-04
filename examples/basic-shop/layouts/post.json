@@ -1,0 +1,41 @@
+{
+  "contentTypes": [
+    "post"
+  ],
+  "id": "post-default",
+  "name": "Default Post",
+  "sections": [
+    {
+      "children": [
+        {
+          "blockName": "core/heading",
+          "bindings": {
+            "text": {
+              "path": "title",
+              "source": "content"
+            }
+          },
+          "id": "post-heading",
+          "type": "block"
+        },
+        {
+          "blockName": "core/content-text",
+          "bindings": {
+            "text": {
+              "path": "content",
+              "source": "content"
+            }
+          },
+          "id": "post-content",
+          "type": "block"
+        }
+      ],
+      "id": "post-main",
+      "settings": {
+        "width": "content"
+      },
+      "type": "section"
+    }
+  ],
+  "version": 1
+}

@@ -1,0 +1,38 @@
+{
+  "contentTypes": [
+    "category",
+    "tag",
+    "product_cat",
+    "product_tag"
+  ],
+  "id": "archive-default",
+  "name": "Default Archive",
+  "sections": [
+    {
+      "children": [
+        {
+          "blockName": "core/heading",
+          "bindings": {
+            "text": {
+              "path": "title",
+              "source": "content"
+            }
+          },
+          "id": "archive-heading",
+          "type": "block"
+        },
+        {
+          "blockName": "commerce/archive-links",
+          "id": "archive-links",
+          "type": "block"
+        }
+      ],
+      "id": "archive-main",
+      "settings": {
+        "width": "content"
+      },
+      "type": "section"
+    }
+  ],
+  "version": 1
+}
