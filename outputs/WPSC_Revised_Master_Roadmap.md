@@ -391,6 +391,8 @@ Commits:
 
 ## Phase 15 - Private Data And Preview Safety
 
+Trang thai: DONE
+
 Muc tieu:
 
 - Build preview/draft/private data mot cach an toan.

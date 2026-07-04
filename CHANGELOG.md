@@ -24,5 +24,6 @@
 - Added a plugin system with data, route, render, and build hooks.
 - Prepared v0.1.0 workspace package boundaries and getting started documentation.
 - Added real source auth support for WordPress and WooCommerce using environment-backed credentials.
+- Added preview build safety with draft/private filtering and token guarded preview builds.
 
 Status: Mini core prototype complete, architecture remains `DRAFT`.
