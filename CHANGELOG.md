@@ -28,5 +28,6 @@
 - Added customer auth strategy contracts for static/runtime boundaries and frontend secret safety.
 - Added a runtime commerce API scaffold with session-backed cart, checkout proxy, and order lookup handlers.
 - Added customer account UI helpers for login, logout, dashboard, orders, and addresses.
+- Added taxonomy archive route generation, archive pagination, and sitemap coverage for category/tag/product archives.
 
 Status: Mini core prototype complete, architecture remains `DRAFT`.

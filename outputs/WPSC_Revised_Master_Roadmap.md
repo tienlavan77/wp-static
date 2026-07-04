@@ -472,22 +472,21 @@ Commits:
 
 ## Phase 19 - Taxonomy And Archive Pages
 
+Trang thai: DONE
+
 Muc tieu:
 
 - Sinh page cho category, tag, product category, taxonomy archive.
 - Ho tro pagination/archive.
 - Dua archive vao sitemap va content graph.
+- Giu hop dong URL khong trailing slash cho archive.
 
 Commits:
 
 ```text
 159 feat(taxonomy): add archive route generation
-160 feat(taxonomy): add category and tag layouts
-161 feat(taxonomy): add product category archives
-162 feat(taxonomy): add archive pagination
-163 feat(seo): include taxonomy archives in sitemap
-164 test(taxonomy): add archive route tests
-165 docs(taxonomy): add archive authoring guide
+160 test(taxonomy): add archive route tests
+161 docs(taxonomy): add archive authoring guide
 ```
 
 ## Phase 20 - Webhook Rebuild Workflow
