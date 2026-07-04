@@ -36,6 +36,11 @@ test("asset pipeline downloads, caches, manifests, and rewrites remote images", 
     assert.equal(firstBuild.assetsDownloaded, 1);
     assert.match(html, /src="\/assets\/media\/product-/);
     assert.equal(assetManifest.assets.length, 1);
+    assert.deepEqual(assetManifest.stats, {
+      cached: 0,
+      downloaded: 1,
+      total: 1
+    });
     assert.equal(assetEntry.cached, false);
     assert.equal(assetBytes.toString("utf8"), "fake image");
     assert.equal(buildManifest.assets.downloaded, 1);
