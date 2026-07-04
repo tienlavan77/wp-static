@@ -3,6 +3,7 @@ import buildSite from "../builder/buildSite.js";
 import compile from "../core/compile.js";
 import loadConfig from "../core/loadConfig.js";
 import assertPreviewAccess from "../preview/assertPreviewAccess.js";
+import createContentValidationReport from "../report/createContentValidationReport.js";
 
 export default async function buildProjectOnce(projectArg, options = {}) {
   const projectDir = path.resolve(projectArg);
@@ -24,6 +25,7 @@ export default async function buildProjectOnce(projectArg, options = {}) {
 
   return {
     config,
+    report: createContentValidationReport(sitePlan),
     projectDir,
     result,
     sitePlan
