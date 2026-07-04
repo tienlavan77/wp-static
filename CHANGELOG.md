@@ -33,5 +33,6 @@
 - Added incremental build planning with route dependency tracking, changed item parsing, input hashes, and affected page writes.
 - Added content, collection, route render, and asset cache stats with parallel route rendering and asset work.
 - Added block schemas, props validation, data bindings, and starter commerce blocks for the visual builder foundation.
+- Added visual builder layout JSON documents with content type mapping, nested section/block nodes, and responsive settings.
 
 Status: Mini core prototype complete, architecture remains `DRAFT`.

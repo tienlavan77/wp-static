@@ -589,13 +589,13 @@ Commits:
 192 docs(block): add block authoring guide
 ```
 
-## Phase 24 - Visual Builder Data Model
+## Phase 24 - Visual Builder Data Model - DONE
 
 Muc tieu:
 
-- Luu layout keo tha thanh JSON.
-- Layout theo content type: page, post, product, category.
-- Ho tro section/component nesting va responsive settings.
+- [x] Luu layout keo tha thanh JSON.
+- [x] Layout theo content type: page, post, product, category.
+- [x] Ho tro section/component nesting va responsive settings.
 
 Commits:
 
