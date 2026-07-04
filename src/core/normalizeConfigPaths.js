@@ -7,6 +7,16 @@ export default function normalizeConfigPaths(config, projectDir) {
       path.resolve(projectDir, layoutPath)
     ])
   );
+  const plugins = (config.plugins ?? []).map((pluginConfig) => {
+    if (typeof pluginConfig === "string") {
+      return path.resolve(projectDir, pluginConfig);
+    }
+
+    return {
+      ...pluginConfig,
+      path: pluginConfig?.path ? path.resolve(projectDir, pluginConfig.path) : pluginConfig?.path
+    };
+  });
 
   return {
     ...config,
@@ -18,7 +28,8 @@ export default function normalizeConfigPaths(config, projectDir) {
       themeAssets: config.theme?.assets ? path.resolve(projectDir, config.theme.assets) : null,
       themeComponents: config.theme?.components ? path.resolve(projectDir, config.theme.components) : null,
       themeLayout: config.theme?.layout ? path.resolve(projectDir, config.theme.layout) : null,
-      themeLayouts
+      themeLayouts,
+      plugins
     }
   };
 }

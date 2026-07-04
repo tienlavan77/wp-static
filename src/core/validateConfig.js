@@ -12,6 +12,7 @@ export default function validateConfig(config) {
   requireString(config.theme, "theme.layout");
   requireOptionalString(config.theme, "theme.assets");
   requireOptionalString(config.theme, "theme.components");
+  requireOptionalPluginArray(config.plugins);
 
   if (config.adapter.type === "mock") {
     requireString(config.adapter, "adapter.source");
@@ -26,6 +27,26 @@ export default function validateConfig(config) {
   }
 
   return config;
+}
+
+function requireOptionalPluginArray(plugins) {
+  if (plugins === undefined) {
+    return;
+  }
+
+  if (!Array.isArray(plugins)) {
+    throw new ConfigError('Config field "plugins" must be an array when provided.');
+  }
+
+  for (const plugin of plugins) {
+    if (typeof plugin === "string") {
+      continue;
+    }
+
+    if (!isPlainObject(plugin) || typeof plugin.path !== "string" || plugin.path.trim() === "") {
+      throw new ConfigError('Each plugin must be a path string or an object with a non-empty "path".');
+    }
+  }
 }
 
 function requireString(object, fieldPath) {
