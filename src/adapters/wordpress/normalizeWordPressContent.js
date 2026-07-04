@@ -11,6 +11,7 @@ export default function normalizeWordPressContent(rawItem, type = "page") {
     type,
     title: stripTags(title),
     slug,
+    status: rawItem.status ?? null,
     domain: "wordpress",
     data: {
       acf: rawItem.acf ?? {},

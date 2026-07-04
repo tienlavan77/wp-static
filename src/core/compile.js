@@ -6,6 +6,7 @@ import createRoutes from "../router/createRoutes.js";
 import createPluginContext from "../plugins/createPluginContext.js";
 import loadPlugins from "../plugins/loadPlugins.js";
 import { runPluginHook } from "../plugins/runPluginHook.js";
+import filterPublicContents from "../preview/filterPublicContents.js";
 import renderPage from "../renderer/renderPage.js";
 import resolveTheme from "../theme/resolveTheme.js";
 
@@ -25,7 +26,9 @@ export default async function compile(config, options = {}) {
     collections: rawCollections,
     contents: rawContents
   }, pluginContext);
-  const contents = data.contents;
+  const contents = filterPublicContents(data.contents, {
+    preview: options.preview
+  });
   const collections = data.collections ?? {};
   const graph = createContentGraph({
     contents,

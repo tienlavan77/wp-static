@@ -8,6 +8,7 @@ export default function normalizeWooCommerceProduct(rawProduct = {}) {
     type: "product",
     title: stripTags(rawProduct.name ?? slug),
     slug,
+    status: rawProduct.status ?? null,
     domain: "woocommerce",
     data: {
       acf: rawProduct.acf ?? {},

@@ -11,6 +11,8 @@ export { default as createMedia } from "./content/createMedia.js";
 export { default as createMenu } from "./content/createMenu.js";
 export { default as createMockAdapter } from "./adapters/mockAdapter.js";
 export { default as createPluginContext } from "./plugins/createPluginContext.js";
+export { default as assertPreviewAccess } from "./preview/assertPreviewAccess.js";
+export { default as filterPublicContents } from "./preview/filterPublicContents.js";
 export { default as createTerm } from "./content/createTerm.js";
 export { default as createWatchTargets } from "./dev-server/createWatchTargets.js";
 export { default as createWooCommerceAdapter } from "./adapters/woocommerce/woocommerceAdapter.js";

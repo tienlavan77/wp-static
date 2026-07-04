@@ -26,10 +26,19 @@ export default function createContent(rawContent) {
     slug: rawContent.slug.trim(),
     domain: rawContent.domain.trim(),
     data: structuredClone(rawContent.data),
+    status: normalizeStatus(rawContent.status),
     ...cloneOptionalFields(rawContent)
   };
 
   return deepFreeze(content);
+}
+
+function normalizeStatus(status) {
+  if (typeof status !== "string" || status.trim() === "") {
+    return null;
+  }
+
+  return status.trim();
 }
 
 function cloneOptionalFields(rawContent) {

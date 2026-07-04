@@ -41,7 +41,10 @@ async function main(cliArgs) {
   }
 
   if (cliArgs[0] === "build") {
-    await buildProject(readProjectArg(cliArgs));
+    await buildProject(readProjectArg(cliArgs), {
+      preview: cliArgs.includes("--preview"),
+      previewToken: readOptionalArg(cliArgs, "--preview-token")
+    });
     return;
   }
 
@@ -76,10 +79,26 @@ async function main(cliArgs) {
   printHelp();
 }
 
-async function buildProject(projectArg) {
-  const { config, result, sitePlan } = await buildProjectOnce(projectArg);
+async function buildProject(projectArg, options = {}) {
+  const { config, result, sitePlan } = await buildProjectOnce(projectArg, options);
 
   printBuildSummary(config, sitePlan, result, logger);
+}
+
+function readOptionalArg(cliArgs, flagName) {
+  const flagIndex = cliArgs.indexOf(flagName);
+
+  if (flagIndex === -1) {
+    return null;
+  }
+
+  const value = cliArgs[flagIndex + 1];
+
+  if (!value || value.startsWith("--")) {
+    throw new Error(`CLI option "${flagName}" requires a value.`);
+  }
+
+  return value;
 }
 
 function readProjectArg(cliArgs) {
@@ -195,7 +214,7 @@ async function createProject(projectName) {
 
 function printHelp() {
   console.log(`Usage:
-  wpsc build [--project <project-dir>]
+  wpsc build [--project <project-dir>] [--preview --preview-token <token>]
   wpsc clean [--project <project-dir>]
   wpsc create <project-name>
   wpsc dev [--project <project-dir>] [--port <port>]
