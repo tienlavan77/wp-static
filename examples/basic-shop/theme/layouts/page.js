@@ -17,11 +17,11 @@ function renderArchiveLinks(content, html) {
     return "";
   }
 
-  return html.raw(html`
-    <nav class="archive-links" aria-label="Danh mục">
-      ${links.map((link) => html.raw(`<a href="${escapeAttribute(link.href)}">${escapeText(link.label)}</a>`))}
-    </nav>
-  `);
+  return html.raw([
+    '<nav class="archive-links" aria-label="Danh mục">',
+    ...links.map((link) => `<a href="${escapeAttribute(link.href)}">${escapeText(link.label)}</a>`),
+    "</nav>"
+  ].join(""));
 }
 
 function escapeAttribute(value) {
