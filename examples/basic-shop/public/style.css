@@ -4,8 +4,20 @@
   --muted: #5f6f64;
   --line: #d8dfd8;
   --paper: #fbfbf7;
+  --surface: #ffffff;
   --accent: #0f7a5f;
   --accent-strong: #0a5c48;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ink: #edf6ef;
+  --muted: #a9baad;
+  --line: #314137;
+  --paper: #101712;
+  --surface: #17221a;
+  --accent: #57d3ad;
+  --accent-strong: #8be8c8;
 }
 
 * {
@@ -17,6 +29,7 @@ body {
   color: var(--ink);
   background: var(--paper);
   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  transition: background 160ms ease, color 160ms ease;
 }
 
 a {
@@ -54,6 +67,50 @@ a {
   text-decoration: none;
 }
 
+.theme-toggle {
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  width: 58px;
+  min-width: 58px;
+  height: 32px;
+  padding: 3px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--ink);
+  background: var(--surface);
+  cursor: pointer;
+}
+
+.theme-toggle span {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.theme-toggle__sun {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+:root[data-theme="dark"] .theme-toggle__sun {
+  background: transparent;
+  color: var(--muted);
+}
+
+.theme-toggle__moon {
+  color: var(--muted);
+}
+
+:root[data-theme="dark"] .theme-toggle__moon {
+  background: var(--accent);
+  color: #07120d;
+}
+
 .archive-links {
   display: flex;
   flex-wrap: wrap;
@@ -64,6 +121,7 @@ a {
   padding: 8px 11px;
   border: 1px solid var(--line);
   border-radius: 8px;
+  background: var(--surface);
   color: var(--accent-strong);
   font-size: 14px;
   font-weight: 700;
