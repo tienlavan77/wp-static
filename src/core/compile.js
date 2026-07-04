@@ -36,7 +36,10 @@ export default async function compile(config, options = {}) {
     menus: collections.menus,
     terms: collections.terms
   });
-  const routes = await runPluginHook(plugins, "routes", createRoutes(contents, config), pluginContext);
+  const routes = await runPluginHook(plugins, "routes", createRoutes(contents, {
+    ...config,
+    terms: graph.terms.items
+  }), pluginContext);
   const theme = await resolveTheme(config, projectDir, {
     cacheBust: options.cacheBust
   });

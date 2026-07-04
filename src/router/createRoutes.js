@@ -1,4 +1,5 @@
 import { RouteError } from "../shared/errors.js";
+import createArchiveRoutes from "./createArchiveRoutes.js";
 
 export default function createRoutes(contents, config = {}) {
   if (!Array.isArray(contents)) {
@@ -6,8 +7,12 @@ export default function createRoutes(contents, config = {}) {
   }
 
   const homepage = config.homepage ?? "home";
+  const terms = config.terms ?? [];
 
-  const routes = contents.map((content) => createRoute(content, homepage));
+  const routes = [
+    ...contents.map((content) => createRoute(content, homepage)),
+    ...createArchiveRoutes(contents, terms, config)
+  ];
 
   assertUniqueRoutePaths(routes);
 

@@ -17,6 +17,7 @@ export { default as createTerm } from "./content/createTerm.js";
 export { default as createWatchTargets } from "./dev-server/createWatchTargets.js";
 export { default as createWooCommerceAdapter } from "./adapters/woocommerce/woocommerceAdapter.js";
 export { default as createWooCommerceClient } from "./adapters/woocommerce/woocommerceClient.js";
+export { default as createArchiveRoutes } from "./router/createArchiveRoutes.js";
 export { default as createRoutes } from "./router/createRoutes.js";
 export { default as deepFreeze } from "./shared/deepFreeze.js";
 export { default as escapeHtml } from "./shared/escapeHtml.js";

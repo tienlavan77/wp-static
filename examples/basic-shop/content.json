@@ -36,7 +36,15 @@
       "currency": "VND",
       "sku": "IP15-128-BLK",
       "description": "Điện thoại Apple với thiết kế gọn, hiệu năng mạnh và camera linh hoạt.",
-      "inStock": true
+      "inStock": true,
+      "terms": [
+        {
+          "id": "product_cat:dien-thoai",
+          "name": "Điện thoại",
+          "slug": "dien-thoai",
+          "taxonomy": "product_cat"
+        }
+      ]
     }
   },
   {
@@ -50,7 +58,15 @@
       "currency": "VND",
       "sku": "TS-BASIC-WHT",
       "description": "Áo thun cotton đơn giản, dễ phối đồ, phù hợp dùng hằng ngày.",
-      "inStock": true
+      "inStock": true,
+      "terms": [
+        {
+          "id": "product_cat:thoi-trang",
+          "name": "Thời trang",
+          "slug": "thoi-trang",
+          "taxonomy": "product_cat"
+        }
+      ]
     }
   }
 ]
