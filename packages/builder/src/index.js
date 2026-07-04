@@ -1,7 +1,10 @@
 export { default as buildSite } from "../../../src/builder/buildSite.js";
 export { default as cleanOutput } from "../../../src/builder/cleanOutput.js";
+export { default as coreCommerceBlocks } from "../../../src/blocks/core/commerceBlocks.js";
 export { default as copyPublicAssets } from "../../../src/builder/copyPublicAssets.js";
 export { default as createBuildManifest } from "../../../src/builder/createBuildManifest.js";
+export { default as createBlockRegistry } from "../../../src/blocks/createBlockRegistry.js";
+export { default as createBlockSchema } from "../../../src/blocks/createBlockSchema.js";
 export { createCacheKey, default as createJsonFileCache } from "../../../src/cache/createJsonFileCache.js";
 export { default as createInputHash } from "../../../src/incremental/createInputHash.js";
 export { default as createRouteRenderCache } from "../../../src/cache/createRouteRenderCache.js";
@@ -11,4 +14,7 @@ export { default as planIncrementalBuild } from "../../../src/incremental/planIn
 export { default as collectAssetUrls } from "../../../src/assets/collectAssetUrls.js";
 export { default as processAssetPipeline } from "../../../src/assets/processAssetPipeline.js";
 export { default as readThroughCache } from "../../../src/cache/readThroughCache.js";
+export { default as renderBlock } from "../../../src/blocks/renderBlock.js";
+export { default as resolveBlockBindings } from "../../../src/blocks/resolveBlockBindings.js";
 export { default as runLimitedParallel } from "../../../src/performance/runLimitedParallel.js";
+export { default as validateBlockProps } from "../../../src/blocks/validateBlockProps.js";

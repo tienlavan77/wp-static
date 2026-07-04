@@ -1,8 +1,11 @@
 export { default as buildSite } from "./builder/buildSite.js";
 export { default as cleanOutput } from "./builder/cleanOutput.js";
 export { default as compile } from "./core/compile.js";
+export { default as coreCommerceBlocks } from "./blocks/core/commerceBlocks.js";
 export { resolveWooCommerceCredentials, resolveWordPressAuth } from "./auth/sourceCredentials.js";
 export { default as createBuildManifest } from "./builder/createBuildManifest.js";
+export { default as createBlockRegistry } from "./blocks/createBlockRegistry.js";
+export { default as createBlockSchema } from "./blocks/createBlockSchema.js";
 export { createCacheKey, default as createJsonFileCache } from "./cache/createJsonFileCache.js";
 export { default as createContent } from "./core/createContent.js";
 export { default as createContentCollection } from "./content/createContentCollection.js";
@@ -47,7 +50,10 @@ export { default as createRouteDependencyGraph } from "./incremental/createRoute
 export { default as resolveTheme } from "./theme/resolveTheme.js";
 export { default as mapWebhookChanges } from "./webhook/mapWebhookChanges.js";
 export { default as readThroughCache } from "./cache/readThroughCache.js";
+export { default as renderBlock } from "./blocks/renderBlock.js";
+export { default as resolveBlockBindings } from "./blocks/resolveBlockBindings.js";
 export { default as runLimitedParallel } from "./performance/runLimitedParallel.js";
+export { default as validateBlockProps } from "./blocks/validateBlockProps.js";
 export { runPluginEvent, runPluginHook } from "./plugins/runPluginHook.js";
 export {
   assertNoFrontendSecrets,
