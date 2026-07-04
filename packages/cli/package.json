@@ -1,0 +1,13 @@
+{
+  "name": "@wpsc/cli",
+  "version": "0.1.0",
+  "description": "CLI and dev server utilities for WPSC.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "bin": {
+    "wpsc": "../../src/cli/index.js"
+  },
+  "license": "UNLICENSED"
+}

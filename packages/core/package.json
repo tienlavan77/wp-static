@@ -1,0 +1,10 @@
+{
+  "name": "@wpsc/core",
+  "version": "0.1.0",
+  "description": "Core compile and project utilities for WPSC.",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "license": "UNLICENSED"
+}

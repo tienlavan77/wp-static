@@ -1,0 +1,9 @@
+export { default as createMockAdapter } from "../../../src/adapters/mockAdapter.js";
+export { default as createWordPressAdapter } from "../../../src/adapters/wordpress/wordpressAdapter.js";
+export { default as createWordPressClient } from "../../../src/adapters/wordpress/wordpressClient.js";
+export { default as normalizeRankMathSeo } from "../../../src/adapters/wordpress/normalizeRankMathSeo.js";
+export { default as normalizeWordPressContent } from "../../../src/adapters/wordpress/normalizeWordPressContent.js";
+export { default as normalizeWordPressMedia } from "../../../src/adapters/wordpress/normalizeWordPressMedia.js";
+export { default as createWooCommerceAdapter } from "../../../src/adapters/woocommerce/woocommerceAdapter.js";
+export { default as createWooCommerceClient } from "../../../src/adapters/woocommerce/woocommerceClient.js";
+export { default as normalizeWooCommerceProduct } from "../../../src/adapters/woocommerce/normalizeWooCommerceProduct.js";

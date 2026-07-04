@@ -1,2 +1,18 @@
 export { default as compile } from "../../../src/core/compile.js";
 export { default as createContent } from "../../../src/core/createContent.js";
+export { default as doctorProject } from "../../../src/core/doctorProject.js";
+export { default as loadConfig } from "../../../src/core/loadConfig.js";
+export { default as normalizeConfigPaths } from "../../../src/core/normalizeConfigPaths.js";
+export { default as validateConfig } from "../../../src/core/validateConfig.js";
+export { default as createContentCollection } from "../../../src/content/createContentCollection.js";
+export { default as createContentGraph } from "../../../src/content/createContentGraph.js";
+export { default as createMedia } from "../../../src/content/createMedia.js";
+export { default as createMenu } from "../../../src/content/createMenu.js";
+export { default as createTerm } from "../../../src/content/createTerm.js";
+export { default as createSeoMetadata } from "../../../src/seo/createSeoMetadata.js";
+export { default as generateRobotsTxt } from "../../../src/seo/generateRobotsTxt.js";
+export { default as generateSitemap } from "../../../src/seo/generateSitemap.js";
+export { default as renderSeoTags } from "../../../src/seo/renderSeoTags.js";
+export { default as createPluginContext } from "../../../src/plugins/createPluginContext.js";
+export { default as loadPlugins } from "../../../src/plugins/loadPlugins.js";
+export { runPluginEvent, runPluginHook } from "../../../src/plugins/runPluginHook.js";
