@@ -1,6 +1,7 @@
 export { default as buildSite } from "./builder/buildSite.js";
 export { default as cleanOutput } from "./builder/cleanOutput.js";
 export { default as compile } from "./core/compile.js";
+export { resolveWooCommerceCredentials, resolveWordPressAuth } from "./auth/sourceCredentials.js";
 export { default as createBuildManifest } from "./builder/createBuildManifest.js";
 export { default as createContent } from "./core/createContent.js";
 export { default as createContentCollection } from "./content/createContentCollection.js";
