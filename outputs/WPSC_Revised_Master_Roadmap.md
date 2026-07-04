@@ -367,6 +367,8 @@ WPSC v0.1.0 usable framework
 
 ## Phase 14 - Real Source Integration And Source Auth
 
+Trang thai: DONE
+
 Muc tieu:
 
 - Dung mot WordPress/WooCommerce site that de build static.

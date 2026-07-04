@@ -23,5 +23,6 @@
 - Added a dev server workflow with watch targets, rebuild support, and live reload injection.
 - Added a plugin system with data, route, render, and build hooks.
 - Prepared v0.1.0 workspace package boundaries and getting started documentation.
+- Added real source auth support for WordPress and WooCommerce using environment-backed credentials.
 
 Status: Mini core prototype complete, architecture remains `DRAFT`.
