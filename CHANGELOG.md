@@ -20,5 +20,6 @@
 - Added SEO output rendering for metadata, canonical, robots, Open Graph, Twitter Cards, sitemap.xml, and robots.txt.
 - Added a theme resolver with content type layouts, fallback layout, components, theme metadata, and theme asset copying.
 - Added a remote image asset pipeline with download cache, HTML URL rewriting, and asset manifests.
+- Added a dev server workflow with watch targets, rebuild support, and live reload injection.
 
 Status: Mini core prototype complete, architecture remains `DRAFT`.

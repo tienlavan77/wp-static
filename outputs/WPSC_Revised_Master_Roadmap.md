@@ -287,6 +287,8 @@ Commits:
 
 ## Phase 11 - Dev Server And Watch Mode
 
+Trang thai: DONE
+
 Muc tieu:
 
 - Dev nhanh.
