@@ -30,5 +30,5 @@ test("build pipeline writes html files and manifest", async () => {
   assert.equal(manifest.pages, 6);
   assert.equal(manifest.routes.some((route) => route.path === "/iphone-15"), true);
   assert.equal(manifest.routes.some((route) => route.outputPath === "iphone-15.html"), true);
-  assert.equal(manifest.routes.some((route) => route.path === "/product-category/dien-thoai"), true);
+  assert.equal(manifest.routes.some((route) => route.path === "/dien-thoai"), true);
 });

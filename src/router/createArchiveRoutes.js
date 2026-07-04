@@ -1,21 +1,21 @@
 const DEFAULT_ARCHIVE_CONFIG = {
   category: {
-    basePath: "category",
+    basePath: "",
     contentTypes: ["post", "page"],
     titlePrefix: "Category"
   },
   post_tag: {
-    basePath: "tag",
+    basePath: "",
     contentTypes: ["post", "page"],
     titlePrefix: "Tag"
   },
   product_cat: {
-    basePath: "product-category",
+    basePath: "",
     contentTypes: ["product"],
     titlePrefix: "Product Category"
   },
   product_tag: {
-    basePath: "product-tag",
+    basePath: "",
     contentTypes: ["product"],
     titlePrefix: "Product Tag"
   }
@@ -61,7 +61,7 @@ function normalizeArchiveConfig(customConfig = {}) {
       taxonomy,
       {
         ...options,
-        basePath: normalizePathPart(options.basePath ?? taxonomy),
+        basePath: normalizePathPart(options.basePath),
         contentTypes: normalizeStringArray(options.contentTypes),
         pageSize: normalizePageSize(options.pageSize),
         taxonomy,
@@ -74,8 +74,9 @@ function normalizeArchiveConfig(customConfig = {}) {
 function createTermArchiveRoutes(term, items, termConfig) {
   const pageSize = termConfig.pageSize;
   const pageCount = Math.max(1, Math.ceil(items.length / pageSize));
-  const basePath = `/${termConfig.basePath}/${normalizePathPart(term.slug)}`;
-  const outputBasePath = `${termConfig.basePath}/${normalizePathPart(term.slug)}`;
+  const slug = normalizePathPart(term.slug);
+  const basePath = createRoutePath(termConfig.basePath, slug);
+  const outputBasePath = createOutputBasePath(termConfig.basePath, slug);
   const routes = [];
 
   for (let page = 1; page <= pageCount; page += 1) {
@@ -172,4 +173,12 @@ function normalizePathPart(value) {
   return String(value ?? "")
     .trim()
     .replace(/^\/+|\/+$/g, "");
+}
+
+function createRoutePath(basePath, slug) {
+  return basePath ? `/${basePath}/${slug}` : `/${slug}`;
+}
+
+function createOutputBasePath(basePath, slug) {
+  return basePath ? `${basePath}/${slug}` : slug;
 }

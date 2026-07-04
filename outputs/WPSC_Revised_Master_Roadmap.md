@@ -479,7 +479,7 @@ Muc tieu:
 - Sinh page cho category, tag, product category, taxonomy archive.
 - Ho tro pagination/archive.
 - Dua archive vao sitemap va content graph.
-- Giu hop dong URL khong trailing slash cho archive.
+- Giu hop dong URL `domain/slug`, khong them taxonomy base, khong trailing slash cho archive.
 
 Commits:
 
@@ -487,6 +487,7 @@ Commits:
 159 feat(taxonomy): add archive route generation
 160 test(taxonomy): add archive route tests
 161 docs(taxonomy): add archive authoring guide
+162 fix(taxonomy): use slug-only archive routes
 ```
 
 ## Phase 20 - Webhook Rebuild Workflow

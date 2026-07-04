@@ -19,10 +19,10 @@ test("createArchiveRoutes creates default taxonomy archive routes", () => {
   ]);
 
   assert.deepEqual(routes.map((route) => route.path), [
-    "/product-category/dien-thoai",
-    "/product-category/thoi-trang"
+    "/dien-thoai",
+    "/thoi-trang"
   ]);
-  assert.equal(routes[0].outputPath, "product-category/dien-thoai.html");
+  assert.equal(routes[0].outputPath, "dien-thoai.html");
   assert.equal(routes[0].content.type, "archive:product_cat");
   assert.equal(routes[0].content.data.items[0].slug, "iphone-15");
 });
@@ -58,12 +58,12 @@ test("createRoutes includes archive routes and detects conflicts", () => {
   assert.throws(
     () => createRoutes([
       product("product-iphone-15", "iphone-15", "dien-thoai"),
-      page("page-conflict", "product-category/dien-thoai")
+      page("page-conflict", "dien-thoai")
     ], {
       homepage: "home",
       terms: [term("dien-thoai", "Điện thoại", "product_cat")]
     }),
-    /Duplicate route "\/product-category\/dien-thoai"/
+    /Duplicate route "\/dien-thoai"/
   );
 });
 
@@ -101,8 +101,8 @@ test("compile includes taxonomy archive pages in the site plan and sitemap", asy
     }
   });
 
-  assert.equal(paths.includes("/product-category/dien-thoai"), true);
-  assert.match(sitemap, /<loc>https:\/\/example.com\/product-category\/dien-thoai<\/loc>/);
+  assert.equal(paths.includes("/dien-thoai"), true);
+  assert.match(sitemap, /<loc>https:\/\/example.com\/dien-thoai<\/loc>/);
 });
 
 function page(id, slug) {
