@@ -20,7 +20,9 @@ export default async function compile(config, options = {}) {
     terms: collections.terms
   });
   const routes = createRoutes(contents, config);
-  const theme = await resolveTheme(config, projectDir);
+  const theme = await resolveTheme(config, projectDir, {
+    cacheBust: options.cacheBust
+  });
   const pages = routes.map((route) => ({
     route,
     html: renderPage(route, theme.resolveLayout(route.content), {

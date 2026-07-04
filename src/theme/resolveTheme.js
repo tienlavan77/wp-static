@@ -1,7 +1,7 @@
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
-export default async function resolveTheme(config, projectDir) {
+export default async function resolveTheme(config, projectDir, options = {}) {
   const themeConfig = config.theme ?? {};
   const metadata = {
     name: themeConfig.meta?.name ?? themeConfig.name ?? config.name,
@@ -12,9 +12,9 @@ export default async function resolveTheme(config, projectDir) {
     config._paths?.themeLayout,
     projectDir,
     themeConfig.layout
-  ));
-  const layouts = await loadLayouts(themeConfig, config._paths?.themeLayouts, projectDir);
-  const components = await loadComponents(themeConfig, config._paths?.themeComponents, projectDir);
+  ), options);
+  const layouts = await loadLayouts(themeConfig, config._paths?.themeLayouts, projectDir, options);
+  const components = await loadComponents(themeConfig, config._paths?.themeComponents, projectDir, options);
   const assetsDir = config._paths?.themeAssets ?? resolveOptionalPath(projectDir, themeConfig.assets);
 
   return {
@@ -27,29 +27,30 @@ export default async function resolveTheme(config, projectDir) {
   };
 }
 
-async function loadLayouts(themeConfig, normalizedLayouts, projectDir) {
+async function loadLayouts(themeConfig, normalizedLayouts, projectDir, options) {
   const entries = Object.entries(normalizedLayouts ?? themeConfig.layouts ?? {});
   const layouts = new Map();
 
   for (const [contentType, layoutPath] of entries) {
-    layouts.set(contentType, await importDefaultModule(resolvePath(layoutPath, projectDir, layoutPath)));
+    layouts.set(contentType, await importDefaultModule(resolvePath(layoutPath, projectDir, layoutPath), options));
   }
 
   return layouts;
 }
 
-async function loadComponents(themeConfig, normalizedPath, projectDir) {
+async function loadComponents(themeConfig, normalizedPath, projectDir, options) {
   const componentsPath = normalizedPath ?? resolveOptionalPath(projectDir, themeConfig.components);
 
   if (!componentsPath) {
     return {};
   }
 
-  return importDefaultModule(componentsPath);
+  return importDefaultModule(componentsPath, options);
 }
 
-async function importDefaultModule(absolutePath) {
-  const module = await import(pathToFileURL(absolutePath).href);
+async function importDefaultModule(absolutePath, options = {}) {
+  const cacheSuffix = options.cacheBust ? `?t=${options.cacheBust}` : "";
+  const module = await import(`${pathToFileURL(absolutePath).href}${cacheSuffix}`);
   const value = module.default ?? module;
 
   if (typeof value !== "function" && !isPlainObject(value)) {

@@ -10,6 +10,7 @@ export { default as createMedia } from "./content/createMedia.js";
 export { default as createMenu } from "./content/createMenu.js";
 export { default as createMockAdapter } from "./adapters/mockAdapter.js";
 export { default as createTerm } from "./content/createTerm.js";
+export { default as createWatchTargets } from "./dev-server/createWatchTargets.js";
 export { default as createWooCommerceAdapter } from "./adapters/woocommerce/woocommerceAdapter.js";
 export { default as createWooCommerceClient } from "./adapters/woocommerce/woocommerceClient.js";
 export { default as createRoutes } from "./router/createRoutes.js";
@@ -28,6 +29,7 @@ export { default as generateRobotsTxt } from "./seo/generateRobotsTxt.js";
 export { default as generateSitemap } from "./seo/generateSitemap.js";
 export { default as resolveTheme } from "./theme/resolveTheme.js";
 export { default as serveStatic } from "./dev-server/serveStatic.js";
+export { default as startDevServer } from "./dev-server/startDevServer.js";
 export { default as validateConfig } from "./core/validateConfig.js";
 export {
   AdapterError,

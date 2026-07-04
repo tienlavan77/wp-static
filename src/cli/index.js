@@ -2,12 +2,12 @@
 
 import path from "node:path";
 import { cp, mkdir, stat } from "node:fs/promises";
-import buildSite from "../builder/buildSite.js";
 import cleanOutput from "../builder/cleanOutput.js";
-import compile from "../core/compile.js";
 import doctorProject from "../core/doctorProject.js";
 import loadConfig from "../core/loadConfig.js";
+import buildProjectOnce from "../dev-server/buildProjectOnce.js";
 import serveStatic from "../dev-server/serveStatic.js";
+import startDevServer from "../dev-server/startDevServer.js";
 import { getPackageInfo } from "../index.js";
 import createLogger from "../shared/createLogger.js";
 
@@ -55,6 +55,11 @@ async function main(cliArgs) {
     return;
   }
 
+  if (cliArgs[0] === "dev") {
+    await devProject(readProjectArg(cliArgs), readPortArg(cliArgs));
+    return;
+  }
+
   if (cliArgs[0] === "serve") {
     await serveProject(readProjectArg(cliArgs), readPortArg(cliArgs));
     return;
@@ -72,16 +77,7 @@ async function main(cliArgs) {
 }
 
 async function buildProject(projectArg) {
-  const projectDir = path.resolve(projectArg);
-  const config = await loadConfig(projectDir);
-  const sitePlan = await compile(config, { projectDir });
-  const result = await buildSite(sitePlan, {
-    config,
-    outputDir: config._paths.outputDir,
-    publicDir: config._paths.publicDir ?? undefined,
-    site: config.site,
-    themeAssetsDir: sitePlan.theme?.assetsDir ?? undefined
-  });
+  const { config, result, sitePlan } = await buildProjectOnce(projectArg);
 
   printBuildSummary(config, sitePlan, result, logger);
 }
@@ -154,6 +150,23 @@ async function serveProject(projectArg, port) {
   process.on("SIGTERM", close);
 }
 
+async function devProject(projectArg, port) {
+  const projectDir = path.resolve(projectArg);
+  const devServer = await startDevServer(projectDir, {
+    logger,
+    port
+  });
+
+  logger.info(`Dev server running at http://localhost:${port}`);
+
+  const close = () => {
+    devServer.close();
+    process.exit(0);
+  };
+  process.on("SIGINT", close);
+  process.on("SIGTERM", close);
+}
+
 async function createProject(projectName) {
   if (!projectName) {
     throw new Error("Usage: wpsc create <project-name>");
@@ -185,6 +198,7 @@ function printHelp() {
   wpsc build [--project <project-dir>]
   wpsc clean [--project <project-dir>]
   wpsc create <project-name>
+  wpsc dev [--project <project-dir>] [--port <port>]
   wpsc doctor [--project <project-dir>]
   wpsc serve [--project <project-dir>] [--port <port>]
   wpsc --help
