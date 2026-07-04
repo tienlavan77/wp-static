@@ -4,6 +4,9 @@ export default function createBuildManifest(sitePlan, buildResult, options = {})
     project: {
       name: options.config?.name ?? null
     },
+    plugins: (sitePlan.plugins ?? []).map((plugin) => ({
+      name: plugin.name
+    })),
     builtAt: new Date().toISOString(),
     outputDir: buildResult.outputDir,
     pages: sitePlan.pages.length,

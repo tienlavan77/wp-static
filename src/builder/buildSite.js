@@ -4,11 +4,17 @@ import copyPublicAssets from "./copyPublicAssets.js";
 import createBuildManifest from "./createBuildManifest.js";
 import { BuildError } from "../shared/errors.js";
 import processAssetPipeline from "../assets/processAssetPipeline.js";
+import createPluginContext from "../plugins/createPluginContext.js";
+import { runPluginEvent } from "../plugins/runPluginHook.js";
 import generateRobotsTxt from "../seo/generateRobotsTxt.js";
 import generateSitemap from "../seo/generateSitemap.js";
 
 export default async function buildSite(sitePlan, options = {}) {
   const outputDir = options.outputDir ?? "dist";
+  const plugins = sitePlan.plugins ?? [];
+  const pluginContext = createPluginContext(options.config ?? {}, {
+    projectDir: options.config?._paths?.projectDir
+  });
 
   try {
     await rm(outputDir, { recursive: true, force: true });
@@ -16,6 +22,12 @@ export default async function buildSite(sitePlan, options = {}) {
   } catch (error) {
     throw new BuildError(`Unable to prepare output directory "${outputDir}": ${error.message}`);
   }
+
+  await runPluginEvent(plugins, "buildStart", {
+    options,
+    outputDir,
+    sitePlan
+  }, pluginContext);
 
   const copiedPublicAssets = await copyPublicAssets(options.publicDir, outputDir);
   const copiedThemeAssets = await copyPublicAssets(options.themeAssetsDir, path.join(outputDir, "theme"));
@@ -51,6 +63,11 @@ export default async function buildSite(sitePlan, options = {}) {
     assets: assetPipeline.entries
   }, null, 2)}\n`, "utf8");
   await writeFile(buildResult.manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
+  await runPluginEvent(plugins, "buildEnd", {
+    manifest,
+    result: buildResult,
+    sitePlan
+  }, pluginContext);
 
   return buildResult;
 }
