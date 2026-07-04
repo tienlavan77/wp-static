@@ -514,11 +514,15 @@ Commits:
 
 ## Phase 21 - Incremental Build Engine
 
+Trang thai: DONE
+
 Muc tieu:
 
 - Sua cai nao thi build lai cai do va cac phan lien quan.
 - Full build chi dung cho build dau tien hoac doi lon.
 - Dung dependency graph de tinh route bi anh huong.
+- Changed route hint van tuan thu `domain/slug`.
+- Route moi/route can xem duoc link tu demo homepage neu la public route.
 
 Commits:
 

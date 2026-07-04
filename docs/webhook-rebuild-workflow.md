@@ -78,7 +78,7 @@ The receiver normalizes slugs without leading or trailing `/`. Route hints alway
 
 Webhook rebuilds are serialized. If another webhook arrives while a build is running, WPSC returns `202` and keeps one queued rebuild. That prevents overlapping builds from writing the same `dist` directory at the same time.
 
-Phase 20 still performs a full build after a webhook. Phase 21 will use the changed item list to rebuild only affected routes and related outputs.
+Phase 21 can use the changed item list to rebuild affected routes and related shared outputs.
 
 ## Editor Workflow
 
