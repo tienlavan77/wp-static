@@ -53,6 +53,38 @@ test("WooCommerce client fetches paginated collections with credentials", async 
   assert.match(urls[0], /consumer_secret=cs_test/);
 });
 
+test("WooCommerce client reads credentials from env names", async () => {
+  const urls = [];
+  const fetchImpl = async (url) => {
+    urls.push(String(url));
+
+    return {
+      ok: true,
+      headers: new Headers({
+        "x-wp-totalpages": "1"
+      }),
+      async json() {
+        return [];
+      }
+    };
+  };
+  const client = createWooCommerceClient({
+    baseUrl: "https://example.com",
+    consumerKeyEnv: "WOO_KEY",
+    consumerSecretEnv: "WOO_SECRET",
+    env: {
+      WOO_KEY: "ck_env",
+      WOO_SECRET: "cs_env"
+    },
+    fetchImpl
+  });
+
+  await client.getCollection("/wp-json/wc/v3/products");
+
+  assert.match(urls[0], /consumer_key=ck_env/);
+  assert.match(urls[0], /consumer_secret=cs_env/);
+});
+
 test("WooCommerce repository fetches products and variations", async () => {
   const calls = [];
   const client = {
