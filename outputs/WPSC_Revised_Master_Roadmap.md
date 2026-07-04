@@ -550,10 +550,13 @@ wpsc build --changed menu:primary
 
 ## Phase 22 - Performance And Cache
 
+Trang thai: DONE
+
 Muc tieu:
 
 - Build nhanh voi site lon.
 - Cache content/media/asset va parallel rendering.
+- Cache khong doi public URL, van giu `domain/slug`.
 
 Commits:
 

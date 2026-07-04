@@ -31,5 +31,6 @@
 - Added taxonomy archive route generation, archive pagination, and sitemap coverage for category/tag/product archives using the `domain/slug` URL contract.
 - Added a guarded webhook rebuild receiver, source event normalization, rebuild queue, and validation report.
 - Added incremental build planning with route dependency tracking, changed item parsing, input hashes, and affected page writes.
+- Added content, collection, route render, and asset cache stats with parallel route rendering and asset work.
 
 Status: Mini core prototype complete, architecture remains `DRAFT`.
