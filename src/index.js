@@ -45,6 +45,12 @@ export { default as createCommerceRuntime } from "./runtime/commerce/createComme
 export { default as createCommerceServer } from "./runtime/commerce/createCommerceServer.js";
 export { default as createSessionStore } from "./runtime/commerce/createSessionStore.js";
 export { default as resolveCustomerSession } from "./runtime/commerce/sessionMiddleware.js";
+export { default as renderAccountDashboard } from "./runtime/account/renderAccountDashboard.js";
+export { default as renderAccountShell } from "./runtime/account/renderAccountShell.js";
+export { default as renderAddressBookView } from "./runtime/account/renderAddressBookView.js";
+export { default as renderLoginView } from "./runtime/account/renderLoginView.js";
+export { default as renderLogoutView } from "./runtime/account/renderLogoutView.js";
+export { default as renderOrderHistoryView } from "./runtime/account/renderOrderHistoryView.js";
 export { default as serveStatic } from "./dev-server/serveStatic.js";
 export { default as startDevServer } from "./dev-server/startDevServer.js";
 export { default as validateConfig } from "./core/validateConfig.js";
