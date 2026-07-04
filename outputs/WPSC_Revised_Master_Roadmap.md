@@ -431,6 +431,8 @@ Commits:
 
 ## Phase 17 - Runtime Commerce API
 
+Trang thai: DONE
+
 Muc tieu:
 
 - Them runtime API rieng cho cart, checkout, order, account neu site can login.
