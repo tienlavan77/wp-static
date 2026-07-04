@@ -12,12 +12,19 @@ import generateSitemap from "../seo/generateSitemap.js";
 export default async function buildSite(sitePlan, options = {}) {
   const outputDir = options.outputDir ?? "dist";
   const plugins = sitePlan.plugins ?? [];
+  const incremental = options.incremental ?? null;
+  const pagesToWrite = incremental?.fullBuild === false
+    ? sitePlan.pages.filter((page) => incremental.changedRoutes.includes(page.route.path))
+    : sitePlan.pages;
   const pluginContext = createPluginContext(options.config ?? {}, {
     projectDir: options.config?._paths?.projectDir
   });
 
   try {
-    await rm(outputDir, { recursive: true, force: true });
+    if (incremental?.fullBuild !== false) {
+      await rm(outputDir, { recursive: true, force: true });
+    }
+
     await mkdir(outputDir, { recursive: true });
   } catch (error) {
     throw new BuildError(`Unable to prepare output directory "${outputDir}": ${error.message}`);
@@ -36,7 +43,7 @@ export default async function buildSite(sitePlan, options = {}) {
     outputDir
   });
 
-  for (const page of sitePlan.pages) {
+  for (const page of pagesToWrite) {
     const filePath = path.join(outputDir, page.route.outputPath);
     await mkdir(path.dirname(filePath), { recursive: true });
     await writeFile(filePath, assetPipeline.rewriteHtml(page.html), "utf8");
@@ -50,9 +57,13 @@ export default async function buildSite(sitePlan, options = {}) {
     assetManifestPath: path.join(outputDir, ".wpsc", "assets.json"),
     assetsDownloaded: assetPipeline.entries.length,
     assetPipeline,
+    changedRoutes: incremental?.changedRoutes ?? [],
+    fullBuild: incremental?.fullBuild !== false,
+    inputHash: incremental?.inputHash ?? null,
     manifestPath: path.join(outputDir, ".wpsc", "manifest.json"),
-    pagesWritten: sitePlan.pages.length,
+    pagesWritten: pagesToWrite.length,
     seoOutputs,
+    totalPages: sitePlan.pages.length,
     outputDir
   };
   const manifest = createBuildManifest(sitePlan, buildResult, options);

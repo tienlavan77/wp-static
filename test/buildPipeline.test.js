@@ -27,7 +27,10 @@ test("build pipeline writes html files and manifest", async () => {
   const manifest = JSON.parse(await readFile(result.manifestPath, "utf8"));
 
   assert.equal(result.pagesWritten, 6);
+  assert.equal(result.totalPages, 6);
+  assert.equal(result.fullBuild, true);
   assert.equal(manifest.pages, 6);
+  assert.equal(manifest.incremental.fullBuild, true);
   assert.equal(manifest.routes.some((route) => route.path === "/iphone-15"), true);
   assert.equal(manifest.routes.some((route) => route.outputPath === "iphone-15.html"), true);
   assert.equal(manifest.routes.some((route) => route.path === "/dien-thoai"), true);

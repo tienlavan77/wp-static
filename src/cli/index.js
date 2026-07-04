@@ -43,6 +43,7 @@ async function main(cliArgs) {
 
   if (cliArgs[0] === "build") {
     await buildProject(readProjectArg(cliArgs), {
+      changed: readRepeatedArg(cliArgs, "--changed"),
       preview: cliArgs.includes("--preview"),
       previewToken: readOptionalArg(cliArgs, "--preview-token")
     });
@@ -107,6 +108,26 @@ function readOptionalArg(cliArgs, flagName) {
   }
 
   return value;
+}
+
+function readRepeatedArg(cliArgs, flagName) {
+  const values = [];
+
+  for (let index = 0; index < cliArgs.length; index += 1) {
+    if (cliArgs[index] !== flagName) {
+      continue;
+    }
+
+    const value = cliArgs[index + 1];
+
+    if (!value || value.startsWith("--")) {
+      throw new Error(`CLI option "${flagName}" requires a value.`);
+    }
+
+    values.push(value);
+  }
+
+  return values;
 }
 
 function readProjectArg(cliArgs) {
@@ -240,7 +261,7 @@ async function createProject(projectName) {
 
 function printHelp() {
   console.log(`Usage:
-  wpsc build [--project <project-dir>] [--preview --preview-token <token>]
+  wpsc build [--project <project-dir>] [--changed <type:id>] [--preview --preview-token <token>]
   wpsc clean [--project <project-dir>]
   wpsc create <project-name>
   wpsc dev [--project <project-dir>] [--port <port>]
@@ -254,6 +275,9 @@ function printHelp() {
 function printBuildSummary(config, sitePlan, result, activeLogger) {
   activeLogger.info(`Project: ${config.name}`);
   activeLogger.info(`Pages: ${result.pagesWritten}`);
+  if (result.fullBuild === false) {
+    activeLogger.info(`Incremental: ${result.changedRoutes.join(", ") || "no affected routes"}`);
+  }
   activeLogger.info(`Assets copied: ${result.copiedPublicAssets ? "yes" : "no"}`);
   activeLogger.info(`Theme assets copied: ${result.copiedThemeAssets ? "yes" : "no"}`);
   activeLogger.info(`Remote assets downloaded: ${result.assetsDownloaded ?? 0}`);

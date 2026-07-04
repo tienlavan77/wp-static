@@ -30,6 +30,8 @@ export { default as loadConfig } from "./core/loadConfig.js";
 export { default as loadPlugins } from "./plugins/loadPlugins.js";
 export { default as normalizeConfigPaths } from "./core/normalizeConfigPaths.js";
 export { default as normalizeWebhookPayload } from "./webhook/normalizeWebhookPayload.js";
+export { default as parseChangedItem } from "./incremental/parseChangedItem.js";
+export { default as planIncrementalBuild } from "./incremental/planIncrementalBuild.js";
 export { default as renderPage } from "./renderer/renderPage.js";
 export { default as renderSeoTags } from "./seo/renderSeoTags.js";
 export { default as createSeoMetadata } from "./seo/createSeoMetadata.js";
@@ -38,6 +40,8 @@ export { default as processAssetPipeline } from "./assets/processAssetPipeline.j
 export { default as generateRobotsTxt } from "./seo/generateRobotsTxt.js";
 export { default as generateSitemap } from "./seo/generateSitemap.js";
 export { default as createContentValidationReport } from "./report/createContentValidationReport.js";
+export { default as createInputHash } from "./incremental/createInputHash.js";
+export { default as createRouteDependencyGraph } from "./incremental/createRouteDependencyGraph.js";
 export { default as resolveTheme } from "./theme/resolveTheme.js";
 export { default as mapWebhookChanges } from "./webhook/mapWebhookChanges.js";
 export { runPluginEvent, runPluginHook } from "./plugins/runPluginHook.js";

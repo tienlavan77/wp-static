@@ -10,6 +10,13 @@ export default function createBuildManifest(sitePlan, buildResult, options = {})
     builtAt: new Date().toISOString(),
     outputDir: buildResult.outputDir,
     pages: sitePlan.pages.length,
+    incremental: {
+      changedRoutes: buildResult.changedRoutes ?? [],
+      fullBuild: buildResult.fullBuild !== false,
+      inputHash: buildResult.inputHash ?? null,
+      pagesWritten: buildResult.pagesWritten,
+      totalPages: buildResult.totalPages ?? sitePlan.pages.length
+    },
     assets: {
       copiedPublicAssets: buildResult.copiedPublicAssets,
       copiedThemeAssets: buildResult.copiedThemeAssets,
