@@ -18,7 +18,10 @@ export { default as createWatchTargets } from "./dev-server/createWatchTargets.j
 export { default as createWooCommerceAdapter } from "./adapters/woocommerce/woocommerceAdapter.js";
 export { default as createWooCommerceClient } from "./adapters/woocommerce/woocommerceClient.js";
 export { default as createArchiveRoutes } from "./router/createArchiveRoutes.js";
+export { default as createRebuildQueue } from "./webhook/createRebuildQueue.js";
 export { default as createRoutes } from "./router/createRoutes.js";
+export { default as createWebhookReceiver } from "./webhook/createWebhookReceiver.js";
+export { default as createWebhookServer } from "./webhook/createWebhookServer.js";
 export { default as deepFreeze } from "./shared/deepFreeze.js";
 export { default as escapeHtml } from "./shared/escapeHtml.js";
 export { default as html } from "./renderer/html.js";
@@ -26,6 +29,7 @@ export { default as doctorProject } from "./core/doctorProject.js";
 export { default as loadConfig } from "./core/loadConfig.js";
 export { default as loadPlugins } from "./plugins/loadPlugins.js";
 export { default as normalizeConfigPaths } from "./core/normalizeConfigPaths.js";
+export { default as normalizeWebhookPayload } from "./webhook/normalizeWebhookPayload.js";
 export { default as renderPage } from "./renderer/renderPage.js";
 export { default as renderSeoTags } from "./seo/renderSeoTags.js";
 export { default as createSeoMetadata } from "./seo/createSeoMetadata.js";
@@ -33,7 +37,9 @@ export { default as collectAssetUrls } from "./assets/collectAssetUrls.js";
 export { default as processAssetPipeline } from "./assets/processAssetPipeline.js";
 export { default as generateRobotsTxt } from "./seo/generateRobotsTxt.js";
 export { default as generateSitemap } from "./seo/generateSitemap.js";
+export { default as createContentValidationReport } from "./report/createContentValidationReport.js";
 export { default as resolveTheme } from "./theme/resolveTheme.js";
+export { default as mapWebhookChanges } from "./webhook/mapWebhookChanges.js";
 export { runPluginEvent, runPluginHook } from "./plugins/runPluginHook.js";
 export {
   assertNoFrontendSecrets,

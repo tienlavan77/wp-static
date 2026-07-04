@@ -12,6 +12,7 @@ test("cli prints help", async () => {
   assert.match(result.stdout, /wpsc create/);
   assert.match(result.stdout, /wpsc dev/);
   assert.match(result.stdout, /wpsc doctor/);
+  assert.match(result.stdout, /wpsc webhook/);
 });
 
 test("cli prints version", async () => {

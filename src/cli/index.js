@@ -8,6 +8,7 @@ import loadConfig from "../core/loadConfig.js";
 import buildProjectOnce from "../dev-server/buildProjectOnce.js";
 import serveStatic from "../dev-server/serveStatic.js";
 import startDevServer from "../dev-server/startDevServer.js";
+import createWebhookServer from "../webhook/createWebhookServer.js";
 import { getPackageInfo } from "../index.js";
 import createLogger from "../shared/createLogger.js";
 
@@ -65,6 +66,13 @@ async function main(cliArgs) {
 
   if (cliArgs[0] === "serve") {
     await serveProject(readProjectArg(cliArgs), readPortArg(cliArgs));
+    return;
+  }
+
+  if (cliArgs[0] === "webhook") {
+    await webhookProject(readProjectArg(cliArgs), readPortArg(cliArgs), {
+      secret: readOptionalArg(cliArgs, "--secret")
+    });
     return;
   }
 
@@ -186,6 +194,24 @@ async function devProject(projectArg, port) {
   process.on("SIGTERM", close);
 }
 
+async function webhookProject(projectArg, port, options = {}) {
+  const projectDir = path.resolve(projectArg);
+  const webhookServer = createWebhookServer({
+    logger,
+    projectDir,
+    secret: options.secret
+  });
+
+  webhookServer.listen(port);
+  logger.info(`Webhook receiver running at http://localhost:${port}/webhook/rebuild`);
+
+  const close = () => {
+    webhookServer.server.close(() => process.exit(0));
+  };
+  process.on("SIGINT", close);
+  process.on("SIGTERM", close);
+}
+
 async function createProject(projectName) {
   if (!projectName) {
     throw new Error("Usage: wpsc create <project-name>");
@@ -220,6 +246,7 @@ function printHelp() {
   wpsc dev [--project <project-dir>] [--port <port>]
   wpsc doctor [--project <project-dir>]
   wpsc serve [--project <project-dir>] [--port <port>]
+  wpsc webhook [--project <project-dir>] [--port <port>] [--secret <secret>]
   wpsc --help
   wpsc --version`);
 }
