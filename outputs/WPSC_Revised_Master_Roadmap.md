@@ -336,6 +336,8 @@ Commits:
 
 ## Phase 13 - Package Extraction And v0.1 Release
 
+Trang thai: DONE
+
 Muc tieu:
 
 - Tach package sau khi data/theme/seo pipeline da du hinh.

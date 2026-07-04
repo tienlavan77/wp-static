@@ -1,0 +1,69 @@
+# Getting Started
+
+WPSC v0.1.0 is a static commerce framework prototype for building fast HTML output
+from WordPress, WooCommerce, or local mock content.
+
+## Install
+
+During local development, run commands from the repository root:
+
+```bash
+npm test
+npm run build:example
+node src/cli/index.js dev --project examples/basic-shop --port 8080
+```
+
+## Project Shape
+
+```text
+my-shop/
+  wpsc.config.js
+  content.json
+  public/
+  theme/
+    layout.js
+    layouts/
+    components/
+    assets/
+```
+
+## Build
+
+```bash
+node src/cli/index.js build --project examples/basic-shop
+```
+
+The build writes static output to `dist`, including:
+
+- HTML routes
+- copied public assets
+- copied theme assets
+- downloaded remote media assets
+- `.wpsc/manifest.json`
+- `.wpsc/assets.json`
+- `sitemap.xml`
+- `robots.txt`
+
+## Dev
+
+```bash
+node src/cli/index.js dev --project examples/basic-shop --port 8080
+```
+
+Dev mode performs an initial build, serves the output, watches config/content/theme
+paths, rebuilds on change, and injects live reload into HTML.
+
+## Package Boundaries
+
+The v0.1.0 workspace exposes draft package entrypoints:
+
+- `@wpsc/shared`
+- `@wpsc/core`
+- `@wpsc/adapters`
+- `@wpsc/router`
+- `@wpsc/renderer`
+- `@wpsc/builder`
+- `@wpsc/cli`
+
+These packages currently re-export the stable prototype modules while the codebase
+continues toward full physical package extraction.
