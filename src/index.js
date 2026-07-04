@@ -41,6 +41,10 @@ export {
   FORBIDDEN_FRONTEND_SECRETS,
   validateCustomerAuthMode
 } from "./runtime/customerAuthStrategy.js";
+export { default as createCommerceRuntime } from "./runtime/commerce/createCommerceRuntime.js";
+export { default as createCommerceServer } from "./runtime/commerce/createCommerceServer.js";
+export { default as createSessionStore } from "./runtime/commerce/createSessionStore.js";
+export { default as resolveCustomerSession } from "./runtime/commerce/sessionMiddleware.js";
 export { default as serveStatic } from "./dev-server/serveStatic.js";
 export { default as startDevServer } from "./dev-server/startDevServer.js";
 export { default as validateConfig } from "./core/validateConfig.js";
