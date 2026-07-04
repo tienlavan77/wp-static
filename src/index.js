@@ -34,6 +34,13 @@ export { default as generateRobotsTxt } from "./seo/generateRobotsTxt.js";
 export { default as generateSitemap } from "./seo/generateSitemap.js";
 export { default as resolveTheme } from "./theme/resolveTheme.js";
 export { runPluginEvent, runPluginHook } from "./plugins/runPluginHook.js";
+export {
+  assertNoFrontendSecrets,
+  CUSTOMER_AUTH_BOUNDARY,
+  CUSTOMER_AUTH_MODES,
+  FORBIDDEN_FRONTEND_SECRETS,
+  validateCustomerAuthMode
+} from "./runtime/customerAuthStrategy.js";
 export { default as serveStatic } from "./dev-server/serveStatic.js";
 export { default as startDevServer } from "./dev-server/startDevServer.js";
 export { default as validateConfig } from "./core/validateConfig.js";
