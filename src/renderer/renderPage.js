@@ -41,6 +41,7 @@ export default function renderPage(route, layout, options = {}) {
     '          <a href="/">Trang chủ</a>',
     '          <a href="/gioi-thieu">Giới thiệu</a>',
     '          <a href="/iphone-15">iPhone 15</a>',
+    '          <a href="/builder.html">Builder</a>',
     '        </nav>',
     '        <button class="theme-toggle" type="button" aria-label="Đổi giao diện sáng tối" aria-pressed="false" title="Đổi giao diện sáng tối">',
     '          <span class="theme-toggle__sun" aria-hidden="true">L</span>',

@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>WPSC Builder</title>
+    <link rel="stylesheet" href="./builder.css">
+  </head>
+  <body>
+    <main class="builder-shell" data-builder-root>
+      <aside class="builder-sidebar">
+        <h1>Builder</h1>
+        <div class="builder-tabs" role="tablist" aria-label="Builder tools">
+          <button class="is-active" type="button" data-panel-button="blocks">Blocks</button>
+          <button type="button" data-panel-button="props">Props</button>
+        </div>
+        <section class="builder-panel is-active" data-panel="blocks">
+          <div class="block-palette" data-block-palette></div>
+        </section>
+        <section class="builder-panel" data-panel="props">
+          <form class="props-panel" data-props-panel></form>
+        </section>
+      </aside>
+      <section class="builder-canvas-wrap">
+        <div class="builder-toolbar">
+          <strong data-layout-name>Default Page</strong>
+          <button type="button" data-save-layout>Save JSON</button>
+        </div>
+        <div class="builder-canvas" data-canvas></div>
+      </section>
+      <aside class="builder-preview-wrap">
+        <div class="builder-toolbar">
+          <strong>Preview</strong>
+        </div>
+        <iframe title="Live preview" data-preview></iframe>
+      </aside>
+    </main>
+    <script type="module" src="./builder.js"></script>
+  </body>
+</html>
