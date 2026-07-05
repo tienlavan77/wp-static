@@ -9,8 +9,11 @@ export default function renderLayout(rawLayout, options = {}) {
   const layout = createLayoutDocument(rawLayout);
   const registry = options.registry ?? createBlockRegistry([
     ...coreCommerceBlocks,
+    ...(options.theme?.blocks ?? []),
     ...(options.blocks ?? [])
-  ]);
+  ], {
+    allowOverride: true
+  });
   const context = createVisualBuilderContext({
     ...options,
     html: options.html ?? html
