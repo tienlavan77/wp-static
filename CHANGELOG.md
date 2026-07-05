@@ -38,5 +38,6 @@
 - Added a dependency-free visual builder UI prototype with block palette, canvas ordering, props editing, live preview, and JSON export.
 - Added theme block libraries, project block overrides, and theme-aware builder preview rendering.
 - Added production builder foundations with editor auth, layout revisions, draft/publish state, and rebuild triggers.
+- Added advanced commerce data for product variant pages, sale/stock collections, and related products.
 
 Status: Mini core prototype complete, architecture remains `DRAFT`.

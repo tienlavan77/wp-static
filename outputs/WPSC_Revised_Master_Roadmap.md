@@ -682,11 +682,11 @@ Commits:
 220 docs(builder): add production builder guide
 ```
 
-## Phase 29 - Advanced Commerce
+## Phase 29 - Advanced Commerce - DONE
 
 Muc tieu:
 
-- Ho tro shop lon hon.
+- [x] Ho tro shop lon hon.
 
 Commits:
 

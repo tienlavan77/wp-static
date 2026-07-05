@@ -40,7 +40,7 @@ test("plugin hooks can transform data, render html, and observe builds", async (
   const manifest = JSON.parse(await readFile(result.manifestPath, "utf8"));
 
   assert.equal(sitePlan.plugins[0].name, "example-plugin");
-  assert.equal(result.pagesWritten, 7);
+  assert.equal(result.pagesWritten, 9);
   assert.match(pluginPage, /Plugin demo/);
   assert.match(pluginPage, /rendered-by-example-plugin/);
   assert.match(marker, /example-plugin buildEnd/);

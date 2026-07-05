@@ -30,7 +30,8 @@ test("parseChangedItem parses content and taxonomy changes", () => {
 });
 
 test("route dependency graph maps changed products to product and archive routes", async () => {
-  const full = await buildProjectOnce("examples/basic-shop");
+  const projectDir = await createIsolatedBasicShopProject("wpsc-incremental-graph-");
+  const full = await buildProjectOnce(projectDir);
   const graph = createRouteDependencyGraph(full.sitePlan);
   const affected = graph.findAffectedRoutes([parseChangedItem("product:iphone-15")]);
 
@@ -40,32 +41,48 @@ test("route dependency graph maps changed products to product and archive routes
 });
 
 test("incremental plan maps taxonomy changes to slug-only archive routes", async () => {
-  const full = await buildProjectOnce("examples/basic-shop");
+  const projectDir = await createIsolatedBasicShopProject("wpsc-incremental-plan-");
+  const full = await buildProjectOnce(projectDir);
   const plan = planIncrementalBuild(full.sitePlan, [
     parseChangedItem("term:product_cat:dien-thoai")
   ]);
 
   assert.equal(plan.fullBuild, false);
-  assert.deepEqual(plan.changedRoutes, ["/iphone-15", "/dien-thoai"]);
+  assert.deepEqual(plan.changedRoutes, ["/iphone-15", "/iphone-15-128gb-den", "/iphone-15-256gb-xanh", "/dien-thoai"]);
   assert.deepEqual(plan.affectedPages.map((page) => page.route.outputPath), [
     "iphone-15.html",
+    "iphone-15-128gb-den.html",
+    "iphone-15-256gb-xanh.html",
     "dien-thoai.html"
   ]);
   assert.equal(typeof plan.inputHash, "string");
 });
 
 test("buildProjectOnce supports changed item incremental builds", async () => {
-  await buildProjectOnce("examples/basic-shop");
-  const incremental = await buildProjectOnce("examples/basic-shop", {
+  const projectDir = await createIsolatedBasicShopProject("wpsc-incremental-build-");
+  await buildProjectOnce(projectDir);
+  const incremental = await buildProjectOnce(projectDir, {
     changed: ["product:iphone-15"]
   });
   const manifest = JSON.parse(await readFile(incremental.result.manifestPath, "utf8"));
 
   assert.equal(incremental.result.fullBuild, false);
-  assert.equal(incremental.result.pagesWritten, 2);
-  assert.deepEqual(incremental.result.changedRoutes, ["/iphone-15", "/dien-thoai"]);
-  assert.deepEqual(manifest.incremental.changedRoutes, ["/iphone-15", "/dien-thoai"]);
+  assert.equal(incremental.result.pagesWritten, 4);
+  assert.deepEqual(incremental.result.changedRoutes, ["/iphone-15", "/iphone-15-128gb-den", "/iphone-15-256gb-xanh", "/dien-thoai"]);
+  assert.deepEqual(manifest.incremental.changedRoutes, ["/iphone-15", "/iphone-15-128gb-den", "/iphone-15-256gb-xanh", "/dien-thoai"]);
 });
+
+async function createIsolatedBasicShopProject(prefix) {
+  const projectDir = await mkdtemp(path.join(os.tmpdir(), prefix));
+  await cp("examples/basic-shop", projectDir, {
+    filter(source) {
+      return !source.includes(`${path.sep}dist`) && !source.includes(`${path.sep}.wpsc`);
+    },
+    recursive: true
+  });
+
+  return projectDir;
+}
 
 test("cli build accepts repeated changed item flags", async () => {
   const projectDir = await mkdtemp(path.join(os.tmpdir(), "wpsc-incremental-cli-"));
@@ -90,6 +107,6 @@ test("cli build accepts repeated changed item flags", async () => {
     "term:product_cat:thoi-trang"
   ]);
 
-  assert.match(result.stdout, /Pages: 4/);
-  assert.match(result.stdout, /Incremental: \/iphone-15, \/ao-thun-basic, \/dien-thoai, \/thoi-trang/);
+  assert.match(result.stdout, /Pages: 6/);
+  assert.match(result.stdout, /Incremental: \/iphone-15, \/ao-thun-basic, \/iphone-15-128gb-den, \/iphone-15-256gb-xanh, \/dien-thoai, \/thoi-trang/);
 });

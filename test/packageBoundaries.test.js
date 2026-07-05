@@ -13,6 +13,7 @@ test("package boundary entrypoints export expected APIs", async () => {
 
   assert.equal(typeof shared.escapeHtml, "function");
   assert.equal(typeof core.compile, "function");
+  assert.equal(typeof core.applyAdvancedCommerceData, "function");
   assert.equal(typeof adapters.createWordPressAdapter, "function");
   assert.equal(typeof router.createRoutes, "function");
   assert.equal(typeof renderer.renderPage, "function");
