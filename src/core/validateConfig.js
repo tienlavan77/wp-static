@@ -14,6 +14,8 @@ export default function validateConfig(config) {
   requireOptionalString(config.theme, "theme.blocks");
   requireOptionalString(config.theme, "theme.components");
   requireOptionalString(config.project, "project.blocks");
+  requireOptionalString(config.builder, "builder.layoutsDir");
+  requireOptionalString(config.builder?.editor, "builder.editor.tokenEnv");
   requireOptionalPluginArray(config.plugins);
 
   if (config.adapter.type === "mock") {

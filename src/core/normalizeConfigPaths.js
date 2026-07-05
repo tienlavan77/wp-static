@@ -25,6 +25,7 @@ export default function normalizeConfigPaths(config, projectDir) {
       outputDir: path.resolve(projectDir, config.outputDir),
       publicDir: config.publicDir ? path.resolve(projectDir, config.publicDir) : null,
       adapterSource: config.adapter?.source ? path.resolve(projectDir, config.adapter.source) : null,
+      builderLayouts: config.builder?.layoutsDir ? path.resolve(projectDir, config.builder.layoutsDir) : null,
       projectBlocks: config.project?.blocks ? path.resolve(projectDir, config.project.blocks) : null,
       themeAssets: config.theme?.assets ? path.resolve(projectDir, config.theme.assets) : null,
       themeBlocks: config.theme?.blocks ? path.resolve(projectDir, config.theme.blocks) : null,

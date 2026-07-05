@@ -7,6 +7,12 @@ export default {
   },
   outputDir: "./dist",
   publicDir: "./public",
+  builder: {
+    layoutsDir: "./layouts/editor",
+    editor: {
+      tokenEnv: "WPSC_BUILDER_TOKEN"
+    }
+  },
   site: {
     url: "http://tinsinhphat.local",
     title: "Basic Shop",
