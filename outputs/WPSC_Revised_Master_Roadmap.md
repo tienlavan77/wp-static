@@ -607,13 +607,13 @@ Commits:
 197 test(builder): add layout model tests
 ```
 
-## Phase 25 - Visual Builder Renderer
+## Phase 25 - Visual Builder Renderer - DONE
 
 Muc tieu:
 
-- Render layout JSON thanh HTML static.
-- Mapping block voi content graph.
-- Fallback an toan khi thieu data.
+- [x] Render layout JSON thanh HTML static.
+- [x] Mapping block voi content graph.
+- [x] Fallback an toan khi thieu data.
 
 Commits:
 
