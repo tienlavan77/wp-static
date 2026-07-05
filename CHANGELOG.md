@@ -39,5 +39,6 @@
 - Added theme block libraries, project block overrides, and theme-aware builder preview rendering.
 - Added production builder foundations with editor auth, layout revisions, draft/publish state, and rebuild triggers.
 - Added advanced commerce data for product variant pages, sale/stock collections, and related products.
+- Added deployment helpers and guides for rsync, Cloudflare Pages, S3/R2, and GitHub Actions.
 
 Status: Mini core prototype complete, architecture remains `DRAFT`.

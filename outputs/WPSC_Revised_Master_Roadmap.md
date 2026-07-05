@@ -697,11 +697,11 @@ Commits:
 224 docs(commerce): add advanced commerce guide
 ```
 
-## Phase 30 - Deployment Integrations
+## Phase 30 - Deployment Integrations - DONE
 
 Muc tieu:
 
-- Deploy de hon.
+- [x] Deploy de hon.
 
 Commits:
 
