@@ -76,6 +76,7 @@ export { default as renderAddressBookView } from "./runtime/account/renderAddres
 export { default as renderLoginView } from "./runtime/account/renderLoginView.js";
 export { default as renderLayout } from "./visual-builder/renderLayout.js";
 export { default as renderLayoutNode } from "./visual-builder/renderLayoutNode.js";
+export { default as renderThemePreview } from "./visual-builder/renderThemePreview.js";
 export { default as renderLogoutView } from "./runtime/account/renderLogoutView.js";
 export { default as renderOrderHistoryView } from "./runtime/account/renderOrderHistoryView.js";
 export { default as serveStatic } from "./dev-server/serveStatic.js";
