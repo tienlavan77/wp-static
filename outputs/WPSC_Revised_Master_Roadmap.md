@@ -664,13 +664,13 @@ Commits:
 215 test(builder): add theme block integration tests
 ```
 
-## Phase 28 - Production Builder
+## Phase 28 - Production Builder - DONE
 
 Muc tieu:
 
-- Builder san sang dung cho editor.
-- Co auth, revision, draft/publish layout.
-- Layout doi thi trigger rebuild.
+- [x] Builder san sang dung cho editor.
+- [x] Co auth, revision, draft/publish layout.
+- [x] Layout doi thi trigger rebuild.
 
 Commits:
 

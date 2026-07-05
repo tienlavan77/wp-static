@@ -17,7 +17,9 @@ test("package boundary entrypoints export expected APIs", async () => {
   assert.equal(typeof router.createRoutes, "function");
   assert.equal(typeof renderer.renderPage, "function");
   assert.equal(typeof builder.buildSite, "function");
+  assert.equal(typeof builder.createBuilderWorkflow, "function");
   assert.equal(typeof builder.createLayoutDocument, "function");
+  assert.equal(typeof builder.createLayoutRevisionStore, "function");
   assert.equal(typeof builder.renderLayout, "function");
   assert.equal(typeof builder.renderThemePreview, "function");
   assert.equal(builderUi.builderUiApp.status, "prototype");
