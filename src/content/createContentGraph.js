@@ -65,7 +65,17 @@ function createIndexCollection(items, groupKey = null) {
 }
 
 function collectTerms(contents) {
-  return contents.flatMap((content) => content.data?.terms ?? []);
+  const byKey = new Map();
+
+  for (const term of contents.flatMap((content) => content.data?.terms ?? [])) {
+    const key = `${term.taxonomy ?? term.type ?? ""}:${term.slug ?? term.id ?? ""}`;
+
+    if (!byKey.has(key)) {
+      byKey.set(key, term);
+    }
+  }
+
+  return [...byKey.values()];
 }
 
 function collectMedia(contents) {

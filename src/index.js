@@ -1,5 +1,9 @@
 export { default as buildSite } from "./builder/buildSite.js";
+export { default as addRelatedProducts } from "./commerce/addRelatedProducts.js";
+export { default as applyAdvancedCommerceData } from "./commerce/applyAdvancedCommerceData.js";
 export { default as cleanOutput } from "./builder/cleanOutput.js";
+export { default as createCommerceCollections } from "./commerce/createCommerceCollections.js";
+export { default as createProductVariantContents } from "./commerce/createProductVariantContents.js";
 export { default as compile } from "./core/compile.js";
 export { default as coreCommerceBlocks } from "./blocks/core/commerceBlocks.js";
 export { resolveWooCommerceCredentials, resolveWordPressAuth } from "./auth/sourceCredentials.js";

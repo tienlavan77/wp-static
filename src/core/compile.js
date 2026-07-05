@@ -5,6 +5,7 @@ import createJsonFileCache, { createCacheKey } from "../cache/createJsonFileCach
 import createRouteRenderCache from "../cache/createRouteRenderCache.js";
 import readThroughCache from "../cache/readThroughCache.js";
 import createContentGraph from "../content/createContentGraph.js";
+import applyAdvancedCommerceData from "../commerce/applyAdvancedCommerceData.js";
 import createRoutes from "../router/createRoutes.js";
 import createPluginContext from "../plugins/createPluginContext.js";
 import loadPlugins from "../plugins/loadPlugins.js";
@@ -67,10 +68,11 @@ export default async function compile(config, options = {}) {
     collections: rawCollections,
     contents: rawContents
   }, pluginContext);
-  const contents = filterPublicContents(data.contents, {
+  const commerceData = applyAdvancedCommerceData(data);
+  const contents = filterPublicContents(commerceData.contents, {
     preview: options.preview
   });
-  const collections = data.collections ?? {};
+  const collections = commerceData.collections ?? {};
   const graph = createContentGraph({
     contents,
     media: collections.media,

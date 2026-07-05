@@ -43,10 +43,26 @@
     "domain": "shop",
     "data": {
       "price": 19900000,
+      "regularPrice": 21900000,
+      "salePrice": 19900000,
       "currency": "VND",
       "sku": "IP15-128-BLK",
       "description": "Điện thoại Apple với thiết kế gọn, hiệu năng mạnh và camera linh hoạt.",
       "inStock": true,
+      "variants": [
+        {
+          "name": "128GB Đen",
+          "slug": "128gb-den",
+          "sku": "IP15-128-BLK",
+          "price": 19900000
+        },
+        {
+          "name": "256GB Xanh",
+          "slug": "256gb-xanh",
+          "sku": "IP15-256-BLU",
+          "price": 22900000
+        }
+      ],
       "terms": [
         {
           "id": "product_cat:dien-thoai",
@@ -65,6 +81,7 @@
     "domain": "shop",
     "data": {
       "price": 249000,
+      "regularPrice": 249000,
       "currency": "VND",
       "sku": "TS-BASIC-WHT",
       "description": "Áo thun cotton đơn giản, dễ phối đồ, phù hợp dùng hằng ngày.",

@@ -33,6 +33,8 @@ function collectRouteDependencies(route) {
   return {
     content: {
       id: content.id ?? null,
+      parentId: content.data?.parentProductId ?? null,
+      parentSlug: content.data?.parentProductSlug ?? null,
       slug: content.slug ?? null,
       type: normalizeContentType(content.type)
     },
@@ -70,12 +72,14 @@ function matchesDependency(item, dependencies) {
 
   const sameContent = dependencies.content.type === item.type
     && (dependencies.content.id === item.id || dependencies.content.slug === item.routeSlug);
+  const sameParentContent = item.type === "product"
+    && (dependencies.content.parentId === item.id || dependencies.content.parentSlug === item.routeSlug);
   const inArchive = dependencies.archiveItems.some((archiveItem) => {
     return archiveItem.type === item.type
       && (archiveItem.id === item.id || archiveItem.slug === item.routeSlug);
   });
 
-  return sameContent || inArchive;
+  return sameContent || sameParentContent || inArchive;
 }
 
 function normalizeContentType(type) {
