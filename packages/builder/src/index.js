@@ -1,4 +1,5 @@
 export { default as buildSite } from "../../../src/builder/buildSite.js";
+export { default as assertBuilderEditorAccess } from "../../../src/visual-builder/production/assertBuilderEditorAccess.js";
 export { default as cleanOutput } from "../../../src/builder/cleanOutput.js";
 export { default as coreCommerceBlocks } from "../../../src/blocks/core/commerceBlocks.js";
 export { default as copyPublicAssets } from "../../../src/builder/copyPublicAssets.js";
@@ -9,6 +10,8 @@ export { createCacheKey, default as createJsonFileCache } from "../../../src/cac
 export { default as createContentTypeLayoutIndex } from "../../../src/visual-builder/createContentTypeLayoutIndex.js";
 export { default as createLayoutDocument, validateLayoutDocument } from "../../../src/visual-builder/createLayoutDocument.js";
 export { default as createLayoutNode } from "../../../src/visual-builder/createLayoutNode.js";
+export { default as createLayoutRevisionStore } from "../../../src/visual-builder/production/createLayoutRevisionStore.js";
+export { default as createBuilderWorkflow } from "../../../src/visual-builder/production/createBuilderWorkflow.js";
 export { default as createInputHash } from "../../../src/incremental/createInputHash.js";
 export { default as createRouteRenderCache } from "../../../src/cache/createRouteRenderCache.js";
 export { default as createRouteDependencyGraph } from "../../../src/incremental/createRouteDependencyGraph.js";

@@ -13,12 +13,15 @@ export { default as createContentCollection } from "./content/createContentColle
 export { default as createContentGraph } from "./content/createContentGraph.js";
 export { default as createLayoutDocument, validateLayoutDocument } from "./visual-builder/createLayoutDocument.js";
 export { default as createLayoutNode } from "./visual-builder/createLayoutNode.js";
+export { default as createLayoutRevisionStore } from "./visual-builder/production/createLayoutRevisionStore.js";
+export { default as createBuilderWorkflow } from "./visual-builder/production/createBuilderWorkflow.js";
 export { default as createLogger } from "./shared/createLogger.js";
 export { default as createMedia } from "./content/createMedia.js";
 export { default as createMenu } from "./content/createMenu.js";
 export { default as createMockAdapter } from "./adapters/mockAdapter.js";
 export { default as createPluginContext } from "./plugins/createPluginContext.js";
 export { default as assertPreviewAccess } from "./preview/assertPreviewAccess.js";
+export { default as assertBuilderEditorAccess } from "./visual-builder/production/assertBuilderEditorAccess.js";
 export { default as filterPublicContents } from "./preview/filterPublicContents.js";
 export { default as createTerm } from "./content/createTerm.js";
 export { default as createWatchTargets } from "./dev-server/createWatchTargets.js";
