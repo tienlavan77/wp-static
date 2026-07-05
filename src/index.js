@@ -2,6 +2,7 @@ export { default as buildSite } from "./builder/buildSite.js";
 export { default as addRelatedProducts } from "./commerce/addRelatedProducts.js";
 export { default as applyAdvancedCommerceData } from "./commerce/applyAdvancedCommerceData.js";
 export { default as cleanOutput } from "./builder/cleanOutput.js";
+export { default as createRsyncDeployPlan } from "./deploy/createRsyncDeployPlan.js";
 export { default as createCommerceCollections } from "./commerce/createCommerceCollections.js";
 export { default as createProductVariantContents } from "./commerce/createProductVariantContents.js";
 export { default as compile } from "./core/compile.js";
@@ -65,6 +66,7 @@ export { default as readThroughCache } from "./cache/readThroughCache.js";
 export { default as renderBlock } from "./blocks/renderBlock.js";
 export { default as resolveBlockBindings } from "./blocks/resolveBlockBindings.js";
 export { default as runLimitedParallel } from "./performance/runLimitedParallel.js";
+export { default as runRsyncDeploy } from "./deploy/runRsyncDeploy.js";
 export { default as validateBlockProps } from "./blocks/validateBlockProps.js";
 export { runPluginEvent, runPluginHook } from "./plugins/runPluginHook.js";
 export {

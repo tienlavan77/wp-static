@@ -8,6 +8,7 @@ import loadConfig from "../core/loadConfig.js";
 import buildProjectOnce from "../dev-server/buildProjectOnce.js";
 import serveStatic from "../dev-server/serveStatic.js";
 import startDevServer from "../dev-server/startDevServer.js";
+import runRsyncDeploy from "../deploy/runRsyncDeploy.js";
 import createWebhookServer from "../webhook/createWebhookServer.js";
 import { getPackageInfo } from "../index.js";
 import createLogger from "../shared/createLogger.js";
@@ -62,6 +63,14 @@ async function main(cliArgs) {
 
   if (cliArgs[0] === "dev") {
     await devProject(readProjectArg(cliArgs), readPortArg(cliArgs));
+    return;
+  }
+
+  if (cliArgs[0] === "deploy" && cliArgs[1] === "rsync") {
+    await deployRsync(readProjectArg(cliArgs), {
+      dryRun: cliArgs.includes("--dry-run"),
+      target: readOptionalArg(cliArgs, "--target")
+    });
     return;
   }
 
@@ -198,6 +207,22 @@ async function serveProject(projectArg, port) {
   process.on("SIGTERM", close);
 }
 
+async function deployRsync(projectArg, options = {}) {
+  if (!options.target) {
+    throw new Error('CLI option "--target" is required for deploy rsync.');
+  }
+
+  const { config, result } = await buildProjectOnce(projectArg);
+
+  await runRsyncDeploy({
+    dryRun: options.dryRun,
+    sourceDir: result.outputDir,
+    target: options.target
+  });
+
+  logger.info(`Deployed ${config.name} to ${options.target}${options.dryRun ? " (dry run)" : ""}`);
+}
+
 async function devProject(projectArg, port) {
   const projectDir = path.resolve(projectArg);
   const devServer = await startDevServer(projectDir, {
@@ -264,6 +289,7 @@ function printHelp() {
   wpsc build [--project <project-dir>] [--changed <type:id>] [--preview --preview-token <token>]
   wpsc clean [--project <project-dir>]
   wpsc create <project-name>
+  wpsc deploy rsync [--project <project-dir>] --target <user@host:/path/> [--dry-run]
   wpsc dev [--project <project-dir>] [--port <port>]
   wpsc doctor [--project <project-dir>]
   wpsc serve [--project <project-dir>] [--port <port>]

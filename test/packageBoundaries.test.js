@@ -25,4 +25,5 @@ test("package boundary entrypoints export expected APIs", async () => {
   assert.equal(typeof builder.renderThemePreview, "function");
   assert.equal(builderUi.builderUiApp.status, "prototype");
   assert.equal(typeof cli.startDevServer, "function");
+  assert.equal(typeof cli.createRsyncDeployPlan, "function");
 });
