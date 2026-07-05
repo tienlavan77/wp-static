@@ -1,12 +1,12 @@
 import createBlockSchema from "./createBlockSchema.js";
 
-export default function createBlockRegistry(blocks = []) {
+export default function createBlockRegistry(blocks = [], options = {}) {
   const blockMap = new Map();
 
   for (const rawBlock of blocks) {
     const block = createBlockSchema(rawBlock);
 
-    if (blockMap.has(block.name)) {
+    if (blockMap.has(block.name) && !options.allowOverride) {
       throw new Error(`Duplicate block "${block.name}".`);
     }
 
