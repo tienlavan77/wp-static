@@ -1,4 +1,5 @@
 export { default as compile } from "../../../src/core/compile.js";
+export { default as applyAdvancedCommerceData } from "../../../src/commerce/applyAdvancedCommerceData.js";
 export { default as createContent } from "../../../src/core/createContent.js";
 export { default as doctorProject } from "../../../src/core/doctorProject.js";
 export { default as loadConfig } from "../../../src/core/loadConfig.js";
