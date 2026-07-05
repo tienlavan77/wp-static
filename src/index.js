@@ -15,6 +15,7 @@ export { default as createLayoutDocument, validateLayoutDocument } from "./visua
 export { default as createLayoutNode } from "./visual-builder/createLayoutNode.js";
 export { default as createLayoutRevisionStore } from "./visual-builder/production/createLayoutRevisionStore.js";
 export { default as createBuilderWorkflow } from "./visual-builder/production/createBuilderWorkflow.js";
+export { default as createBuilderPublishChange } from "./visual-builder/production/createBuilderPublishChange.js";
 export { default as createLogger } from "./shared/createLogger.js";
 export { default as createMedia } from "./content/createMedia.js";
 export { default as createMenu } from "./content/createMenu.js";

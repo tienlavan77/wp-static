@@ -12,6 +12,7 @@ export { default as createLayoutDocument, validateLayoutDocument } from "../../.
 export { default as createLayoutNode } from "../../../src/visual-builder/createLayoutNode.js";
 export { default as createLayoutRevisionStore } from "../../../src/visual-builder/production/createLayoutRevisionStore.js";
 export { default as createBuilderWorkflow } from "../../../src/visual-builder/production/createBuilderWorkflow.js";
+export { default as createBuilderPublishChange } from "../../../src/visual-builder/production/createBuilderPublishChange.js";
 export { default as createInputHash } from "../../../src/incremental/createInputHash.js";
 export { default as createRouteRenderCache } from "../../../src/cache/createRouteRenderCache.js";
 export { default as createRouteDependencyGraph } from "../../../src/incremental/createRouteDependencyGraph.js";

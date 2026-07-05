@@ -1,4 +1,5 @@
 import assertBuilderEditorAccess from "./assertBuilderEditorAccess.js";
+import createBuilderPublishChange from "./createBuilderPublishChange.js";
 import createLayoutRevisionStore from "./createLayoutRevisionStore.js";
 
 export default function createBuilderWorkflow(options = {}) {
@@ -18,14 +19,7 @@ export default function createBuilderWorkflow(options = {}) {
       const result = await store.publish(layoutId);
       const rebuild = rebuildQueue
         ? await rebuildQueue.enqueue({
-          changes: [{
-            id: layoutId,
-            reason: `builder:publish:${layoutId}`,
-            routeSlug: null,
-            source: "builder",
-            taxonomy: null,
-            type: "layout"
-          }],
+          changes: [createBuilderPublishChange(layoutId)],
           payload: result.record.published,
           reason: `builder layout publish: ${layoutId}`
         })
