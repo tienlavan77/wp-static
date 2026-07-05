@@ -8,6 +8,7 @@ test("package boundary entrypoints export expected APIs", async () => {
   const router = await import("../packages/router/src/index.js");
   const renderer = await import("../packages/renderer/src/index.js");
   const builder = await import("../packages/builder/src/index.js");
+  const builderUi = await import("../packages/builder-ui/src/index.js");
   const cli = await import("../packages/cli/src/index.js");
 
   assert.equal(typeof shared.escapeHtml, "function");
@@ -18,5 +19,6 @@ test("package boundary entrypoints export expected APIs", async () => {
   assert.equal(typeof builder.buildSite, "function");
   assert.equal(typeof builder.createLayoutDocument, "function");
   assert.equal(typeof builder.renderLayout, "function");
+  assert.equal(builderUi.builderUiApp.status, "prototype");
   assert.equal(typeof cli.startDevServer, "function");
 });

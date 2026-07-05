@@ -626,13 +626,13 @@ Commits:
 203 test(builder): add visual renderer tests
 ```
 
-## Phase 26 - Builder UI Prototype
+## Phase 26 - Builder UI Prototype - DONE
 
 Muc tieu:
 
-- Prototype UI keo tha dung duoc.
-- Preview live va save layout JSON.
-- Chua can dep, uu tien workflow that.
+- [x] Prototype UI keo tha dung duoc.
+- [x] Preview live va save layout JSON.
+- [x] Chua can dep, uu tien workflow that.
 
 Commits:
 

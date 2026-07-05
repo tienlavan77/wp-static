@@ -35,5 +35,6 @@
 - Added block schemas, props validation, data bindings, and starter commerce blocks for the visual builder foundation.
 - Added visual builder layout JSON documents with content type mapping, nested section/block nodes, and responsive settings.
 - Added visual builder layout rendering with content bindings, commerce blocks, taxonomy archive blocks, and safe missing-block fallbacks.
+- Added a dependency-free visual builder UI prototype with block palette, canvas ordering, props editing, live preview, and JSON export.
 
 Status: Mini core prototype complete, architecture remains `DRAFT`.
