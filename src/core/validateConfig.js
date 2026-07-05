@@ -11,7 +11,9 @@ export default function validateConfig(config) {
   requireString(config.adapter, "adapter.type");
   requireString(config.theme, "theme.layout");
   requireOptionalString(config.theme, "theme.assets");
+  requireOptionalString(config.theme, "theme.blocks");
   requireOptionalString(config.theme, "theme.components");
+  requireOptionalString(config.project, "project.blocks");
   requireOptionalPluginArray(config.plugins);
 
   if (config.adapter.type === "mock") {

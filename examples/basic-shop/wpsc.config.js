@@ -14,6 +14,7 @@ export default {
   },
   theme: {
     layout: "./theme/layout.js",
+    blocks: "./theme/blocks.js",
     layouts: {
       page: "./theme/layouts/page.js",
       product: "./theme/layouts/product.js"
