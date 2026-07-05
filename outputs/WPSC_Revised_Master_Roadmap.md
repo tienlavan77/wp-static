@@ -646,13 +646,13 @@ Commits:
 210 test(builder-ui): add builder smoke tests
 ```
 
-## Phase 27 - Theme And Builder Integration
+## Phase 27 - Theme And Builder Integration - DONE
 
 Muc tieu:
 
-- Theme cung cap block library.
-- Project co the override block.
-- Builder dung component that cua theme.
+- [x] Theme cung cap block library.
+- [x] Project co the override block.
+- [x] Builder dung component that cua theme.
 
 Commits:
 

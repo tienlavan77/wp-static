@@ -39,6 +39,7 @@ test("theme resolver supports content type layouts, components, metadata, and as
   assert.equal(manifest.assets.copiedThemeAssets, true);
   assert.equal(manifest.theme.name, "Basic Commerce Theme");
   assert.equal(manifest.theme.version, "0.1.0");
+  assert.equal(sitePlan.theme.blocks.some((block) => block.name === "theme/badge"), true);
 });
 
 test("theme resolver falls back to theme.layout when content type layout is missing", async () => {
