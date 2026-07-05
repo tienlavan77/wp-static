@@ -18,6 +18,8 @@ export { default as collectAssetUrls } from "../../../src/assets/collectAssetUrl
 export { default as processAssetPipeline } from "../../../src/assets/processAssetPipeline.js";
 export { default as readThroughCache } from "../../../src/cache/readThroughCache.js";
 export { default as renderBlock } from "../../../src/blocks/renderBlock.js";
+export { default as renderLayout } from "../../../src/visual-builder/renderLayout.js";
+export { default as renderLayoutNode } from "../../../src/visual-builder/renderLayoutNode.js";
 export { default as resolveBlockBindings } from "../../../src/blocks/resolveBlockBindings.js";
 export { default as runLimitedParallel } from "../../../src/performance/runLimitedParallel.js";
 export { RESPONSIVE_BREAKPOINTS, default as normalizeResponsiveSettings } from "../../../src/visual-builder/normalizeResponsiveSettings.js";
