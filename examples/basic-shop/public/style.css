@@ -117,6 +117,36 @@ a {
   gap: 10px;
 }
 
+.demo-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.demo-actions__primary {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: 7px;
+  color: #ffffff;
+  background: var(--accent);
+  font-size: 14px;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.demo-actions__hint {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
 .archive-links a {
   padding: 8px 11px;
   border: 1px solid var(--line);

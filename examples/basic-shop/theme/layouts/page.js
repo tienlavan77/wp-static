@@ -4,10 +4,24 @@ export default function pageLayout({ components, content, route, html }) {
       <p class="eyebrow">${components.label("page")}</p>
       <h1>${content.title}</h1>
       <p class="description">${content.data.headline ?? content.data.description ?? ""}</p>
+      ${renderHomeDemoLinks(route, html)}
       ${renderArchiveLinks(content, html)}
       <small class="meta">${route.path}</small>
     </main>
   `;
+}
+
+function renderHomeDemoLinks(route, html) {
+  if (route.path !== "/") {
+    return "";
+  }
+
+  return html.raw([
+    '<div class="demo-actions" aria-label="Demo">',
+    '<a class="demo-actions__primary" href="/builder.html">Mở Builder demo</a>',
+    '<span class="demo-actions__hint">Dùng nút L/D trên header để kiểm tra dark mode.</span>',
+    "</div>"
+  ].join(""));
 }
 
 function renderArchiveLinks(content, html) {

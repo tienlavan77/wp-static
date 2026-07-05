@@ -1,21 +1,31 @@
 import path from "node:path";
+import { stat } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 
 export default async function resolveTheme(config, projectDir, options = {}) {
   const themeConfig = config.theme ?? {};
-  const metadata = {
-    name: themeConfig.meta?.name ?? themeConfig.name ?? config.name,
-    version: themeConfig.meta?.version ?? null,
-    description: themeConfig.meta?.description ?? null
-  };
-  const fallbackLayout = await importDefaultModule(resolvePath(
+  const fallbackLayoutPath = resolvePath(
     config._paths?.themeLayout,
     projectDir,
     themeConfig.layout
-  ), options);
-  const layouts = await loadLayouts(themeConfig, config._paths?.themeLayouts, projectDir, options);
-  const components = await loadComponents(themeConfig, config._paths?.themeComponents, projectDir, options);
+  );
+  const layoutPaths = resolveLayoutPaths(themeConfig, config._paths?.themeLayouts, projectDir);
+  const componentsPath = config._paths?.themeComponents ?? resolveOptionalPath(projectDir, themeConfig.components);
   const assetsDir = config._paths?.themeAssets ?? resolveOptionalPath(projectDir, themeConfig.assets);
+  const metadata = {
+    name: themeConfig.meta?.name ?? themeConfig.name ?? config.name,
+    version: themeConfig.meta?.version ?? null,
+    description: themeConfig.meta?.description ?? null,
+    fingerprint: await createThemeFingerprint([
+      fallbackLayoutPath,
+      ...Object.values(layoutPaths),
+      componentsPath,
+      assetsDir
+    ])
+  };
+  const fallbackLayout = await importDefaultModule(fallbackLayoutPath, options);
+  const layouts = await loadLayouts(layoutPaths, options);
+  const components = await loadComponents(componentsPath, options);
 
   return {
     metadata,
@@ -27,20 +37,26 @@ export default async function resolveTheme(config, projectDir, options = {}) {
   };
 }
 
-async function loadLayouts(themeConfig, normalizedLayouts, projectDir, options) {
+function resolveLayoutPaths(themeConfig, normalizedLayouts, projectDir) {
   const entries = Object.entries(normalizedLayouts ?? themeConfig.layouts ?? {});
+  return Object.fromEntries(entries.map(([contentType, layoutPath]) => [
+    contentType,
+    resolvePath(layoutPath, projectDir, layoutPath)
+  ]));
+}
+
+async function loadLayouts(layoutPaths, options) {
+  const entries = Object.entries(layoutPaths);
   const layouts = new Map();
 
   for (const [contentType, layoutPath] of entries) {
-    layouts.set(contentType, await importDefaultModule(resolvePath(layoutPath, projectDir, layoutPath), options));
+    layouts.set(contentType, await importDefaultModule(layoutPath, options));
   }
 
   return layouts;
 }
 
-async function loadComponents(themeConfig, normalizedPath, projectDir, options) {
-  const componentsPath = normalizedPath ?? resolveOptionalPath(projectDir, themeConfig.components);
-
+async function loadComponents(componentsPath, options) {
   if (!componentsPath) {
     return {};
   }
@@ -66,6 +82,28 @@ function resolvePath(normalizedPath, projectDir, inputPath) {
   }
 
   return path.resolve(projectDir, inputPath);
+}
+
+async function createThemeFingerprint(paths) {
+  const entries = [];
+
+  for (const filePath of paths.filter(Boolean)) {
+    try {
+      const info = await stat(filePath);
+      entries.push({
+        mtimeMs: Math.trunc(info.mtimeMs),
+        path: filePath,
+        size: info.size
+      });
+    } catch {
+      entries.push({
+        missing: true,
+        path: filePath
+      });
+    }
+  }
+
+  return entries;
 }
 
 function resolveOptionalPath(projectDir, inputPath) {

@@ -19,9 +19,12 @@ test("renderPage includes a working dark mode toggle in the site header", async 
   const css = await readFile("examples/basic-shop/public/style.css", "utf8");
 
   assert.match(rendered, /class="theme-toggle"/);
+  assert.match(rendered, /href="\/builder\.html"/);
   assert.match(rendered, /\/style\.css\?v=darkmode-1/);
   assert.match(rendered, /localStorage\.getItem\("wpsc-theme"\)/);
   assert.match(rendered, /document\.documentElement\.dataset\.theme/);
   assert.match(css, /:root\[data-theme="dark"\]/);
   assert.match(css, /--paper: #101712/);
+  assert.match(css, /\.demo-actions/);
+  assert.match(css, /background: var\(--surface\)/);
 });

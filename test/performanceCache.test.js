@@ -28,6 +28,28 @@ test("buildProjectOnce reuses content and route render caches", async () => {
   assert.equal(manifest.cache.routeRenderCacheHits, 6);
 });
 
+test("buildProjectOnce invalidates route render cache when theme files change", async () => {
+  const projectDir = await mkdtemp(path.join(os.tmpdir(), "wpsc-theme-cache-"));
+  await cp("examples/basic-shop", projectDir, {
+    filter(source) {
+      return !source.includes(`${path.sep}dist`) && !source.includes(`${path.sep}.wpsc`);
+    },
+    recursive: true
+  });
+
+  await buildProjectOnce(projectDir);
+  await writeFile(
+    path.join(projectDir, "theme", "layouts", "page.js"),
+    "export default ({ html }) => html`<main class=\"page-view\">fresh theme</main>`;\n",
+    "utf8"
+  );
+  const changed = await buildProjectOnce(projectDir);
+  const homepage = await readFile(path.join(projectDir, "dist", "index.html"), "utf8");
+
+  assert.equal(changed.sitePlan.cache.routeRenderCacheMisses, 6);
+  assert.match(homepage, /fresh theme/);
+});
+
 test("large catalog compile supports parallel rendering and render cache hits", async () => {
   const projectDir = await createLargeCatalogProject(80);
   const config = {
