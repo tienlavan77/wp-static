@@ -48,6 +48,28 @@ export default {
 };
 ```
 
+## Project .env File
+
+WPSC loads `.env` from the project directory before reading `wpsc.config.js`. Values that
+already exist in the shell are kept, so deployment environments can override local files.
+
+For the Basic Shop example:
+
+```sh
+cp examples/basic-shop/.env.example examples/basic-shop/.env
+```
+
+Then fill:
+
+```env
+WPSC_WOO_CONSUMER_KEY=ck_replace_me
+WPSC_WOO_CONSUMER_SECRET=cs_replace_me
+WPSC_WP_USERNAME=
+WPSC_WP_APP_PASSWORD=
+```
+
+Keep `examples/basic-shop/.env` private. It is ignored by git.
+
 ## WordPress And WooCommerce Together
 
 Use this for a real store that needs WordPress pages, posts, menus, media, SEO, and
