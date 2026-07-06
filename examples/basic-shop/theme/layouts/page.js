@@ -1,6 +1,10 @@
-export default function pageLayout({ components, content, route, html }) {
+export default function pageLayout({ components, content, graph, route, html }) {
   if (content.data.uiDemo === true) {
     return renderUiStorefrontDemo({ content, html, route });
+  }
+
+  if (route.path === "/") {
+    return renderStorefrontHome({ content, graph, html });
   }
 
   return html`
@@ -11,6 +15,73 @@ export default function pageLayout({ components, content, route, html }) {
       ${renderHomeDemoLinks(route, html)}
       ${renderArchiveLinks(content, html)}
       <small class="meta">${route.path}</small>
+    </main>
+  `;
+}
+
+function renderStorefrontHome({ content, graph, html }) {
+  const products = getFeaturedProducts(content, graph).slice(0, 6);
+  const categories = createHomeCategories(content, graph).slice(0, 6);
+  const stats = [
+    ["125+", "mẫu sản phẩm"],
+    ["24h", "phản hồi báo giá"],
+    ["1 route", "build homepage"]
+  ];
+
+  return html`
+    <main class="storefront-home">
+      <section class="storefront-container py-6">
+        <div class="grid gap-6 lg:grid-cols-[1.1fr_.9fr]">
+          <div class="rounded-panel border border-[var(--storefront-line)] bg-[var(--storefront-surface)] p-5 shadow-storefront lg:p-7">
+            <p class="storefront-kicker">Tín Sinh Phát Storefront</p>
+            <h1 class="mt-4 max-w-3xl text-3xl font-bold leading-tight sm:text-5xl">${content.data.headline ?? content.title}</h1>
+            <p class="mt-4 max-w-2xl text-base leading-7 text-[var(--storefront-muted)]">${content.data.description ?? ""}</p>
+            <div class="mt-6 flex flex-wrap gap-3">
+              <a class="storefront-button" href="/shop">Xem sản phẩm</a>
+              <a class="storefront-button-secondary" href="/lien-he">Nhận báo giá</a>
+            </div>
+            <dl class="mt-6 grid gap-3 sm:grid-cols-3">
+              ${html.raw(stats.map(([value, label]) => `
+                <div class="rounded-md border border-[var(--storefront-line)] px-3 py-3">
+                  <dt class="text-xl font-bold">${escapeText(value)}</dt>
+                  <dd class="text-xs leading-5 text-[var(--storefront-muted)]">${escapeText(label)}</dd>
+                </div>
+              `).join(""))}
+            </dl>
+          </div>
+
+          <aside class="rounded-panel border border-[var(--storefront-line)] bg-[var(--storefront-paper)] p-5 lg:p-6">
+            <div class="flex items-center justify-between gap-4">
+              <div>
+                <p class="storefront-kicker">Danh mục</p>
+                <h2 class="mt-2 text-2xl font-bold">Duyệt nhanh</h2>
+              </div>
+              <a class="storefront-button-secondary" href="/shop">Tất cả</a>
+            </div>
+            <div class="mt-5 grid gap-2">
+              ${html.raw(categories.map((category) => `
+                <a class="flex items-center justify-between rounded-md border border-[var(--storefront-line)] bg-[var(--storefront-surface)] px-3 py-3 text-sm transition hover:border-brand-600" href="${escapeAttribute(category.href)}">
+                  <span class="font-bold">${escapeText(category.label)}</span>
+                  <span class="text-[var(--storefront-muted)]">Xem</span>
+                </a>
+              `).join(""))}
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="storefront-container pb-8">
+        <div class="flex flex-col gap-3 border-t border-[var(--storefront-line)] pt-6 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p class="storefront-kicker">Sản phẩm nổi bật</p>
+            <h2 class="mt-2 text-2xl font-bold">Gợi ý cho đơn hàng in ấn</h2>
+          </div>
+          <a class="storefront-button-secondary" href="/shop">Xem thêm</a>
+        </div>
+        <div class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          ${html.raw(products.map((product) => renderHomeProductCard(product)).join(""))}
+        </div>
+      </section>
     </main>
   `;
 }
@@ -125,6 +196,73 @@ function renderMetric(label, value) {
       <strong class="text-right">${escapeText(value)}</strong>
     </div>
   `;
+}
+
+function getFeaturedProducts(content, graph) {
+  const byId = graph?.findContentById;
+  const featuredIds = Array.isArray(content.data.featuredProductIds)
+    ? content.data.featuredProductIds
+    : [];
+  const featured = featuredIds
+    .map((id) => byId?.(id))
+    .filter(Boolean);
+
+  if (featured.length > 0) {
+    return featured;
+  }
+
+  return (graph?.contents?.items ?? []).filter((item) => item.type === "product");
+}
+
+function createHomeCategories(content, graph) {
+  const explicitLinks = content.data.archiveLinks;
+
+  if (Array.isArray(explicitLinks) && explicitLinks.length > 0) {
+    return explicitLinks.map((link) => ({
+      href: link.href,
+      label: link.label
+    }));
+  }
+
+  return (graph?.terms?.items ?? [])
+    .filter((term) => term.taxonomy === "product_cat")
+    .map((term) => ({
+      href: `/${term.slug}`,
+      label: term.name
+    }));
+}
+
+function renderHomeProductCard(product) {
+  const data = product.data ?? {};
+  const price = formatPrice(data.price, data.currency);
+  const description = data.shortDescription ?? data.description ?? "";
+
+  return `
+    <article class="rounded-panel border border-[var(--storefront-line)] bg-[var(--storefront-surface)] p-4">
+      <a class="block" href="/${escapeAttribute(product.slug)}">
+        <div class="grid aspect-[4/3] place-items-center rounded-md bg-[var(--storefront-paper)] text-sm font-bold text-[var(--storefront-muted)]">
+          ${escapeText(product.title).slice(0, 28)}
+        </div>
+        <h3 class="mt-4 line-clamp-2 min-h-12 text-base font-bold leading-6">${escapeText(product.title)}</h3>
+      </a>
+      <p class="mt-2 line-clamp-2 min-h-10 text-sm leading-5 text-[var(--storefront-muted)]">${escapeText(description)}</p>
+      <div class="mt-4 flex items-center justify-between gap-3">
+        <strong class="text-brand-700">${escapeText(price)}</strong>
+        <a class="storefront-button-secondary min-h-9 px-3" href="/${escapeAttribute(product.slug)}">Chi tiết</a>
+      </div>
+    </article>
+  `;
+}
+
+function formatPrice(value, currency = "VND") {
+  if (typeof value !== "number") {
+    return "Liên hệ";
+  }
+
+  return new Intl.NumberFormat("vi-VN", {
+    currency,
+    style: "currency"
+  }).format(value);
 }
 
 function renderHomeDemoLinks(route, html) {

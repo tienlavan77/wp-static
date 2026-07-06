@@ -48,6 +48,7 @@ Remote assets downloaded: 0
 | `1647787` | Done | Limited incremental asset processing to changed pages. |
 | `9af5ff5` | Done | Added flat-route taxonomy breadcrumbs. |
 | `ca7735e` | Done | Refined storefront shell demo header, hero, metrics, and footer. |
+| `TBD` | In progress | Build storefront homepage directly on `/`. |
 
 ## Current Demo Page
 
@@ -206,3 +207,4 @@ http://tinsinhphat.local/ui-storefront-demo
 - Exact brand colors after visual review.
 - Header utility row content: hotline, Zalo, email, address, or account/cart.
 - When to promote demo header/footer into global layouts.
+- Whether homepage should keep this direct layout or later move into reusable shared sections.
