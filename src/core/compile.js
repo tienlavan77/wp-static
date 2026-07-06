@@ -1,3 +1,4 @@
+import { stat } from "node:fs/promises";
 import createMockAdapter from "../adapters/mockAdapter.js";
 import createWordPressAdapter from "../adapters/wordpress/wordpressAdapter.js";
 import createWordPressWooCommerceAdapter from "../adapters/wordpressWooCommerce/wordpressWooCommerceAdapter.js";
@@ -87,6 +88,7 @@ export default async function compile(config, options = {}) {
   const theme = await resolveTheme(config, projectDir, {
     cacheBust: options.cacheBust
   });
+  const rendererFingerprint = await createRendererFingerprint();
   const routeRenderCache = createRouteRenderCache({
     cacheDir
   });
@@ -94,6 +96,7 @@ export default async function compile(config, options = {}) {
     const html = await renderRoute(route, {
       config,
       graph,
+      rendererFingerprint,
       routeRenderCache,
       stats,
       theme
@@ -121,7 +124,10 @@ export default async function compile(config, options = {}) {
 }
 
 async function renderRoute(route, context) {
-  const cacheKey = context.routeRenderCache?.createKey(route, context.theme.metadata);
+  const cacheKey = context.routeRenderCache?.createKey(route, {
+    ...context.theme.metadata,
+    renderer: context.rendererFingerprint
+  });
   const cachedHtml = cacheKey ? await context.routeRenderCache.get(cacheKey) : null;
 
   if (cachedHtml !== null) {
@@ -142,6 +148,25 @@ async function renderRoute(route, context) {
   }
 
   return html;
+}
+
+async function createRendererFingerprint() {
+  const filePath = new URL("../renderer/renderPage.js", import.meta.url);
+
+  try {
+    const info = await stat(filePath);
+
+    return {
+      mtimeMs: Math.trunc(info.mtimeMs),
+      path: filePath.pathname,
+      size: info.size
+    };
+  } catch {
+    return {
+      missing: true,
+      path: filePath.pathname
+    };
+  }
 }
 
 function createAdapter(config, projectDir) {
