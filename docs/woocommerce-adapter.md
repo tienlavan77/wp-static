@@ -1,6 +1,6 @@
 # WooCommerce Adapter Guide
 
-Status: `Draft`
+Status: v1 stable adapter.
 
 The WooCommerce adapter follows this layer order:
 

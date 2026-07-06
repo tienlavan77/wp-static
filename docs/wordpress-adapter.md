@@ -1,6 +1,6 @@
 # WordPress Adapter Guide
 
-Status: `Draft`
+Status: v1 stable adapter.
 
 The WordPress adapter follows this layer order:
 

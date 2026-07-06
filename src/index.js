@@ -70,6 +70,11 @@ export { default as runLimitedParallel } from "./performance/runLimitedParallel.
 export { default as runRsyncDeploy } from "./deploy/runRsyncDeploy.js";
 export { default as validateBlockProps } from "./blocks/validateBlockProps.js";
 export { runPluginEvent, runPluginHook } from "./plugins/runPluginHook.js";
+export {
+  V1_ADAPTER_API,
+  V1_ADAPTER_OPTIONAL_METHODS,
+  V1_ADAPTER_REQUIRED_METHODS
+} from "./api/v1AdapterApi.js";
 export { V1_PLUGIN_API, V1_PLUGIN_HOOKS } from "./api/v1PluginApi.js";
 export {
   V1_THEME_API,
