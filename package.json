@@ -12,6 +12,8 @@
   },
   "scripts": {
     "build": "node src/cli/index.js build",
+    "build:css:example": "tailwindcss -i examples/basic-shop/theme/storefront.css -o examples/basic-shop/public/storefront.css --minify",
+    "prebuild:example": "npm run build:css:example",
     "build:example": "node src/cli/index.js build --project examples/basic-shop",
     "wpsc": "node src/cli/index.js",
     "test": "node --test"
@@ -29,5 +31,11 @@
   "bin": {
     "wpsc": "./src/cli/index.js"
   },
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.2",
+    "autoprefixer": "^10.5.2",
+    "postcss": "^8.5.16",
+    "tailwindcss": "^4.3.2"
+  }
 }

@@ -32,6 +32,7 @@ export default function renderPage(route, layout, options = {}) {
     "    </script>",
     renderSeoTags(route.content, route, options),
     '    <link rel="stylesheet" href="/style.css?v=darkmode-1">',
+    '    <link rel="stylesheet" href="/storefront.css?v=ui-1">',
     "  </head>",
     "  <body>",
     '    <div class="site-shell">',

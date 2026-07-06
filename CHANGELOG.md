@@ -49,5 +49,6 @@
 - Added deployment helpers and guides for rsync, Cloudflare Pages, S3/R2, and GitHub Actions.
 - Marked stable public APIs and added API migration, compatibility, and deprecation policy docs.
 - Added public route data JSON output for theme, builder, SEO, and commerce UI data.
+- Added a Tailwind storefront CSS pipeline and design token foundation for the next UI phases.
 
 Status: WPSC v1.0 production framework ready.
