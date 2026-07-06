@@ -57,7 +57,50 @@ test("asset pipeline downloads, caches, manifests, and rewrites remote images", 
   }
 });
 
-function createSitePlan(imageUrl) {
+test("incremental build processes assets for changed pages only", async () => {
+  const outputDir = await mkdtemp(path.join(os.tmpdir(), "wpsc-assets-incremental-"));
+  const changedUrl = "https://example.test/media/changed.jpg";
+  const unchangedUrl = "https://example.test/media/unchanged.jpg";
+  const sitePlan = createSitePlan(changedUrl, {
+    extraPages: [{
+      imageUrl: unchangedUrl,
+      outputPath: "unchanged.html",
+      path: "/unchanged",
+      slug: "unchanged"
+    }]
+  });
+  const originalFetch = globalThis.fetch;
+  const requestedUrls = [];
+
+  try {
+    globalThis.fetch = async (url) => {
+      requestedUrls.push(String(url));
+
+      return {
+        ok: true,
+        async arrayBuffer() {
+          return Buffer.from("fake image");
+        }
+      };
+    };
+
+    const result = await buildSite(sitePlan, {
+      incremental: {
+        changedRoutes: ["/product"],
+        fullBuild: false
+      },
+      outputDir
+    });
+
+    assert.equal(result.pagesWritten, 1);
+    assert.equal(result.assetsDownloaded, 1);
+    assert.deepEqual(requestedUrls, [changedUrl]);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+function createSitePlan(imageUrl, options = {}) {
   const content = {
     id: "product-1",
     type: "product",
@@ -96,7 +139,27 @@ function createSitePlan(imageUrl) {
           content
         },
         html: `<img src="${imageUrl}" alt="">`
-      }
+      },
+      ...(options.extraPages ?? []).map((page) => {
+        const extraContent = {
+          id: `product-${page.slug}`,
+          type: "product",
+          slug: page.slug,
+          title: page.slug,
+          data: {
+            image: page.imageUrl
+          }
+        };
+
+        return {
+          route: {
+            path: page.path,
+            outputPath: page.outputPath,
+            content: extraContent
+          },
+          html: `<img src="${page.imageUrl}" alt="">`
+        };
+      })
     ],
     routes: []
   };

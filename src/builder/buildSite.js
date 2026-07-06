@@ -39,7 +39,9 @@ export default async function buildSite(sitePlan, options = {}) {
 
   const copiedPublicAssets = await copyPublicAssets(options.publicDir, outputDir);
   const copiedThemeAssets = await copyPublicAssets(options.themeAssetsDir, path.join(outputDir, "theme"));
-  const assetPipeline = await processAssetPipeline(sitePlan, {
+  const assetPipeline = await processAssetPipeline(createAssetSitePlan(sitePlan, pagesToWrite, {
+    incremental
+  }), {
     assetConcurrency: options.assetConcurrency,
     cacheDir: options.assetCacheDir,
     outputDir
@@ -91,6 +93,23 @@ export default async function buildSite(sitePlan, options = {}) {
   }, pluginContext);
 
   return buildResult;
+}
+
+function createAssetSitePlan(sitePlan, pagesToWrite, options = {}) {
+  if (options.incremental?.fullBuild !== false) {
+    return sitePlan;
+  }
+
+  return {
+    ...sitePlan,
+    graph: {
+      ...sitePlan.graph,
+      media: {
+        items: []
+      }
+    },
+    pages: pagesToWrite
+  };
 }
 
 async function writeSeoOutputs(sitePlan, outputDir, options) {
