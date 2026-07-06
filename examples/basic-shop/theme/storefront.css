@@ -59,6 +59,12 @@
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     font-size: 13pt;
   }
+
+  .site-shell {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+  }
 }
 
 @layer components {
