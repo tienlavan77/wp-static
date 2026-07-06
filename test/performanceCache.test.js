@@ -23,9 +23,9 @@ test("buildProjectOnce reuses content and route render caches", async () => {
   assert.equal(first.sitePlan.cache.contentCacheHit, false);
   assert.equal(second.sitePlan.cache.contentCacheHit, true);
   assert.equal(second.sitePlan.cache.collectionCacheHit, true);
-  assert.equal(second.sitePlan.cache.routeRenderCacheHits, 7);
-  assert.equal(second.sitePlan.cache.routeRenderCacheMisses, 0);
-  assert.equal(manifest.cache.routeRenderCacheHits, 7);
+  assert.equal(second.sitePlan.cache.routeRenderCacheHits, 6);
+  assert.equal(second.sitePlan.cache.routeRenderCacheMisses, 1);
+  assert.equal(manifest.cache.routeRenderCacheHits, 6);
 });
 
 test("buildProjectOnce invalidates route render cache when theme files change", async () => {
@@ -88,7 +88,8 @@ test("large catalog compile supports parallel rendering and render cache hits", 
   assert.equal(first.pages.length, 81);
   assert.equal(first.cache.routeRenderCacheMisses, 81);
   assert.equal(second.cache.contentCacheHit, true);
-  assert.equal(second.cache.routeRenderCacheHits, 81);
+  assert.equal(second.cache.routeRenderCacheHits, 80);
+  assert.equal(second.cache.routeRenderCacheMisses, 1);
 });
 
 test("build manifest records asset cache stats", async () => {

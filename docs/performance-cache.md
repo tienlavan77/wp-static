@@ -27,6 +27,9 @@ Adapter content and collection responses are cached as JSON. For mock projects, 
 
 Rendered route HTML is cached by route path, content data, theme metadata, and the renderer shell fingerprint. WPSC still runs plugin `render` hooks after reading cached route HTML so plugins can keep their behavior.
 
+The homepage route `/` is intentionally not cached during route rendering, so active
+homepage design changes are visible on every build.
+
 Manifest cache stats:
 
 ```json

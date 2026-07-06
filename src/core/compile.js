@@ -124,10 +124,12 @@ export default async function compile(config, options = {}) {
 }
 
 async function renderRoute(route, context) {
-  const cacheKey = context.routeRenderCache?.createKey(route, {
-    ...context.theme.metadata,
-    renderer: context.rendererFingerprint
-  });
+  const cacheKey = route.path === "/"
+    ? null
+    : context.routeRenderCache?.createKey(route, {
+      ...context.theme.metadata,
+      renderer: context.rendererFingerprint
+    });
   const cachedHtml = cacheKey ? await context.routeRenderCache.get(cacheKey) : null;
 
   if (cachedHtml !== null) {
