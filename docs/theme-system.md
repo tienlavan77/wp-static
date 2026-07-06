@@ -3,6 +3,8 @@
 WPSC themes can define a fallback layout, layouts by content type, reusable components,
 theme assets, and metadata.
 
+Status: v1 stable.
+
 ## Config
 
 ```js
@@ -43,6 +45,9 @@ export default function productLayout({ components, content, graph, html, route,
 }
 ```
 
+The v1 layout context fields are frozen and exported from the root package as
+`V1_THEME_LAYOUT_CONTEXT_FIELDS`.
+
 ## Components
 
 `theme.components` points to a module that exports a plain object. Layouts can call those
@@ -53,3 +58,8 @@ layout template to render. Template values are HTML-escaped by default.
 
 Files in `theme.assets` are copied to `dist/theme`. Public assets are still copied to the
 root of `dist`.
+
+## Stable Theme Config Fields
+
+The v1 theme config fields are `layout`, `layouts`, `components`, `assets`, `blocks`,
+and `meta`. They are exported from the root package as `V1_THEME_CONFIG_FIELDS`.

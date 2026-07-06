@@ -72,6 +72,11 @@ export { default as validateBlockProps } from "./blocks/validateBlockProps.js";
 export { runPluginEvent, runPluginHook } from "./plugins/runPluginHook.js";
 export { V1_PLUGIN_API, V1_PLUGIN_HOOKS } from "./api/v1PluginApi.js";
 export {
+  V1_THEME_API,
+  V1_THEME_CONFIG_FIELDS,
+  V1_THEME_LAYOUT_CONTEXT_FIELDS
+} from "./api/v1ThemeApi.js";
+export {
   assertNoFrontendSecrets,
   CUSTOMER_AUTH_BOUNDARY,
   CUSTOMER_AUTH_MODES,
