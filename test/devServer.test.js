@@ -9,8 +9,8 @@ test("buildProjectOnce builds a project for dev mode", async () => {
   const { config, result, sitePlan } = await buildProjectOnce("examples/basic-shop");
 
   assert.equal(config.name, "Basic Shop");
-  assert.equal(sitePlan.pages.length, 6);
-  assert.equal(result.pagesWritten, 6);
+  assert.equal(sitePlan.pages.length, 7);
+  assert.equal(result.pagesWritten, 7);
 });
 
 test("createWatchTargets includes config, content, public, and theme paths", async () => {

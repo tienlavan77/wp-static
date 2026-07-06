@@ -50,5 +50,6 @@
 - Marked stable public APIs and added API migration, compatibility, and deprecation policy docs.
 - Added public route data JSON output for theme, builder, SEO, and commerce UI data.
 - Added a Tailwind storefront CSS pipeline and design token foundation for the next UI phases.
+- Added a single-route storefront UI demo page for iterative header and footer design.
 
 Status: WPSC v1.0 production framework ready.

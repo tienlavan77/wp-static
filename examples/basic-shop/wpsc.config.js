@@ -7,6 +7,9 @@ export default {
   },
   outputDir: "./dist",
   publicDir: "./public",
+  plugins: [
+    "./plugins/ui-demo-route.js"
+  ],
   builder: {
     layoutsDir: "./layouts/editor",
     editor: {
