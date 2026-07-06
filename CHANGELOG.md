@@ -40,5 +40,6 @@
 - Added production builder foundations with editor auth, layout revisions, draft/publish state, and rebuild triggers.
 - Added advanced commerce data for product variant pages, sale/stock collections, and related products.
 - Added deployment helpers and guides for rsync, Cloudflare Pages, S3/R2, and GitHub Actions.
+- Marked stable public APIs and added API migration, compatibility, and deprecation policy docs.
 
 Status: Mini core prototype complete, architecture remains `DRAFT`.

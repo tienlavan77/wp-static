@@ -712,11 +712,11 @@ Commits:
 228 feat(deploy): add GitHub Actions guide
 ```
 
-## Phase 31 - API Stabilization
+## Phase 31 - API Stabilization - DONE
 
 Muc tieu:
 
-- Dong API on dinh de tien toi v1.0.
+- [x] Dong API on dinh de tien toi v1.0.
 
 Commits:
 
