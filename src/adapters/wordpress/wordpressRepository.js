@@ -32,6 +32,7 @@ export default function createWordPressRepository(client, options = {}) {
         return terms.map((term) => ({
           id: term.id,
           name: term.name,
+          parentId: term.parent ?? null,
           slug: term.slug,
           taxonomy
         }));

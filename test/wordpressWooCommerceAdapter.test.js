@@ -15,6 +15,7 @@ test("WordPress WooCommerce adapter merges content and collections", async () =>
     ["/wp-json/wp/v2/categories", [{
       id: 2,
       name: "Tin tức",
+      parent: 9,
       slug: "tin-tuc"
     }]],
     ["/wp-json/wp/v2/media", []],
@@ -34,6 +35,7 @@ test("WordPress WooCommerce adapter merges content and collections", async () =>
     ["/wp-json/wc/v3/products/categories", [{
       id: 5,
       name: "Thời trang",
+      parent: 2,
       slug: "thoi-trang"
     }]],
     ["/wp-json/wc/v3/products/tags", [{
@@ -80,6 +82,8 @@ test("WordPress WooCommerce adapter merges content and collections", async () =>
   assert.equal(collections.menus.length, 1);
   assert.equal(collections.productCategories[0].slug, "thoi-trang");
   assert.equal(collections.productTags[0].slug, "sale");
+  assert.equal(collections.terms.find((term) => term.slug === "tin-tuc").parentId, 9);
+  assert.equal(collections.terms.find((term) => term.slug === "thoi-trang").parentId, 2);
   assert.deepEqual(collections.terms.map((term) => term.taxonomy), [
     "categories",
     "product_cat",

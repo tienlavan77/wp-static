@@ -65,6 +65,7 @@ function normalizeProductTerms(items, taxonomy) {
   return items.map((item) => ({
     id: item.id,
     name: item.name,
+    parentId: item.parent ?? null,
     slug: item.slug,
     taxonomy
   }));

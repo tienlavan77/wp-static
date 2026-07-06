@@ -1,4 +1,5 @@
 import createSeoMetadata from "../seo/createSeoMetadata.js";
+import createTaxonomyBreadcrumbs from "../taxonomy/createTaxonomyBreadcrumbs.js";
 
 export default function createRouteDataPayload(route, context = {}) {
   const content = route.content;
@@ -126,7 +127,7 @@ function createGraphPayload(content, graph) {
   }
 
   return {
-    breadcrumbs: [],
+    breadcrumbs: createTaxonomyBreadcrumbs(content, graph),
     menus: graph.menus?.items ?? [],
     related: (content.data?.relatedProductIds ?? [])
       .map((id) => graph.findContentById?.(id))
