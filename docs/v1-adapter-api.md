@@ -26,7 +26,14 @@ The root package exports:
 
 - `createMockAdapter`
 - `createWordPressAdapter`
+- `createWordPressWooCommerceAdapter`
 - `createWooCommerceAdapter`
 
 The adapter contract is intentionally small so new sources can be added without changing
 the build pipeline.
+
+## WordPress And WooCommerce Together
+
+Use `createWordPressWooCommerceAdapter` or config `adapter.type: "wordpressWooCommerce"`
+when the site needs WordPress pages/posts/menu/media and WooCommerce products in the same
+static build.

@@ -45,6 +45,7 @@ import {
 import {
   createMockAdapter,
   createWordPressAdapter,
+  createWordPressWooCommerceAdapter,
   createWooCommerceAdapter
 } from "wpsc";
 ```

@@ -59,3 +59,9 @@ Products are normalized into `Content`:
 
 Rank Math fields are normalized into `content.seo`, the same shape used by the
 WordPress adapter.
+
+## With WordPress Content
+
+For stores that need WooCommerce products plus WordPress pages, posts, menus, media, ACF,
+and SEO in the same build, use `adapter.type: "wordpressWooCommerce"` instead of choosing
+only `woocommerce`.

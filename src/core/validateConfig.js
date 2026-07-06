@@ -30,6 +30,11 @@ export default function validateConfig(config) {
     requireString(config.adapter, "adapter.baseUrl");
   }
 
+  if (config.adapter.type === "wordpressWooCommerce") {
+    requireString(config.adapter.wordpress, "adapter.wordpress.baseUrl");
+    requireString(config.adapter.woocommerce, "adapter.woocommerce.baseUrl");
+  }
+
   return config;
 }
 

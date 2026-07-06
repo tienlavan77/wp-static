@@ -24,6 +24,7 @@ const stableRootExports = [
   "createSessionStore",
   "createWooCommerceAdapter",
   "createWordPressAdapter",
+  "createWordPressWooCommerceAdapter",
   "html",
   "loadConfig",
   "normalizeConfigPaths",
@@ -62,6 +63,7 @@ test("workspace package entrypoints keep stable API families", async () => {
   assert.equal(typeof builder.createBuilderWorkflow, "function");
   assert.equal(typeof cli.createRsyncDeployPlan, "function");
   assert.equal(typeof adapters.createWordPressAdapter, "function");
+  assert.equal(typeof adapters.createWordPressWooCommerceAdapter, "function");
   assert.equal(typeof adapters.createWooCommerceAdapter, "function");
   assert.equal(typeof renderer.renderPage, "function");
 });

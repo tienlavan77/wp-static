@@ -32,6 +32,7 @@ export { default as filterPublicContents } from "./preview/filterPublicContents.
 export { default as createTerm } from "./content/createTerm.js";
 export { default as createWatchTargets } from "./dev-server/createWatchTargets.js";
 export { default as createWordPressAdapter } from "./adapters/wordpress/wordpressAdapter.js";
+export { default as createWordPressWooCommerceAdapter } from "./adapters/wordpressWooCommerce/wordpressWooCommerceAdapter.js";
 export { default as createWooCommerceAdapter } from "./adapters/woocommerce/woocommerceAdapter.js";
 export { default as createWooCommerceClient } from "./adapters/woocommerce/woocommerceClient.js";
 export { default as createArchiveRoutes } from "./router/createArchiveRoutes.js";

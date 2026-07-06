@@ -48,6 +48,51 @@ export default {
 };
 ```
 
+## WordPress And WooCommerce Together
+
+Use this for a real store that needs WordPress pages, posts, menus, media, SEO, and
+WooCommerce products in the same build:
+
+```js
+export default {
+  adapter: {
+    type: "wordpressWooCommerce",
+    wordpress: {
+      baseUrl: "https://api.tinsinhphat.com",
+      contentTypes: ["pages", "posts"],
+      customPostTypes: [],
+      taxonomies: ["categories", "tags"],
+      includeMedia: true,
+      includeMenus: true,
+      includeAcf: true,
+      seo: {
+        provider: "rankmath"
+      },
+      auth: {
+        type: "applicationPassword",
+        usernameEnv: "WPSC_WP_USERNAME",
+        passwordEnv: "WPSC_WP_APP_PASSWORD"
+      }
+    },
+    woocommerce: {
+      baseUrl: "https://api.tinsinhphat.com",
+      consumerKeyEnv: "WPSC_WOO_CONSUMER_KEY",
+      consumerSecretEnv: "WPSC_WOO_CONSUMER_SECRET",
+      includeCategories: true,
+      includeTags: true,
+      includeVariations: true,
+      seo: {
+        provider: "rankmath"
+      }
+    }
+  }
+};
+```
+
+The example project includes `examples/basic-shop/wpsc.real.config.js` with this shape.
+To build against the real source, copy that file to `examples/basic-shop/wpsc.config.js`
+or move its `adapter` block into the active config.
+
 ## Real Project Checklist
 
 - WordPress REST API is reachable.

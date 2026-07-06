@@ -84,3 +84,8 @@ content.data.terms
 
 The client follows the `x-wp-totalpages` response header and requests all
 pages with `per_page=100`.
+
+## With WooCommerce
+
+For stores that need WordPress content and WooCommerce products in the same build, use
+`adapter.type: "wordpressWooCommerce"` instead of choosing only `wordpress`.

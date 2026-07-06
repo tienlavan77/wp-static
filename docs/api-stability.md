@@ -30,6 +30,7 @@ import {
 import {
   createMockAdapter,
   createWordPressAdapter,
+  createWordPressWooCommerceAdapter,
   createWooCommerceAdapter,
   resolveWordPressAuth,
   resolveWooCommerceCredentials

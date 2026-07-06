@@ -1,5 +1,6 @@
 import createMockAdapter from "../adapters/mockAdapter.js";
 import createWordPressAdapter from "../adapters/wordpress/wordpressAdapter.js";
+import createWordPressWooCommerceAdapter from "../adapters/wordpressWooCommerce/wordpressWooCommerceAdapter.js";
 import createWooCommerceAdapter from "../adapters/woocommerce/woocommerceAdapter.js";
 import createJsonFileCache, { createCacheKey } from "../cache/createJsonFileCache.js";
 import createRouteRenderCache from "../cache/createRouteRenderCache.js";
@@ -151,6 +152,10 @@ function createAdapter(config, projectDir) {
 
     if (config.adapter?.type === "woocommerce") {
       return createWooCommerceAdapter(config.adapter);
+    }
+
+    if (config.adapter?.type === "wordpressWooCommerce") {
+      return createWordPressWooCommerceAdapter(config.adapter);
     }
 
     throw new Error(`Unsupported adapter type "${config.adapter?.type}".`);
