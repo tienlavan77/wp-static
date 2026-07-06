@@ -31,6 +31,7 @@ export { default as assertBuilderEditorAccess } from "./visual-builder/productio
 export { default as filterPublicContents } from "./preview/filterPublicContents.js";
 export { default as createTerm } from "./content/createTerm.js";
 export { default as createWatchTargets } from "./dev-server/createWatchTargets.js";
+export { default as createWordPressAdapter } from "./adapters/wordpress/wordpressAdapter.js";
 export { default as createWooCommerceAdapter } from "./adapters/woocommerce/woocommerceAdapter.js";
 export { default as createWooCommerceClient } from "./adapters/woocommerce/woocommerceClient.js";
 export { default as createArchiveRoutes } from "./router/createArchiveRoutes.js";

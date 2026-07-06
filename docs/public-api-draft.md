@@ -1,6 +1,6 @@
-# WPSC Public API Draft
+# WPSC Public API
 
-Status: `Draft`
+Status: `v1 stabilization`
 
 The public API is exported from:
 
@@ -8,7 +8,7 @@ The public API is exported from:
 src/index.js
 ```
 
-## Core
+## Stable Core
 
 ```js
 import {
@@ -19,7 +19,7 @@ import {
 } from "wpsc";
 ```
 
-## Builder
+## Stable Builder
 
 ```js
 import {
@@ -29,7 +29,7 @@ import {
 } from "wpsc";
 ```
 
-## Routing And Rendering
+## Stable Routing And Rendering
 
 ```js
 import {
@@ -39,11 +39,33 @@ import {
 } from "wpsc";
 ```
 
-## Adapters
+## Stable Adapters
 
 ```js
 import {
-  createMockAdapter
+  createMockAdapter,
+  createWordPressAdapter,
+  createWooCommerceAdapter
+} from "wpsc";
+```
+
+## Stable Commerce
+
+```js
+import {
+  applyAdvancedCommerceData,
+  createProductVariantContents,
+  createCommerceCollections,
+  addRelatedProducts
+} from "wpsc";
+```
+
+## Stable Deployment
+
+```js
+import {
+  createRsyncDeployPlan,
+  runRsyncDeploy
 } from "wpsc";
 ```
 
@@ -61,5 +83,10 @@ import {
 
 ## Stability
 
-These APIs remain draft until WPSC reaches the package extraction phase.
-Breaking changes are allowed while the architecture is still marked `DRAFT`.
+The APIs listed here are stable for v1. See:
+
+- `docs/api-stability.md`
+- `docs/api-migration-policy.md`
+- `docs/deprecation-policy.md`
+
+Lower-level exports remain provisional until Phase 32 freezes the final v1 plugin, theme, and adapter boundaries.
