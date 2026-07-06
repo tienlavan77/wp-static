@@ -2,6 +2,8 @@
 
 WPSC plugins are local ESM modules loaded from `wpsc.config.js`.
 
+Status: v1 stable.
+
 ## Config
 
 ```js
@@ -55,3 +57,6 @@ export default function myPlugin(options = {}) {
 - `buildEnd(payload, context)`: observe build completion.
 
 Hook return values are optional. If a hook returns `undefined`, WPSC keeps the previous value.
+
+These hook names are frozen for v1 and are also exported from the root package as
+`V1_PLUGIN_HOOKS`.
