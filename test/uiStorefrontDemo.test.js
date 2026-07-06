@@ -16,7 +16,7 @@ test("UI storefront demo can be rebuilt as a single route", async () => {
   assert.equal(first.result.pagesWritten, 1);
   assert.deepEqual(first.incremental.changedRoutes, ["/ui-storefront-demo"]);
   assert.match(html, /Tín Sinh Phát/);
-  assert.match(html, /storefront.css\?v=ui-2/);
+  assert.match(html, /storefront.css\?v=ui-3/);
   assert.equal(data.route.path, "/ui-storefront-demo");
   assert.equal(outputDir.includes("wpsc-ui-demo-"), true);
 });

@@ -21,7 +21,7 @@ test("renderPage includes a working dark mode toggle in the site header", async 
   assert.match(rendered, /class="theme-toggle"/);
   assert.match(rendered, /href="\/builder\.html"/);
   assert.match(rendered, /\/style\.css\?v=darkmode-1/);
-  assert.match(rendered, /\/storefront\.css\?v=ui-2/);
+  assert.match(rendered, /\/storefront\.css\?v=ui-3/);
   assert.match(rendered, /localStorage\.getItem\("wpsc-theme"\)/);
   assert.match(rendered, /document\.documentElement\.dataset\.theme/);
   assert.match(css, /:root\[data-theme="dark"\]/);

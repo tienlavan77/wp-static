@@ -60,11 +60,12 @@
     font-size: 13pt;
   }
 
-  .site-shell {
-    width: 100%;
-    max-width: none;
-    margin: 0;
-  }
+}
+
+.site-shell {
+  width: 100%;
+  max-width: none;
+  margin: 0;
 }
 
 @layer components {
