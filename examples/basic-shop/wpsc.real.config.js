@@ -1,6 +1,6 @@
 export default {
   name: "Tin Sinh Phat",
-  homepage: "home",
+  homepage: "homepage",
   adapter: {
     type: "wordpressWooCommerce",
     wordpress: {
