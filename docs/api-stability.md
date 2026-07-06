@@ -1,8 +1,9 @@
 # API Stability
 
-Status: `v1 stabilization`
+Status: `v1 stable`
 
-Phase 31 marks the first stable public API surface for WPSC. Stable APIs must keep backward compatibility until the next major version.
+Phase 32 marks the WPSC v1.0 release. Stable APIs must keep backward compatibility until
+the next major version.
 
 ## Stable Core APIs
 
@@ -83,4 +84,6 @@ import {
 
 ## Provisional APIs
 
-Lower-level helpers such as caches, asset pipeline internals, preview helpers, account UI helpers, and incremental build helpers remain provisional. They are exported for composition and tests, but may still change before v1.0 if the v1 release pass finds a simpler boundary.
+Lower-level helpers such as caches, asset pipeline internals, preview helpers, account UI
+helpers, and incremental build helpers remain provisional. They are exported for
+composition and tests, but the stable API groups above are the v1 compatibility contract.

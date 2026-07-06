@@ -19,7 +19,7 @@ export default {
     assets: "./theme/assets",
     meta: {
       name: "Basic Commerce Theme",
-      version: "0.1.0",
+      version: "1.0.0",
       description: "Theme vi du cho WPSC"
     }
   }

@@ -748,3 +748,5 @@ Ket qua:
 ```text
 WPSC v1.0 production framework
 ```
+
+Status: DONE.

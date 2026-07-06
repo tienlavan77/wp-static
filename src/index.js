@@ -112,12 +112,12 @@ export {
   WpscError
 } from "./shared/errors.js";
 
-export const version = "0.1.0";
+export const version = "1.0.0";
 
 export function getPackageInfo() {
   return {
     name: "wpsc",
     version,
-    status: "draft"
+    status: "stable"
   };
 }

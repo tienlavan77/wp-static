@@ -45,8 +45,8 @@ test("root package keeps stable public API exports", async () => {
     assert.equal(typeof api[exportName], "function", `${exportName} should be exported`);
   }
 
-  assert.equal(api.version, "0.1.0");
-  assert.equal(api.getPackageInfo().status, "draft");
+  assert.equal(api.version, "1.0.0");
+  assert.equal(api.getPackageInfo().status, "stable");
 });
 
 test("workspace package entrypoints keep stable API families", async () => {

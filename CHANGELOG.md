@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.0
+
+- Froze the v1 plugin, theme, and adapter API contracts.
+- Added the v1 documentation set.
+- Promoted the root package and workspace packages to `1.0.0`.
+- Marked WPSC as a stable production framework release.
+
 ## 0.1.0
 
 - Added architecture draft for WPSC Mini Core.
@@ -42,4 +49,4 @@
 - Added deployment helpers and guides for rsync, Cloudflare Pages, S3/R2, and GitHub Actions.
 - Marked stable public APIs and added API migration, compatibility, and deprecation policy docs.
 
-Status: Mini core prototype complete, architecture remains `DRAFT`.
+Status: WPSC v1.0 production framework ready.

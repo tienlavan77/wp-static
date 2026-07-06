@@ -1,6 +1,6 @@
 # Content Graph
 
-Status: `Draft`
+Status: v1 stable.
 
 The content graph gives themes and later SEO systems a stable way to look up
 normalized content without calling adapters directly.

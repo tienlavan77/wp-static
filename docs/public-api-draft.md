@@ -1,6 +1,6 @@
 # WPSC Public API
 
-Status: `v1 stabilization`
+Status: `v1 stable`
 
 The public API is exported from:
 
@@ -89,4 +89,5 @@ The APIs listed here are stable for v1. See:
 - `docs/api-migration-policy.md`
 - `docs/deprecation-policy.md`
 
-Lower-level exports remain provisional until Phase 32 freezes the final v1 plugin, theme, and adapter boundaries.
+Lower-level exports remain provisional. Plugin, theme, and adapter boundaries are frozen
+for v1 in the dedicated v1 API docs.

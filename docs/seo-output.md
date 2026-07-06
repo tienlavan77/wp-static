@@ -1,6 +1,6 @@
 # SEO Output System
 
-Status: `Draft`
+Status: v1 stable.
 
 The SEO output system reads normalized `content.seo` data. It does not know
 about Rank Math, Yoast, WooCommerce, or WordPress meta keys.

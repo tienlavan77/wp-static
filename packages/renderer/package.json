@@ -1,6 +1,6 @@
 {
   "name": "@wpsc/renderer",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "HTML rendering and theme resolution for WPSC.",
   "type": "module",
   "exports": {

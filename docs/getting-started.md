@@ -1,6 +1,6 @@
 # Getting Started
 
-WPSC v0.1.0 is a static commerce framework prototype for building fast HTML output
+WPSC v1.0 is a static commerce framework for building fast HTML output
 from WordPress, WooCommerce, or local mock content.
 
 ## Install
@@ -55,7 +55,7 @@ paths, rebuilds on change, and injects live reload into HTML.
 
 ## Package Boundaries
 
-The v0.1.0 workspace exposes draft package entrypoints:
+The v1.0 workspace exposes stable package entrypoints:
 
 - `@wpsc/shared`
 - `@wpsc/core`
@@ -65,5 +65,5 @@ The v0.1.0 workspace exposes draft package entrypoints:
 - `@wpsc/builder`
 - `@wpsc/cli`
 
-These packages currently re-export the stable prototype modules while the codebase
-continues toward full physical package extraction.
+These packages re-export the stable v1 modules while the codebase keeps physical package
+extraction incremental.

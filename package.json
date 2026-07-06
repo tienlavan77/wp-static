@@ -1,8 +1,8 @@
 {
   "name": "wpsc",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
-  "description": "WPSC Mini Core prototype for static commerce builds.",
+  "description": "WPSC static commerce framework for production static builds.",
   "type": "module",
   "workspaces": [
     "packages/*"

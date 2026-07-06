@@ -19,7 +19,7 @@ test("cli prints help", async () => {
 test("cli prints version", async () => {
   const result = await execFileAsync("node", ["src/cli/index.js", "--version"]);
 
-  assert.match(result.stdout, /^0\.1\.0/);
+  assert.match(result.stdout, /^1\.0\.0/);
 });
 
 test("cli builds a project", async () => {
