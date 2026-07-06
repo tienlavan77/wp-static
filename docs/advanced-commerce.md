@@ -5,6 +5,7 @@ Phase 29 adds static commerce data helpers for larger shops.
 ## Variant Pages
 
 Products can include `data.variants`. Each variant becomes a static `product_variant` content item.
+WooCommerce `variations` are normalized into `data.variants` before this step.
 
 Example route:
 
@@ -13,6 +14,7 @@ Example route:
 ```
 
 Variant routes keep the project URL contract: `domain/slug`, no trailing slash.
+Repeated variations that would create the same route slug are deduped.
 
 ## Sale And Stock Filters
 

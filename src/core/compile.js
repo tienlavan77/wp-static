@@ -47,7 +47,7 @@ export default async function compile(config, options = {}) {
     contentCache,
     createCacheKey({
       adapter: adapterCacheKey,
-      cacheVersion: 1,
+      cacheVersion: 2,
       kind: "contents"
     }),
     () => adapter.getContents()
@@ -56,7 +56,7 @@ export default async function compile(config, options = {}) {
     collectionCache,
     createCacheKey({
       adapter: adapterCacheKey,
-      cacheVersion: 1,
+      cacheVersion: 2,
       kind: "collections"
     }),
     () => (typeof adapter.getCollections === "function" ? adapter.getCollections() : {})

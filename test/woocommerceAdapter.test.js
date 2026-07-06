@@ -24,6 +24,45 @@ test("normalizeWooCommerceProduct maps product data into Content input", async (
   assert.equal(content.seo.openGraph.image, "https://example.com/og-product.jpg");
 });
 
+test("normalizeWooCommerceProduct maps variations into variants", () => {
+  const content = normalizeWooCommerceProduct({
+    id: 44,
+    name: "Hộp giấy",
+    slug: "hop-giay",
+    price: "100000",
+    categories: [],
+    tags: [],
+    images: [],
+    variations: [{
+      id: 501,
+      attributes: [{
+        id: 1,
+        name: "Kích thước",
+        option: "10 x 20 cm",
+        slug: "kich-thuoc"
+      }],
+      image: {
+        id: 9,
+        src: "https://example.com/variant.jpg",
+        name: "Variant",
+        alt: "Variant image"
+      },
+      price: "120000",
+      regular_price: "150000",
+      sale_price: "120000",
+      sku: "BOX-10-20",
+      stock_status: "instock",
+      stock_quantity: 7
+    }]
+  });
+
+  assert.equal(content.data.variants[0].id, 501);
+  assert.equal(content.data.variants[0].name, "10 x 20 cm");
+  assert.equal(content.data.variants[0].slug, "box-10-20");
+  assert.equal(content.data.variants[0].price, 120000);
+  assert.equal(content.data.variants[0].featuredImage.sourceUrl, "https://example.com/variant.jpg");
+});
+
 test("WooCommerce client fetches paginated collections with credentials", async () => {
   const urls = [];
   const fetchImpl = async (url) => {

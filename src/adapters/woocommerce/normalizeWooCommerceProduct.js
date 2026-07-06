@@ -26,6 +26,7 @@ export default function normalizeWooCommerceProduct(rawProduct = {}) {
       sku: rawProduct.sku ?? "",
       stockQuantity: rawProduct.stock_quantity ?? null,
       tags: normalizeTaxonomy(rawProduct.tags),
+      variants: normalizeVariations(rawProduct.variations, slug),
       variations: rawProduct.variations ?? []
     },
     seo: normalizeRankMathSeo(rawProduct)
@@ -51,6 +52,73 @@ function normalizeTaxonomy(items = []) {
     name: item.name,
     slug: item.slug
   }));
+}
+
+function normalizeVariations(variations = [], productSlug) {
+  return variations.map((variation) => {
+    const name = normalizeVariationName(variation);
+    const slug = normalizeVariationSlug(variation, name, productSlug);
+
+    return {
+      id: variation.id,
+      attributes: normalizeVariationAttributes(variation.attributes),
+      featuredImage: normalizeVariationImage(variation.image),
+      inStock: variation.stock_status === "instock",
+      manageStock: variation.manage_stock ?? false,
+      name,
+      price: parsePrice(variation.price),
+      regularPrice: parsePrice(variation.regular_price),
+      salePrice: parsePrice(variation.sale_price),
+      sku: variation.sku ?? "",
+      slug,
+      stockQuantity: variation.stock_quantity ?? null
+    };
+  });
+}
+
+function normalizeVariationAttributes(attributes = []) {
+  return attributes.map((attribute) => ({
+    id: attribute.id,
+    name: attribute.name,
+    option: attribute.option,
+    slug: attribute.slug
+  }));
+}
+
+function normalizeVariationImage(image) {
+  if (!image) {
+    return null;
+  }
+
+  return {
+    id: image.id,
+    alt: image.alt ?? "",
+    name: image.name ?? "",
+    sourceUrl: image.src ?? null
+  };
+}
+
+function normalizeVariationName(variation) {
+  const options = normalizeVariationAttributes(variation.attributes)
+    .map((attribute) => attribute.option)
+    .filter(Boolean);
+
+  if (options.length > 0) {
+    return options.join(" / ");
+  }
+
+  return stripTags(variation.name ?? `Variation ${variation.id}`);
+}
+
+function normalizeVariationSlug(variation, name, productSlug) {
+  const value = variation.slug ?? variation.sku ?? name ?? variation.id;
+  const slug = String(value)
+    .trim()
+    .toLowerCase()
+    .replaceAll(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+
+  return slug || `${productSlug}-variation-${variation.id}`;
 }
 
 function parsePrice(value) {

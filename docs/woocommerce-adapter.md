@@ -51,6 +51,7 @@ Products are normalized into `Content`:
     categories: [],
     tags: [],
     images: [],
+    variants: [],
     variations: []
   },
   seo: {}
@@ -59,6 +60,10 @@ Products are normalized into `Content`:
 
 Rank Math fields are normalized into `content.seo`, the same shape used by the
 WordPress adapter.
+
+When `includeVariations` is enabled, WooCommerce variation records are fetched and
+normalized into `data.variants`. WPSC keeps the raw `data.variations` value for reference,
+but static variant routes are generated from `data.variants`.
 
 ## With WordPress Content
 

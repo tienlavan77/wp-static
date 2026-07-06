@@ -25,6 +25,39 @@ test("createProductVariantContents creates slug-only variant pages", () => {
   assert.equal(variants[0].data.parentProductSlug, "phone");
 });
 
+test("createProductVariantContents supports WooCommerce variations alias", () => {
+  const variants = createProductVariantContents([product("product-box", "box", {
+    variations: [{
+      name: "Large",
+      price: 200,
+      sku: "BOX-L"
+    }]
+  })]);
+
+  assert.equal(variants[0].slug, "box-box-l");
+  assert.equal(variants[0].data.price, 200);
+});
+
+test("createProductVariantContents ignores WooCommerce variation id references", () => {
+  const variants = createProductVariantContents([product("product-box", "box", {
+    variations: [501, 502]
+  })]);
+
+  assert.deepEqual(variants, []);
+});
+
+test("createProductVariantContents dedupes repeated WooCommerce variations", () => {
+  const variants = createProductVariantContents([product("product-box", "box", {
+    variants: [
+      { id: 501, sku: "BOX-L", price: 200 },
+      { id: 502, sku: "BOX-L", price: 200 }
+    ]
+  })]);
+
+  assert.equal(variants.length, 1);
+  assert.equal(variants[0].slug, "box-box-l");
+});
+
 test("createCommerceCollections returns sale and stock filters", () => {
   const collections = createCommerceCollections([
     product("product-sale", "sale", {

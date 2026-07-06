@@ -1,9 +1,39 @@
 export default function createProductVariantContents(products = []) {
   return products.flatMap((product) => {
-    const variants = Array.isArray(product.data?.variants) ? product.data.variants : [];
+    const variants = Array.isArray(product.data?.variants)
+      ? product.data.variants
+      : product.data?.variations ?? [];
 
-    return variants.map((variant) => createVariantContent(product, variant));
+    return dedupeVariants(variants)
+      .filter((variant) => variant !== null && typeof variant === "object")
+      .map((variant) => createVariantContent(product, variant));
   });
+}
+
+function dedupeVariants(variants) {
+  const seen = new Set();
+  const unique = [];
+
+  for (const variant of variants) {
+    const key = getVariantKey(variant);
+
+    if (seen.has(key)) {
+      continue;
+    }
+
+    seen.add(key);
+    unique.push(variant);
+  }
+
+  return unique;
+}
+
+function getVariantKey(variant) {
+  if (variant !== null && typeof variant === "object") {
+    return normalizeVariantSlug(variant);
+  }
+
+  return variant;
 }
 
 function createVariantContent(product, variant) {
@@ -29,11 +59,11 @@ function createVariantContent(product, variant) {
 }
 
 function normalizeVariantSlug(variant) {
-  const value = variant.slug ?? variant.sku ?? variant.name;
+  const value = variant.slug ?? variant.sku ?? variant.name ?? variant.id;
 
-  if (typeof value !== "string" || value.trim() === "") {
+  if ((typeof value !== "string" && typeof value !== "number") || String(value).trim() === "") {
     throw new Error("Product variant requires slug, sku, or name.");
   }
 
-  return value.trim().toLowerCase().replaceAll(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  return String(value).trim().toLowerCase().replaceAll(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
