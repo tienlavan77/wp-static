@@ -66,6 +66,36 @@ async function getCollectionPage(fetchImpl, baseUrl, pathname, credentials, quer
 
   return {
     headers: response.headers,
-    items: await response.json()
+    items: await parseJsonResponse(response, pathname)
   };
+}
+
+async function parseJsonResponse(response, pathname) {
+  const body = typeof response.text === "function"
+    ? await response.text()
+    : JSON.stringify(await response.json());
+
+  try {
+    return JSON.parse(body);
+  } catch {
+    const jsonStart = findJsonStart(body);
+
+    if (jsonStart > 0) {
+      try {
+        return JSON.parse(body.slice(jsonStart));
+      } catch {
+        // Fall through to the clearer adapter error below.
+      }
+    }
+
+    throw new AdapterError(`WooCommerce collection "${pathname}" did not return valid JSON.`);
+  }
+}
+
+function findJsonStart(body) {
+  const objectStart = body.indexOf("{");
+  const arrayStart = body.indexOf("[");
+  const starts = [objectStart, arrayStart].filter((index) => index >= 0);
+
+  return starts.length > 0 ? Math.min(...starts) : -1;
 }

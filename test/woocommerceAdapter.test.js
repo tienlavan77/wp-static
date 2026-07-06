@@ -85,6 +85,24 @@ test("WooCommerce client reads credentials from env names", async () => {
   assert.match(urls[0], /consumer_secret=cs_env/);
 });
 
+test("WooCommerce client tolerates PHP warnings before JSON", async () => {
+  const client = createWooCommerceClient({
+    baseUrl: "https://example.com",
+    fetchImpl: async () => ({
+      ok: true,
+      headers: new Headers({
+        "x-wp-totalpages": "1"
+      }),
+      async text() {
+        return '<br />\n<b>Warning</b>: plugin warning<br />\n[{"id":5,"name":"Cat"}]';
+      }
+    })
+  });
+  const items = await client.getCollection("/wp-json/wc/v3/products/categories");
+
+  assert.deepEqual(items, [{ id: 5, name: "Cat" }]);
+});
+
 test("WooCommerce repository fetches products and variations", async () => {
   const calls = [];
   const client = {

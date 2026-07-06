@@ -77,6 +77,25 @@ test("WordPress repository fetches pages, posts, and custom post types", async (
   assert.equal(contents[2].type, "du-an");
 });
 
+test("WordPress client tolerates PHP warnings before JSON", async () => {
+  const { default: createWordPressClient } = await import("../src/adapters/wordpress/wordpressClient.js");
+  const client = createWordPressClient({
+    baseUrl: "https://example.com",
+    fetchImpl: async () => ({
+      ok: true,
+      headers: new Headers({
+        "x-wp-totalpages": "1"
+      }),
+      async text() {
+        return '<br />\n<b>Warning</b>: plugin warning<br />\n[{"id":1,"slug":"home"}]';
+      }
+    })
+  });
+  const items = await client.getCollection("/wp-json/wp/v2/pages");
+
+  assert.deepEqual(items, [{ id: 1, slug: "home" }]);
+});
+
 test("createWordPressAdapter requires baseUrl", () => {
   assert.throws(
     () => createWordPressAdapter(),
