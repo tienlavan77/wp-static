@@ -25,14 +25,23 @@ test("build pipeline writes html files and manifest", async () => {
     publicDir: config._paths.publicDir
   });
   const manifest = JSON.parse(await readFile(result.manifestPath, "utf8"));
+  const dataManifest = JSON.parse(await readFile(result.routeData.manifestPath, "utf8"));
+  const homeData = JSON.parse(await readFile(path.join(outputDir, "data", "routes", "index.json"), "utf8"));
+  const productData = JSON.parse(await readFile(path.join(outputDir, "data", "routes", "iphone-15.json"), "utf8"));
 
-  assert.equal(result.pagesWritten, 8);
-  assert.equal(result.totalPages, 8);
+  assert.equal(result.pagesWritten, 6);
+  assert.equal(result.totalPages, 6);
   assert.equal(result.fullBuild, true);
-  assert.equal(manifest.pages, 8);
+  assert.equal(manifest.pages, 6);
   assert.equal(manifest.incremental.fullBuild, true);
   assert.equal(manifest.routes.some((route) => route.path === "/iphone-15"), true);
-  assert.equal(manifest.routes.some((route) => route.path === "/iphone-15-128gb-den"), true);
+  assert.equal(manifest.routes.some((route) => route.path === "/iphone-15-128gb-den"), false);
   assert.equal(manifest.routes.some((route) => route.outputPath === "iphone-15.html"), true);
   assert.equal(manifest.routes.some((route) => route.path === "/dien-thoai"), true);
+  assert.equal(manifest.data.routesWritten, 6);
+  assert.equal(dataManifest.routes.length, 6);
+  assert.equal(dataManifest.routes.some((route) => route.dataPath === "/data/routes/iphone-15.json"), true);
+  assert.equal(homeData.route.path, "/");
+  assert.equal(productData.content.variants.length, 2);
+  assert.equal(productData.runtime.dataUrl, "/data/routes/iphone-15.json");
 });

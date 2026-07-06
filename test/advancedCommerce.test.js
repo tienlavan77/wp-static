@@ -92,7 +92,7 @@ test("addRelatedProducts generates related product ids from matching terms", () 
   assert.deepEqual(contents[0].data.relatedProductIds, ["product-case"]);
 });
 
-test("applyAdvancedCommerceData combines variants, filters, and related data", () => {
+test("applyAdvancedCommerceData keeps variants on parent products", () => {
   const data = applyAdvancedCommerceData({
     contents: [
       product("product-phone", "phone", {
@@ -113,12 +113,13 @@ test("applyAdvancedCommerceData combines variants, filters, and related data", (
     ]
   });
 
-  assert.equal(data.contents.some((content) => content.slug === "phone-black"), true);
+  assert.equal(data.contents.some((content) => content.slug === "phone-black"), false);
   assert.deepEqual(data.collections.commerce.products.onSale.map((item) => item.slug), ["phone"]);
+  assert.equal(data.contents.find((content) => content.id === "product-phone").data.variants[0].slug, "black");
   assert.deepEqual(data.contents.find((content) => content.id === "product-phone").data.relatedProductIds, ["product-case"]);
 });
 
-test("compile includes product variant routes and commerce collections", async () => {
+test("compile keeps product variants on parent product data", async () => {
   const outputDir = await mkdtemp(path.join(os.tmpdir(), "wpsc-advanced-commerce-"));
   const config = await loadConfig("examples/basic-shop");
   const testConfig = {
@@ -135,10 +136,10 @@ test("compile includes product variant routes and commerce collections", async (
     projectDir: config._paths.projectDir
   });
 
-  assert.equal(sitePlan.routes.some((route) => route.path === "/iphone-15-128gb-den"), true);
+  assert.equal(sitePlan.routes.some((route) => route.path === "/iphone-15-128gb-den"), false);
   assert.equal(sitePlan.routes.filter((route) => route.path !== "/").some((route) => route.path.endsWith("/")), false);
-  assert.equal(sitePlan.graph.findContentBySlug("iphone-15").data.relatedProductIds.includes("product-iphone-15:variant:128gb-den"), false);
-  assert.equal(sitePlan.graph.contents.items.some((content) => content.type === "product_variant"), true);
+  assert.equal(sitePlan.graph.findContentBySlug("iphone-15").data.variants.length, 2);
+  assert.equal(sitePlan.graph.contents.items.some((content) => content.type === "product_variant"), false);
 });
 
 function product(id, slug, data = {}) {

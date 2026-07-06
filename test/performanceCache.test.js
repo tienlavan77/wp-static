@@ -23,9 +23,9 @@ test("buildProjectOnce reuses content and route render caches", async () => {
   assert.equal(first.sitePlan.cache.contentCacheHit, false);
   assert.equal(second.sitePlan.cache.contentCacheHit, true);
   assert.equal(second.sitePlan.cache.collectionCacheHit, true);
-  assert.equal(second.sitePlan.cache.routeRenderCacheHits, 8);
+  assert.equal(second.sitePlan.cache.routeRenderCacheHits, 6);
   assert.equal(second.sitePlan.cache.routeRenderCacheMisses, 0);
-  assert.equal(manifest.cache.routeRenderCacheHits, 8);
+  assert.equal(manifest.cache.routeRenderCacheHits, 6);
 });
 
 test("buildProjectOnce invalidates route render cache when theme files change", async () => {
@@ -46,7 +46,7 @@ test("buildProjectOnce invalidates route render cache when theme files change", 
   const changed = await buildProjectOnce(projectDir);
   const homepage = await readFile(path.join(projectDir, "dist", "index.html"), "utf8");
 
-  assert.equal(changed.sitePlan.cache.routeRenderCacheMisses, 8);
+  assert.equal(changed.sitePlan.cache.routeRenderCacheMisses, 6);
   assert.match(homepage, /fresh theme/);
 });
 

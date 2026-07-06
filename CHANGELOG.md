@@ -45,8 +45,9 @@
 - Added a dependency-free visual builder UI prototype with block palette, canvas ordering, props editing, live preview, and JSON export.
 - Added theme block libraries, project block overrides, and theme-aware builder preview rendering.
 - Added production builder foundations with editor auth, layout revisions, draft/publish state, and rebuild triggers.
-- Added advanced commerce data for product variant pages, sale/stock collections, and related products.
+- Added advanced commerce data for parent product variants, sale/stock collections, and related products.
 - Added deployment helpers and guides for rsync, Cloudflare Pages, S3/R2, and GitHub Actions.
 - Marked stable public APIs and added API migration, compatibility, and deprecation policy docs.
+- Added public route data JSON output for theme, builder, SEO, and commerce UI data.
 
 Status: WPSC v1.0 production framework ready.

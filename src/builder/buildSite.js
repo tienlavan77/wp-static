@@ -8,6 +8,7 @@ import createPluginContext from "../plugins/createPluginContext.js";
 import { runPluginEvent } from "../plugins/runPluginHook.js";
 import generateRobotsTxt from "../seo/generateRobotsTxt.js";
 import generateSitemap from "../seo/generateSitemap.js";
+import writeRouteDataOutputs from "../data/writeRouteDataOutputs.js";
 
 export default async function buildSite(sitePlan, options = {}) {
   const outputDir = options.outputDir ?? "dist";
@@ -50,6 +51,11 @@ export default async function buildSite(sitePlan, options = {}) {
     await writeFile(filePath, assetPipeline.rewriteHtml(page.html), "utf8");
   }
 
+  const routeData = await writeRouteDataOutputs(sitePlan, {
+    outputDir,
+    routesToWrite: pagesToWrite.map((page) => page.route),
+    site: options.site
+  });
   const seoOutputs = await writeSeoOutputs(sitePlan, outputDir, options);
 
   const buildResult = {
@@ -65,6 +71,7 @@ export default async function buildSite(sitePlan, options = {}) {
     manifestPath: path.join(outputDir, ".wpsc", "manifest.json"),
     pagesWritten: pagesToWrite.length,
     seoOutputs,
+    routeData,
     totalPages: sitePlan.pages.length,
     outputDir
   };

@@ -34,6 +34,10 @@ export default function createBuildManifest(sitePlan, buildResult, options = {})
     seo: {
       outputs: buildResult.seoOutputs ?? []
     },
+    data: {
+      manifestPath: buildResult.routeData?.manifestPath ?? null,
+      routesWritten: buildResult.routeData?.routesWritten ?? 0
+    },
     graph: {
       contentCount: sitePlan.graph?.contents.items.length ?? 0,
       mediaCount: sitePlan.graph?.media.items.length ?? 0,

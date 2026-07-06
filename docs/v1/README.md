@@ -40,6 +40,7 @@ layouts, incremental rebuilds, and static deployment.
 ## Build And Deploy
 
 - [Incremental Build](../incremental-build.md)
+- [Public Route Data](../public-route-data.md)
 - [Webhook Rebuild Workflow](../webhook-rebuild-workflow.md)
 - [Performance Cache](../performance-cache.md)
 - [Nginx Deployment](../deployment-nginx.md)

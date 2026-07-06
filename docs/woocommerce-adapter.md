@@ -62,8 +62,9 @@ Rank Math fields are normalized into `content.seo`, the same shape used by the
 WordPress adapter.
 
 When `includeVariations` is enabled, WooCommerce variation records are fetched and
-normalized into `data.variants`. WPSC keeps the raw `data.variations` value for reference,
-but static variant routes are generated from `data.variants`.
+normalized into `data.variants`. WPSC keeps the raw `data.variations` value for reference.
+Variants do not create their own static routes; they are exposed through the parent
+product route data JSON.
 
 ## With WordPress Content
 
