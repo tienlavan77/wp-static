@@ -33,6 +33,7 @@ export default function renderPage(route, layout, options = {}) {
     renderSeoTags(route.content, route, options),
     '    <link rel="stylesheet" href="/style.css?v=darkmode-1">',
     '    <link rel="stylesheet" href="/storefront.css?v=ui-3">',
+    '    <script src="/wpsc-enhanced-navigation.js?v=1" defer></script>',
     "  </head>",
     "  <body>",
     '    <div class="site-shell">',

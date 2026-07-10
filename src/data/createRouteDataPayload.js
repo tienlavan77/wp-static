@@ -1,5 +1,6 @@
 import createSeoMetadata from "../seo/createSeoMetadata.js";
 import createTaxonomyBreadcrumbs from "../taxonomy/createTaxonomyBreadcrumbs.js";
+import { createFragmentPublicPath } from "../fragments/writeFragmentOutputs.js";
 
 export default function createRouteDataPayload(route, context = {}) {
   const content = route.content;
@@ -48,6 +49,7 @@ export default function createRouteDataPayload(route, context = {}) {
     },
     runtime: {
       dataUrl: createRouteDataPublicPath(route),
+      fragmentUrl: createFragmentPublicPath(route),
       addToCartEndpoint: "/api/cart/items",
       checkoutEndpoint: "/api/checkout"
     }

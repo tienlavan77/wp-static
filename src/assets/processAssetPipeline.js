@@ -1,6 +1,6 @@
 import path from "node:path";
 import collectAssetUrls from "./collectAssetUrls.js";
-import createAssetFilename from "./createAssetFilename.js";
+import createAssetFilename, { createWebpAssetFilename } from "./createAssetFilename.js";
 import downloadAsset from "./downloadAsset.js";
 import rewriteAssetUrls from "./rewriteAssetUrls.js";
 import runLimitedParallel from "../performance/runLimitedParallel.js";
@@ -26,6 +26,7 @@ export default async function processAssetPipeline(sitePlan, options = {}) {
       sourceUrl: url,
       outputPath: `assets/media/${filename}`,
       publicPath,
+      optimization: createImageOptimizationPlan(url),
       bytes: result.bytes,
       cached: result.cached
     };
@@ -44,5 +45,18 @@ export default async function processAssetPipeline(sitePlan, options = {}) {
     rewriteHtml(html) {
       return rewriteAssetUrls(html, assetMap);
     }
+  };
+}
+
+function createImageOptimizationPlan(url) {
+  const webpEligible = /\.(jpe?g|png|webp)(\?.*)?$/i.test(url);
+
+  return {
+    format: webpEligible ? "webp" : "passthrough",
+    status: webpEligible ? "planned" : "skipped",
+    webpOutputPath: webpEligible ? `assets/media/${createWebpAssetFilename(url)}` : null,
+    note: webpEligible
+      ? "WebP conversion is planned; current build keeps original bytes until an encoder is configured."
+      : "Source format is not converted by the WebP pipeline."
   };
 }

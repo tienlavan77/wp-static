@@ -1,4 +1,4 @@
-import { mkdir, rm, writeFile } from "node:fs/promises";
+import { copyFile, mkdir, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import copyPublicAssets from "./copyPublicAssets.js";
 import createBuildManifest from "./createBuildManifest.js";
@@ -9,6 +9,8 @@ import { runPluginEvent } from "../plugins/runPluginHook.js";
 import generateRobotsTxt from "../seo/generateRobotsTxt.js";
 import generateSitemap from "../seo/generateSitemap.js";
 import writeRouteDataOutputs from "../data/writeRouteDataOutputs.js";
+import writeNormalizedContentStore from "../data/writeNormalizedContentStore.js";
+import writeFragmentOutputs from "../fragments/writeFragmentOutputs.js";
 
 export default async function buildSite(sitePlan, options = {}) {
   const outputDir = options.outputDir ?? "dist";
@@ -53,12 +55,23 @@ export default async function buildSite(sitePlan, options = {}) {
     await writeFile(filePath, assetPipeline.rewriteHtml(page.html), "utf8");
   }
 
+  const fragmentOutputs = await writeFragmentOutputs(pagesToWrite.map((page) => ({
+    ...page,
+    html: assetPipeline.rewriteHtml(page.html)
+  })), {
+    outputDir
+  });
   const routeData = await writeRouteDataOutputs(sitePlan, {
     outputDir,
     routesToWrite: pagesToWrite.map((page) => page.route),
     site: options.site
   });
+  const contentStore = await writeNormalizedContentStore(sitePlan, {
+    outputDir,
+    site: options.site
+  });
   const seoOutputs = await writeSeoOutputs(sitePlan, outputDir, options);
+  await copyRuntimeAssets(outputDir);
 
   const buildResult = {
     copiedPublicAssets,
@@ -74,6 +87,8 @@ export default async function buildSite(sitePlan, options = {}) {
     pagesWritten: pagesToWrite.length,
     seoOutputs,
     routeData,
+    contentStore,
+    fragmentOutputs,
     totalPages: sitePlan.pages.length,
     outputDir
   };
@@ -93,6 +108,11 @@ export default async function buildSite(sitePlan, options = {}) {
   }, pluginContext);
 
   return buildResult;
+}
+
+async function copyRuntimeAssets(outputDir) {
+  const source = new URL("../runtime/enhanced-navigation.js", import.meta.url);
+  await copyFile(source, path.join(outputDir, "wpsc-enhanced-navigation.js"));
 }
 
 function createAssetSitePlan(sitePlan, pagesToWrite, options = {}) {

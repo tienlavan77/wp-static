@@ -13,3 +13,9 @@ export default function createAssetFilename(url) {
 
   return `${basename}-${hash}${extension.toLowerCase()}`;
 }
+
+export function createWebpAssetFilename(url) {
+  const filename = createAssetFilename(url);
+
+  return filename.replace(/\.[^.]+$/, ".webp");
+}

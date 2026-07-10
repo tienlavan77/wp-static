@@ -42,6 +42,9 @@ test("asset pipeline downloads, caches, manifests, and rewrites remote images", 
       total: 1
     });
     assert.equal(assetEntry.cached, false);
+    assert.equal(assetEntry.optimization.format, "webp");
+    assert.equal(assetEntry.optimization.status, "planned");
+    assert.match(assetEntry.optimization.webpOutputPath, /\.webp$/);
     assert.equal(assetBytes.toString("utf8"), "fake image");
     assert.equal(buildManifest.assets.downloaded, 1);
 
