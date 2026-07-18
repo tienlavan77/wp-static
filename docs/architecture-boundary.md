@@ -35,6 +35,47 @@ Plugins
 No subsystem should import private files from another subsystem when a public
 contract or hook exists.
 
+## Owner / Input / Output / Public API Matrix
+
+| Subsystem | Owner | Input | Output | Public API | Forbidden |
+| --- | --- | --- | --- | --- | --- |
+| Adapter Layer | Source integration | Source API credentials, source config, raw WP/Woo/mock data | Normalized contents, terms, media, menus, collections | Adapter contract, `getContents()`, `getCollections()`, optional cache identity | Rendering HTML, writing `dist`, deciding final output paths, exposing credentials to browser |
+| Compiler | Core compilation | Project config, adapter output, plugin hooks, theme metadata | Immutable `sitePlan`, routes, graph, pages | `compile(config, options)`, compiler contract | Writing files, running servers, handling sessions, depending on deployment/VPS details |
+| Build Engine | Static artifact writer | `sitePlan`, output paths, public assets, runtime assets, incremental plan | HTML, fragments, route JSON, search index, SEO files, manifests, copied assets | `buildSite(sitePlan, options)`, build result, progress events | Fetching source data directly, owning customer account rules, knowing raw WP schema |
+| Runtime Kernel | Dynamic commerce/account workflows | Runtime HTTP request, session cookie, runtime config, server-side source service wrappers | Runtime JSON responses, customer session, order/account data, browser enhancements | Runtime API routes, runtime contract, frontend runtime modules | Rebuilding static routes directly, leaking private credentials, requiring public SSR |
+| Theme System | Static storefront presentation | Route, content, graph, site, theme config, block/template data | HTML markup and static asset references | Theme contract, layout functions, component/block APIs | Calling WP/Woo APIs directly, writing build output, reading private runtime sessions |
+| Plugin System | Extension points | Hook context, config, contents, routes, build/render lifecycle data | Hook results, transformed public data, render/build extensions | Plugin contract, declared hooks | Importing private modules as stable API, mutating frozen data in place, bypassing security boundaries |
+
+## Allowed / Forbidden Dependency Matrix
+
+Legend:
+
+```text
+Allowed: stable/public dependency is allowed.
+Forbidden: direct private dependency is forbidden.
+Hook only: dependency must go through plugin hook/context.
+Data only: dependency is allowed through normalized data, not implementation imports.
+```
+
+| From / To | Adapter Layer | Compiler | Build Engine | Runtime Kernel | Theme System | Plugin System |
+| --- | --- | --- | --- | --- | --- | --- |
+| Adapter Layer | Allowed internal | Forbidden | Forbidden | Forbidden | Forbidden | Hook only |
+| Compiler | Allowed via contract | Allowed internal | Forbidden | Forbidden | Data only | Hook only |
+| Build Engine | Forbidden | Data only via `sitePlan` | Allowed internal | Data only for copied runtime assets | Data only for copied theme assets | Hook only |
+| Runtime Kernel | Data only via server-side services | Forbidden | Forbidden | Allowed internal | Forbidden | Hook only |
+| Theme System | Forbidden | Data only via render context | Forbidden | Forbidden except public links/data attributes | Allowed internal | Hook only |
+| Plugin System | Hook context only | Hook context only | Hook context only | Hook context only | Hook context only | Allowed internal |
+
+Forbidden examples:
+
+```text
+src/theme/* -> src/adapters/wordpress/*
+src/runtime/frontend/* -> source credentials or server-only Woo client
+src/adapters/* -> src/builder/*
+src/builder/* -> raw WordPress post/product schema
+project plugin -> undocumented private Core file as stable API
+```
+
 ## Subsystems
 
 ### Adapter Layer
