@@ -18,7 +18,7 @@ docs/sprint-2-developer-workflow.md
 005 - Done - Asset Pipeline
 006 - Done - Production Build
 007 - Done - Performance Metrics
-008 - Sprint Documentation & Final Review
+008 - Done - Sprint Documentation & Final Review
 ```
 
 ## Constraints

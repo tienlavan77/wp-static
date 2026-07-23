@@ -8,6 +8,7 @@ layouts, incremental rebuilds, and static deployment.
 - [Getting Started](../getting-started.md)
 - [Installation Guide](../installation.md)
 - [CLI Reference](../cli-reference.md)
+- [Developer Workflow](../developer-workflow.md)
 - [API Stability](../api-stability.md)
 - [Migration Policy](../api-migration-policy.md)
 - [Deprecation Policy](../deprecation-policy.md)
