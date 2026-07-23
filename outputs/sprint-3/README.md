@@ -13,7 +13,7 @@ In progress.
 | 003 | Hook System | Done |
 | 004 | Plugin SDK Foundation | Done |
 | 005 | Extension Loader | Done |
-| 006 | Runtime Configuration | Pending |
+| 006 | Runtime Configuration | Done |
 | 007 | Runtime Diagnostics | Pending |
 | 008 | Sprint Documentation and Final Review | Pending |
 
