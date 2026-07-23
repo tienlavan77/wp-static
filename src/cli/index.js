@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
 import path from "node:path";
-import { cp, mkdir, stat } from "node:fs/promises";
 import cleanOutput from "../builder/cleanOutput.js";
 import createInstallConfiguration from "../core/createInstallConfiguration.js";
+import createProjectScaffold, { STARTER_TEMPLATES } from "../core/createProjectScaffold.js";
 import doctorProject from "../core/doctorProject.js";
 import loadConfig from "../core/loadConfig.js";
 import buildProjectOnce from "../dev-server/buildProjectOnce.js";
@@ -114,7 +114,10 @@ async function main(cliArgs) {
   }
 
   if (cliArgs[0] === "create") {
-    await createProject(cliArgs[1]);
+    await createProject(cliArgs[1], {
+      listTemplates: cliArgs.includes("--list-templates"),
+      template: readOptionalArg(cliArgs, "--template")
+    });
     return;
   }
 
@@ -338,37 +341,29 @@ async function webhookProject(projectArg, port, options = {}) {
   process.on("SIGTERM", close);
 }
 
-async function createProject(projectName) {
+async function createProject(projectName, options = {}) {
+  if (options.listTemplates) {
+    logger.info(`Available templates: ${STARTER_TEMPLATES.join(", ")}`);
+    return;
+  }
+
   if (!projectName) {
-    throw new Error("Usage: wpsc create <project-name>");
+    throw new Error("Usage: wpsc create <project-name> [--template <template>]");
   }
 
-  const targetDir = path.resolve(projectName);
-
-  try {
-    await stat(targetDir);
-    throw new Error(`Project already exists: ${targetDir}`);
-  } catch (error) {
-    if (error.code !== "ENOENT") {
-      throw error;
-    }
-  }
-
-  await mkdir(path.dirname(targetDir), { recursive: true });
-  await cp(path.resolve("templates/basic-shop"), targetDir, {
-    recursive: true,
-    errorOnExist: true,
-    force: false
+  const result = await createProjectScaffold(projectName, {
+    template: options.template
   });
 
-  logger.info(`Created project at ${targetDir}`);
+  logger.info(`Created ${result.template} project at ${result.projectDir}`);
 }
 
 function printHelp() {
   console.log(`Usage:
   wpsc build [--project <project-dir>] [--changed <type:id>] [--preview --preview-token <token>]
   wpsc clean [--project <project-dir>]
-  wpsc create <project-name>
+  wpsc create <project-name> [--template blank|blog|catalog|commerce|corporate]
+  wpsc create --list-templates
   wpsc deploy rsync [--project <project-dir>] --target <user@host:/path/> [--dry-run]
   wpsc dev [--project <project-dir>] [--port <port>]
   wpsc doctor [--project <project-dir>] [--json]

@@ -1,0 +1,27 @@
+[
+  {
+    "id": "page-home",
+    "type": "page",
+    "title": "Commerce Home",
+    "slug": "home",
+    "domain": "shop",
+    "data": {
+      "headline": "Static commerce starter",
+      "description": "Build a fast storefront from WordPress and WooCommerce data."
+    }
+  },
+  {
+    "id": "product-demo",
+    "type": "product",
+    "title": "Demo Product",
+    "slug": "demo-product",
+    "domain": "shop",
+    "data": {
+      "price": 99000,
+      "currency": "VND",
+      "sku": "DEMO-001",
+      "description": "A sample commerce product.",
+      "inStock": true
+    }
+  }
+]

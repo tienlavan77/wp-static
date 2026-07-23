@@ -1,0 +1,23 @@
+[
+  {
+    "id": "page-home",
+    "type": "page",
+    "title": "Corporate Home",
+    "slug": "home",
+    "domain": "company",
+    "data": {
+      "headline": "Corporate website starter",
+      "description": "Use WPSC for company pages, services, and landing pages."
+    }
+  },
+  {
+    "id": "page-about",
+    "type": "page",
+    "title": "About",
+    "slug": "about",
+    "domain": "company",
+    "data": {
+      "description": "Tell customers who you are and what you do."
+    }
+  }
+]

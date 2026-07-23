@@ -1,0 +1,15 @@
+body {
+  margin: 0;
+  color: #17211d;
+  font: 13pt system-ui, sans-serif;
+}
+
+main {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 72px 24px;
+}
+
+.headline {
+  color: #0c6349;
+}

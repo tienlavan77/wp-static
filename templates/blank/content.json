@@ -1,0 +1,13 @@
+[
+  {
+    "id": "page-home",
+    "type": "page",
+    "title": "Home",
+    "slug": "home",
+    "domain": "site",
+    "data": {
+      "headline": "Blank WPSC project",
+      "description": "Start from an empty static site."
+    }
+  }
+]

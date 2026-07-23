@@ -1,0 +1,25 @@
+[
+  {
+    "id": "page-home",
+    "type": "page",
+    "title": "Catalog Home",
+    "slug": "home",
+    "domain": "catalog",
+    "data": {
+      "headline": "Static product catalog",
+      "description": "Show products without checkout."
+    }
+  },
+  {
+    "id": "product-sample",
+    "type": "product",
+    "title": "Sample Catalog Product",
+    "slug": "sample-product",
+    "domain": "catalog",
+    "data": {
+      "price": 120000,
+      "currency": "VND",
+      "description": "A product listing for catalog-only websites."
+    }
+  }
+]

@@ -1,0 +1,18 @@
+body {
+  margin: 0;
+  color: #1f2933;
+  font: 13pt Georgia, "Times New Roman", serif;
+}
+
+main {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 64px 24px;
+}
+
+.eyebrow {
+  color: #0c6349;
+  font: 700 0.75rem system-ui, sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}

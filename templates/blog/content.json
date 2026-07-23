@@ -1,0 +1,24 @@
+[
+  {
+    "id": "page-home",
+    "type": "page",
+    "title": "Blog Home",
+    "slug": "home",
+    "domain": "blog",
+    "data": {
+      "headline": "A clean static blog",
+      "description": "Publish articles from WordPress into a fast static site."
+    }
+  },
+  {
+    "id": "post-welcome",
+    "type": "post",
+    "title": "Welcome to WPSC Blog",
+    "slug": "welcome",
+    "domain": "blog",
+    "data": {
+      "excerpt": "Your first static article.",
+      "description": "Use this template for content-heavy websites."
+    }
+  }
+]
