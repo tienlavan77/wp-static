@@ -37,11 +37,26 @@ test("asset pipeline downloads, caches, manifests, and rewrites remote images", 
     assert.match(html, /src="\/assets\/media\/product-/);
     assert.equal(assetManifest.assets.length, 1);
     assert.deepEqual(assetManifest.stats, {
+      byType: {
+        css: 0,
+        font: 0,
+        image: 1,
+        js: 0,
+        other: 0
+      },
       cached: 0,
       downloaded: 1,
-      total: 1
+      optimization: {
+        planned: 1,
+        skipped: 0,
+        unknown: 0
+      },
+      total: 1,
+      totalBytes: 10
     });
     assert.equal(assetEntry.cached, false);
+    assert.equal(assetEntry.bytes, 10);
+    assert.equal(assetEntry.type, "image");
     assert.equal(assetEntry.optimization.format, "webp");
     assert.equal(assetEntry.optimization.status, "planned");
     assert.match(assetEntry.optimization.webpOutputPath, /\.webp$/);
@@ -55,6 +70,8 @@ test("asset pipeline downloads, caches, manifests, and rewrites remote images", 
 
     assert.equal(requests, 1);
     assert.equal(secondBuild.entries[0].cached, true);
+    assert.equal(secondBuild.stats.cached, 1);
+    assert.equal(secondBuild.stats.totalBytes, 10);
   } finally {
     globalThis.fetch = originalFetch;
   }

@@ -24,6 +24,7 @@ export default async function processAssetPipeline(sitePlan, options = {}) {
     assetMap.set(url, publicPath);
     return {
       sourceUrl: url,
+      type: classifyAssetType(url),
       outputPath: `assets/media/${filename}`,
       publicPath,
       optimization: createImageOptimizationPlan(url),
@@ -36,16 +37,78 @@ export default async function processAssetPipeline(sitePlan, options = {}) {
 
   return {
     entries,
-    stats: {
-      cached: entries.filter((entry) => entry.cached).length,
-      downloaded: entries.filter((entry) => !entry.cached).length,
-      total: entries.length
-    },
+    stats: createAssetStats(entries),
     map: Object.fromEntries(assetMap),
     rewriteHtml(html) {
       return rewriteAssetUrls(html, assetMap);
     }
   };
+}
+
+function createAssetStats(entries) {
+  return entries.reduce((stats, entry) => {
+    const type = entry.type ?? "other";
+    const optimizationStatus = entry.optimization?.status ?? "unknown";
+
+    return {
+      ...stats,
+      byType: {
+        ...stats.byType,
+        [type]: (stats.byType[type] ?? 0) + 1
+      },
+      cached: stats.cached + (entry.cached ? 1 : 0),
+      downloaded: stats.downloaded + (entry.cached ? 0 : 1),
+      optimization: {
+        ...stats.optimization,
+        [optimizationStatus]: (stats.optimization[optimizationStatus] ?? 0) + 1
+      },
+      total: stats.total + 1,
+      totalBytes: stats.totalBytes + (Number.isFinite(entry.bytes) ? entry.bytes : 0)
+    };
+  }, {
+    byType: {
+      css: 0,
+      font: 0,
+      image: 0,
+      js: 0,
+      other: 0
+    },
+    cached: 0,
+    downloaded: 0,
+    optimization: {
+      planned: 0,
+      skipped: 0,
+      unknown: 0
+    },
+    total: 0,
+    totalBytes: 0
+  });
+}
+
+function classifyAssetType(url) {
+  try {
+    const extension = path.extname(new URL(url).pathname).toLowerCase();
+
+    if ([".avif", ".gif", ".jpg", ".jpeg", ".png", ".svg", ".webp"].includes(extension)) {
+      return "image";
+    }
+
+    if (extension === ".css") {
+      return "css";
+    }
+
+    if (extension === ".js" || extension === ".mjs") {
+      return "js";
+    }
+
+    if ([".eot", ".otf", ".ttf", ".woff", ".woff2"].includes(extension)) {
+      return "font";
+    }
+  } catch {
+    return "other";
+  }
+
+  return "other";
 }
 
 function createImageOptimizationPlan(url) {

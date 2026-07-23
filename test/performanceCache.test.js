@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { cp, mkdtemp, mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdtemp, mkdir, readFile, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -8,13 +8,7 @@ import compile from "../src/core/compile.js";
 import buildProjectOnce from "../src/dev-server/buildProjectOnce.js";
 
 test("buildProjectOnce reuses content and route render caches", async () => {
-  const projectDir = await mkdtemp(path.join(os.tmpdir(), "wpsc-cache-"));
-  await cp("examples/basic-shop", projectDir, {
-    filter(source) {
-      return !source.includes(`${path.sep}dist`) && !source.includes(`${path.sep}.wpsc`);
-    },
-    recursive: true
-  });
+  const projectDir = await createLargeCatalogProject(6);
 
   const first = await buildProjectOnce(projectDir);
   const second = await buildProjectOnce(projectDir);
@@ -29,25 +23,21 @@ test("buildProjectOnce reuses content and route render caches", async () => {
 });
 
 test("buildProjectOnce invalidates route render cache when theme files change", async () => {
-  const projectDir = await mkdtemp(path.join(os.tmpdir(), "wpsc-theme-cache-"));
-  await cp("examples/basic-shop", projectDir, {
-    filter(source) {
-      return !source.includes(`${path.sep}dist`) && !source.includes(`${path.sep}.wpsc`);
-    },
-    recursive: true
-  });
+  const projectDir = await createLargeCatalogProject(6);
 
   await buildProjectOnce(projectDir);
   await writeFile(
-    path.join(projectDir, "theme", "layouts", "page.js"),
+    path.join(projectDir, "theme", "layout.js"),
     "export default ({ html }) => html`<main class=\"page-view\">fresh theme</main>`;\n",
     "utf8"
   );
   const changed = await buildProjectOnce(projectDir);
   const homepage = await readFile(path.join(projectDir, "dist", "index.html"), "utf8");
+  const page = await readFile(path.join(projectDir, "dist", "product-1.html"), "utf8");
 
   assert.equal(changed.sitePlan.cache.routeRenderCacheMisses, 7);
   assert.match(homepage, /fresh theme/);
+  assert.match(page, /fresh theme/);
 });
 
 test("large catalog compile supports parallel rendering and render cache hits", async () => {
@@ -121,10 +111,16 @@ test("build manifest records asset cache stats", async () => {
   });
   const manifest = JSON.parse(await readFile(result.manifestPath, "utf8"));
 
-  assert.deepEqual(result.assetStats, {
-    cached: 0,
-    downloaded: 0,
-    total: 0
+  assert.equal(result.assetStats.cached, 0);
+  assert.equal(result.assetStats.downloaded, 0);
+  assert.equal(result.assetStats.total, 0);
+  assert.equal(result.assetStats.totalBytes, 0);
+  assert.deepEqual(result.assetStats.byType, {
+    css: 0,
+    font: 0,
+    image: 0,
+    js: 0,
+    other: 0
   });
   assert.deepEqual(manifest.assets.stats, result.assetStats);
 });
@@ -156,6 +152,23 @@ async function createLargeCatalogProject(productCount) {
 
   await mkdir(path.join(projectDir, "theme"), { recursive: true });
   await writeFile(path.join(projectDir, "content.json"), `${JSON.stringify(contents, null, 2)}\n`, "utf8");
+  await writeFile(
+    path.join(projectDir, "wpsc.config.js"),
+    `export default {
+  name: "Large Catalog",
+  homepage: "home",
+  adapter: {
+    type: "mock",
+    source: "./content.json"
+  },
+  outputDir: "./dist",
+  theme: {
+    layout: "./theme/layout.js"
+  }
+};
+`,
+    "utf8"
+  );
   await writeFile(
     path.join(projectDir, "theme", "layout.js"),
     "export default ({ content, html }) => html`<main><h1>${content.title}</h1></main>`;\n",
