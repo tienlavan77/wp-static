@@ -16,7 +16,7 @@ docs/sprint-2-developer-workflow.md
 003 - Done - Incremental Build
 004 - Done - Watch Mode
 005 - Done - Asset Pipeline
-006 - Production Build
+006 - Done - Production Build
 007 - Performance Metrics
 008 - Sprint Documentation & Final Review
 ```

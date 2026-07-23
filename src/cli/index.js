@@ -7,6 +7,7 @@ import createProjectScaffold, { STARTER_TEMPLATES } from "../core/createProjectS
 import doctorProject from "../core/doctorProject.js";
 import loadConfig from "../core/loadConfig.js";
 import buildProjectOnce from "../dev-server/buildProjectOnce.js";
+import buildProductionProjectOnce from "../dev-server/buildProductionProjectOnce.js";
 import serveStatic from "../dev-server/serveStatic.js";
 import startDevServer from "../dev-server/startDevServer.js";
 import watchBuildProject from "../dev-server/watchBuildProject.js";
@@ -57,7 +58,8 @@ async function main(cliArgs) {
     await buildProject(readProjectArg(cliArgs), {
       changed: readRepeatedArg(cliArgs, "--changed"),
       preview: cliArgs.includes("--preview"),
-      previewToken: readOptionalArg(cliArgs, "--preview-token")
+      previewToken: readOptionalArg(cliArgs, "--preview-token"),
+      production: cliArgs.includes("--production")
     });
     return;
   }
@@ -136,7 +138,10 @@ async function main(cliArgs) {
 }
 
 async function buildProject(projectArg, options = {}) {
-  const { config, result, sitePlan } = await buildProjectOnce(projectArg, options);
+  const build = options.production
+    ? await buildProductionProjectOnce(projectArg, options)
+    : await buildProjectOnce(projectArg, options);
+  const { config, result, sitePlan } = build;
 
   printBuildSummary(config, sitePlan, result, logger);
 }
@@ -384,7 +389,7 @@ async function createProject(projectName, options = {}) {
 
 function printHelp() {
   console.log(`Usage:
-  wpsc build [--project <project-dir>] [--changed <type:id>] [--preview --preview-token <token>] [--watch]
+  wpsc build [--project <project-dir>] [--changed <type:id>] [--preview --preview-token <token>] [--watch] [--production]
   wpsc clean [--project <project-dir>]
   wpsc create <project-name> [--template blank|blog|catalog|commerce|corporate]
   wpsc create --list-templates
@@ -401,6 +406,7 @@ function printHelp() {
 
 function printBuildSummary(config, sitePlan, result, activeLogger) {
   activeLogger.info(`Project: ${config.name}`);
+  activeLogger.info(`Mode: ${result.productionBuild ? "production" : "development"}`);
   activeLogger.info(`Pages: ${result.pagesWritten}`);
   if (result.fullBuild === false) {
     activeLogger.info(`Incremental: ${result.changedRoutes.join(", ") || "no affected routes"}`);
