@@ -1,66 +1,59 @@
-import { access } from "node:fs/promises";
 import path from "node:path";
 import loadConfig from "./loadConfig.js";
+import {
+  checkNodeVersion,
+  checkPhpVersion,
+  checkReadablePath,
+  checkWritableDirectory
+} from "../validation/checkEnvironment.js";
+import {
+  createError,
+  createOk
+} from "../validation/createValidationResult.js";
 
 export default async function doctorProject(projectDir) {
   const checks = [];
-  const nodeMajor = Number.parseInt(process.versions.node.split(".")[0], 10);
-
-  checks.push({
-    name: "Node.js >= 20",
-    ok: nodeMajor >= 20,
-    detail: process.version
-  });
-
-  checks.push(await checkPath(path.join(projectDir, "wpsc.config.js"), "Config file"));
+  checks.push(await checkNodeVersion());
+  checks.push(await checkPhpVersion());
+  checks.push(await checkReadablePath(path.join(projectDir, "wpsc.config.js"), "Config file", {
+    fix: "Run the install wizard or create wpsc.config.js in the project root."
+  }));
 
   let config = null;
 
   try {
     config = await loadConfig(projectDir);
   } catch (error) {
-    checks.push({
-      name: "Config load",
-      ok: false,
-      detail: error.message
-    });
+    checks.push(createError("Config load", error.message, {
+      category: "config",
+      fix: "Fix the config error above, then run wpsc doctor again.",
+      summary: "WPSC could not load project config."
+    }));
 
     return checks;
   }
 
-  checks.push({
-    name: "Config load",
-    ok: true,
-    detail: config.name
-  });
+  checks.push(createOk("Config load", config.name, {
+    category: "config",
+    summary: `Loaded project config: ${config.name}.`
+  }));
 
   if (config.adapter?.type === "mock") {
-    checks.push(await checkPath(path.resolve(projectDir, config.adapter.source), "Mock content"));
+    checks.push(await checkReadablePath(path.resolve(projectDir, config.adapter.source), "Mock content"));
   }
 
-  checks.push(await checkPath(path.resolve(projectDir, config.theme.layout), "Theme layout"));
+  checks.push(await checkReadablePath(path.resolve(projectDir, config.theme.layout), "Theme layout", {
+    category: "theme",
+    fix: "Check theme.layout in wpsc.config.js and make sure the layout file exists."
+  }));
 
   if (config.publicDir) {
-    checks.push(await checkPath(path.resolve(projectDir, config.publicDir), "Public directory"));
+    checks.push(await checkReadablePath(path.resolve(projectDir, config.publicDir), "Public directory"));
   }
+
+  checks.push(await checkWritableDirectory(path.resolve(projectDir, config.outputDir), "Output directory", {
+    category: "output"
+  }));
 
   return checks;
-}
-
-async function checkPath(targetPath, name) {
-  try {
-    await access(targetPath);
-
-    return {
-      name,
-      ok: true,
-      detail: targetPath
-    };
-  } catch {
-    return {
-      name,
-      ok: false,
-      detail: targetPath
-    };
-  }
 }

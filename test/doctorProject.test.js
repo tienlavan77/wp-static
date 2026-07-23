@@ -7,4 +7,6 @@ test("doctorProject reports healthy example project", async () => {
 
   assert.equal(checks.every((check) => check.ok), true);
   assert.equal(checks.some((check) => check.name === "Config file"), true);
+  assert.equal(checks.some((check) => check.status === "ok"), true);
+  assert.equal(checks.every((check) => typeof check.summary === "string"), true);
 });
