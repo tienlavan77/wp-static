@@ -14,7 +14,7 @@ In progress.
 | 004 | Configuration Generator | Done |
 | 005 | Build Orchestrator | Done |
 | 006 | Installation Report | Done |
-| 007 | Web Installer UI | Pending |
+| 007 | Web Installer UI | Done |
 | 008 | Sprint Documentation and Final Review | Pending |
 
 ## Sprint Rule

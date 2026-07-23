@@ -40,7 +40,7 @@ Browser
 | 004 | Configuration Generator | Done |
 | 005 | Build Orchestrator | Done |
 | 006 | Installation Report | Done |
-| 007 | Web Installer UI | Pending |
+| 007 | Web Installer UI | Done |
 | 008 | Sprint Documentation and Final Review | Pending |
 
 ## Commit 001 - Installation Session
@@ -170,6 +170,26 @@ Commit 006 does not include:
 - filesystem writes
 - browser UI
 - report download endpoint
+
+## Commit 007 - Web Installer UI
+
+Web Installer UI creates a thin browser shell.
+
+Responsibilities:
+
+- display installation state
+- display progress
+- collect initial install input
+- display diagnostics
+- call Wizard API transport endpoint
+
+Commit 007 does not include:
+
+- runtime logic
+- build logic
+- environment validation logic
+- filesystem writes
+- server routing
 
 ## Boundary Rules
 
