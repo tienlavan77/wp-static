@@ -38,7 +38,7 @@ Browser
 | 002 | Wizard API | Done |
 | 003 | Environment Validation | Done |
 | 004 | Configuration Generator | Done |
-| 005 | Build Orchestrator | Pending |
+| 005 | Build Orchestrator | Done |
 | 006 | Installation Report | Pending |
 | 007 | Web Installer UI | Pending |
 | 008 | Sprint Documentation and Final Review | Pending |
@@ -131,6 +131,25 @@ Commit 004 does not include:
 - browser UI
 - build execution
 - WordPress API verification
+
+## Commit 005 - Build Orchestrator
+
+Build Orchestrator coordinates the initial build through an injected build function.
+
+Responsibilities:
+
+- require the installation session to be validated
+- move session progress into `BUILD`
+- call the Build Platform through a provided function
+- finish the session on success
+- fail the session with structured diagnostics on build error
+
+Commit 005 does not include:
+
+- build implementation
+- filesystem config writes
+- browser UI
+- report generation
 
 ## Boundary Rules
 
