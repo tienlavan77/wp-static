@@ -1,5 +1,6 @@
 import { readFile, writeFile } from "node:fs/promises";
 import buildProjectOnce from "./buildProjectOnce.js";
+import createBuildMetrics from "../report/createBuildMetrics.js";
 
 export default async function buildProductionProjectOnce(projectArg, options = {}) {
   const build = await buildProjectOnce(projectArg, {
@@ -19,9 +20,12 @@ export default async function buildProductionProjectOnce(projectArg, options = {
 }
 
 function createProductionMetadata(build) {
+  const metrics = createBuildMetrics(build);
+
   return {
     enabled: true,
     generatedAt: new Date().toISOString(),
+    metrics,
     mode: "production",
     optimizations: {
       assetStats: build.result.assetStats ?? null,

@@ -3,6 +3,7 @@ export default function createBuildReport(details = {}) {
   const buildResult = details.result ?? {};
   const sitePlan = details.sitePlan ?? {};
   const pipeline = details.pipeline ?? null;
+  const metrics = details.metrics ?? null;
   const warnings = details.warnings ?? [];
   const errors = details.errors ?? [];
 
@@ -40,6 +41,10 @@ Generated: ${builtAt}
 | Asset Total | ${formatNumber(buildResult.assetStats?.total)} |
 | Asset Cached | ${formatNumber(buildResult.assetStats?.cached)} |
 | Asset Downloaded | ${formatNumber(buildResult.assetStats?.downloaded)} |
+
+## Performance Metrics
+
+${formatMetrics(metrics)}
 
 ## Runtime
 
@@ -92,6 +97,24 @@ function formatPipeline(pipeline) {
   ].join("\n");
 }
 
+function formatMetrics(metrics) {
+  if (!metrics) {
+    return "No performance metrics.";
+  }
+
+  return [
+    "| Metric | Value |",
+    "| --- | --- |",
+    `| Total Duration | ${formatDuration(metrics.performance?.totalDurationMs)} |`,
+    `| Pages Written | ${formatNumber(metrics.output?.pagesWritten)} |`,
+    `| Total Pages | ${formatNumber(metrics.output?.totalPages)} |`,
+    `| Asset Total | ${formatNumber(metrics.assets?.total)} |`,
+    `| Asset Bytes | ${formatBytes(metrics.assets?.totalBytes)} |`,
+    `| Memory RSS | ${formatBytes(metrics.performance?.memoryRssBytes)} |`,
+    `| Memory Heap Used | ${formatBytes(metrics.performance?.memoryHeapUsedBytes)} |`
+  ].join("\n");
+}
+
 function formatMessages(messages = [], fallback) {
   if (!Array.isArray(messages) || messages.length === 0) {
     return fallback;
@@ -139,4 +162,20 @@ function formatDuration(value) {
   }
 
   return `${(value / 1000).toFixed(2)}s`;
+}
+
+function formatBytes(value) {
+  if (!Number.isFinite(value) || value <= 0) {
+    return "0 B";
+  }
+
+  if (value < 1024) {
+    return `${Math.round(value)} B`;
+  }
+
+  if (value < 1024 * 1024) {
+    return `${(value / 1024).toFixed(1)} KB`;
+  }
+
+  return `${(value / 1024 / 1024).toFixed(1)} MB`;
 }

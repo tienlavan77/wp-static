@@ -20,6 +20,8 @@ test("buildProductionProjectOnce marks result and manifest as production", async
   assert.equal(manifest.production.enabled, true);
   assert.equal(manifest.production.mode, "production");
   assert.equal(manifest.production.optimizations.staticOutput, true);
+  assert.equal(manifest.production.metrics.output.pagesWritten, 2);
+  assert.equal(manifest.production.metrics.assets.total, 0);
 });
 
 test("cli build --production reports production mode", async () => {
