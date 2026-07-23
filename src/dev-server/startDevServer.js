@@ -1,7 +1,7 @@
 import { watch } from "node:fs";
 import path from "node:path";
 import buildProjectOnce from "./buildProjectOnce.js";
-import createWatchTargets from "./createWatchTargets.js";
+import createWatchTargets from "../watcher/createWatchTargets.js";
 import serveStatic from "./serveStatic.js";
 
 export default async function startDevServer(projectArg, options = {}) {

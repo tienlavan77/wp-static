@@ -9,6 +9,7 @@ import loadConfig from "../core/loadConfig.js";
 import buildProjectOnce from "../dev-server/buildProjectOnce.js";
 import serveStatic from "../dev-server/serveStatic.js";
 import startDevServer from "../dev-server/startDevServer.js";
+import watchBuildProject from "../dev-server/watchBuildProject.js";
 import runRsyncDeploy from "../deploy/runRsyncDeploy.js";
 import createWebhookServer from "../webhook/createWebhookServer.js";
 import { getPackageInfo } from "../index.js";
@@ -46,6 +47,13 @@ async function main(cliArgs) {
   }
 
   if (cliArgs[0] === "build") {
+    if (cliArgs.includes("--watch")) {
+      await watchBuild(readProjectArg(cliArgs), {
+        changed: readRepeatedArg(cliArgs, "--changed")
+      });
+      return;
+    }
+
     await buildProject(readProjectArg(cliArgs), {
       changed: readRepeatedArg(cliArgs, "--changed"),
       preview: cliArgs.includes("--preview"),
@@ -131,6 +139,22 @@ async function buildProject(projectArg, options = {}) {
   const { config, result, sitePlan } = await buildProjectOnce(projectArg, options);
 
   printBuildSummary(config, sitePlan, result, logger);
+}
+
+async function watchBuild(projectArg, options = {}) {
+  const watcher = await watchBuildProject(projectArg, {
+    changed: options.changed,
+    logger
+  });
+
+  logger.info("Build watch mode running. Press Ctrl+C to stop.");
+
+  const close = () => {
+    watcher.close();
+    process.exit(0);
+  };
+  process.on("SIGINT", close);
+  process.on("SIGTERM", close);
 }
 
 function readOptionalArg(cliArgs, flagName) {
@@ -360,7 +384,7 @@ async function createProject(projectName, options = {}) {
 
 function printHelp() {
   console.log(`Usage:
-  wpsc build [--project <project-dir>] [--changed <type:id>] [--preview --preview-token <token>]
+  wpsc build [--project <project-dir>] [--changed <type:id>] [--preview --preview-token <token>] [--watch]
   wpsc clean [--project <project-dir>]
   wpsc create <project-name> [--template blank|blog|catalog|commerce|corporate]
   wpsc create --list-templates

@@ -14,7 +14,7 @@ docs/sprint-2-developer-workflow.md
 001 - Done - Build Pipeline Foundation
 002 - Done - Build Report
 003 - Done - Incremental Build
-004 - Watch Mode
+004 - Done - Watch Mode
 005 - Asset Pipeline
 006 - Production Build
 007 - Performance Metrics
