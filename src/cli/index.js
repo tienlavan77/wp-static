@@ -3,6 +3,7 @@
 import path from "node:path";
 import { cp, mkdir, stat } from "node:fs/promises";
 import cleanOutput from "../builder/cleanOutput.js";
+import createInstallConfiguration from "../core/createInstallConfiguration.js";
 import doctorProject from "../core/doctorProject.js";
 import loadConfig from "../core/loadConfig.js";
 import buildProjectOnce from "../dev-server/buildProjectOnce.js";
@@ -74,6 +75,20 @@ async function main(cliArgs) {
     await deployRsync(readProjectArg(cliArgs), {
       dryRun: cliArgs.includes("--dry-run"),
       target: readOptionalArg(cliArgs, "--target")
+    });
+    return;
+  }
+
+  if (cliArgs[0] === "install") {
+    await installProject(readProjectArg(cliArgs), {
+      domain: readOptionalArg(cliArgs, "--domain"),
+      force: cliArgs.includes("--force"),
+      format: cliArgs.includes("--json") ? "json" : "text",
+      outputDir: readOptionalArg(cliArgs, "--output-dir"),
+      siteName: readOptionalArg(cliArgs, "--site-name"),
+      theme: readOptionalArg(cliArgs, "--theme"),
+      woocommerceUrl: readOptionalArg(cliArgs, "--woocommerce-url"),
+      wordpressUrl: readOptionalArg(cliArgs, "--wordpress-url")
     });
     return;
   }
@@ -229,6 +244,34 @@ async function validateProject(projectArg, options = {}) {
   }
 }
 
+async function installProject(projectArg, options = {}) {
+  const result = await createInstallConfiguration(projectArg, options);
+
+  if (options.format === "json") {
+    console.log(JSON.stringify(result, null, 2));
+    return;
+  }
+
+  logger.info(`Install wizard generated configuration in ${result.projectDir}`);
+  logger.info("Files:");
+
+  for (const file of result.files) {
+    logger.info(`  ${file}`);
+  }
+
+  const warnings = result.results.filter((check) => check.status === "warning");
+
+  if (warnings.length > 0) {
+    logger.info("Warnings:");
+    for (const warning of warnings) {
+      logger.info(`  ${warning.name}: ${warning.summary}`);
+      if (warning.fix) {
+        logger.info(`    Fix: ${warning.fix}`);
+      }
+    }
+  }
+}
+
 async function serveProject(projectArg, port) {
   const projectDir = path.resolve(projectArg);
   const config = await loadConfig(projectDir);
@@ -327,6 +370,7 @@ function printHelp() {
   wpsc deploy rsync [--project <project-dir>] --target <user@host:/path/> [--dry-run]
   wpsc dev [--project <project-dir>] [--port <port>]
   wpsc doctor [--project <project-dir>] [--json]
+  wpsc install [--project <project-dir>] [--wordpress-url <url>] [--woocommerce-url <url>] [--domain <url>] [--output-dir <dir>] [--theme <name>] [--site-name <name>] [--force] [--json]
   wpsc serve [--project <project-dir>] [--port <port>]
   wpsc validate [--project <project-dir>] [--json]
   wpsc webhook [--project <project-dir>] [--port <port>] [--secret <secret>]

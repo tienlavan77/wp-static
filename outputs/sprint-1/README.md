@@ -14,11 +14,11 @@ Sprint 1 will be implemented in product-focused commits. Each commit should
 include a diff summary and review file, following the Sprint 0 tracking style.
 
 ```text
-001 - Capture Sprint 1 product foundation spec
-002 - Add validation result model and environment checks
-003 - Upgrade wpsc doctor diagnostics
-004 - Add wpsc validate command
-005 - Add install wizard skeleton and config generation
+001 - Done - Capture Sprint 1 product foundation spec
+002 - Done - Add validation result model and environment checks
+003 - Done - Upgrade wpsc doctor diagnostics
+004 - Done - Add wpsc validate command
+005 - Done - Add install wizard skeleton and config generation
 006 - Add installation report generation
 007 - Add create-wpsc scaffold templates
 008 - Add installation documentation and final Sprint 1 review
@@ -56,4 +56,3 @@ Each diff summary should include:
 - Architecture impact
 - Verification
 - Follow-up items
-
