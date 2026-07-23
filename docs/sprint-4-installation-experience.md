@@ -1,7 +1,7 @@
 # WPSC Sprint 4 - Installation Experience
 
-**Version:** Draft 1.0  
-**Status:** In Progress  
+**Version:** 1.0  
+**Status:** Completed  
 **Prerequisite:** Sprint 3 Runtime Execution Platform Completed
 
 ## Overview
@@ -41,7 +41,7 @@ Browser
 | 005 | Build Orchestrator | Done |
 | 006 | Installation Report | Done |
 | 007 | Web Installer UI | Done |
-| 008 | Sprint Documentation and Final Review | Pending |
+| 008 | Sprint Documentation and Final Review | Done |
 
 ## Commit 001 - Installation Session
 
@@ -199,3 +199,62 @@ Commit 007 does not include:
 - Runtime Configuration remains the source of runtime config validation.
 - Build Platform remains the owner of build execution.
 - Runtime Diagnostics remains the owner of runtime diagnostic reporting.
+
+## Completed Installation Platform
+
+Sprint 4 produced the following installer primitives:
+
+| Primitive | Owner | Purpose |
+| --- | --- | --- |
+| Installation Session | Installer Layer | Owns lifecycle, state, progress, diagnostics, and terminal states. |
+| Wizard API | Installer Layer | Exposes browser-facing actions over Installation Session. |
+| Environment Validation | Installer Layer | Produces structured hosting readiness diagnostics. |
+| Configuration Generator | Installer Layer | Generates configuration objects and file candidates using Runtime Configuration. |
+| Build Orchestrator | Installer Layer | Coordinates the first build through an injected Build Platform function. |
+| Installation Report | Installer Layer | Formats a Markdown support/debug report. |
+| Web Installer UI | Installer Presentation Layer | Provides a thin browser shell over Wizard API. |
+
+## Installation Flow
+
+```text
+Browser
+-> Web Installer UI
+-> Wizard API
+-> Installation Session
+-> Environment Validation
+-> Configuration Generator
+-> Build Orchestrator
+-> Installation Report
+```
+
+The flow consumes Sprint 3 Runtime Configuration and respects the Build Platform boundary.
+
+## Explicit Non-Goals Preserved
+
+Sprint 4 intentionally does not include:
+
+- production HTTP server routing for the installer
+- actual config file writes from the browser flow
+- WordPress REST API verification
+- WooCommerce REST API verification
+- final deployment workflow
+- authentication for installer access
+- multi-tenant installer behavior
+
+Those belong in later product hardening sprints.
+
+## Final Review
+
+Sprint 4 meets the installation-experience foundation goal.
+
+The browser installation experience now has:
+
+- lifecycle state
+- public Wizard API contract
+- environment diagnostics
+- generated configuration candidates
+- initial build orchestration
+- Markdown installation report
+- thin browser UI shell
+
+The implementation remains layered over existing architecture and does not redesign Runtime Kernel, Core Engine, or Build Platform.

@@ -2,7 +2,7 @@
 
 ## Status
 
-In progress.
+Completed.
 
 ## Commit Tracking
 
@@ -15,8 +15,13 @@ In progress.
 | 005 | Build Orchestrator | Done |
 | 006 | Installation Report | Done |
 | 007 | Web Installer UI | Done |
-| 008 | Sprint Documentation and Final Review | Pending |
+| 008 | Sprint Documentation and Final Review | Done |
 
 ## Sprint Rule
 
 Sprint 4 builds the browser installation experience on top of the Sprint 3 Execution Platform. It must not redesign Runtime Kernel, Build Platform, or Core Engine.
+
+## Final Output
+
+- Sprint documentation: `docs/sprint-4-installation-experience.md`
+- Final review: `outputs/sprint-4/final-review.md`
