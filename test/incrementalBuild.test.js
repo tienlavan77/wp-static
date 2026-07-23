@@ -6,9 +6,9 @@ import path from "node:path";
 import { promisify } from "node:util";
 import test from "node:test";
 import buildProjectOnce from "../src/dev-server/buildProjectOnce.js";
-import createRouteDependencyGraph from "../src/incremental/createRouteDependencyGraph.js";
-import parseChangedItem from "../src/incremental/parseChangedItem.js";
-import planIncrementalBuild from "../src/incremental/planIncrementalBuild.js";
+import createRouteDependencyGraph from "../src/graph/createRouteDependencyGraph.js";
+import parseChangedItem from "../src/planner/parseChangedItem.js";
+import planIncrementalBuild from "../src/planner/planIncrementalBuild.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -30,9 +30,7 @@ test("parseChangedItem parses content and taxonomy changes", () => {
 });
 
 test("route dependency graph maps changed products to product and archive routes", async () => {
-  const projectDir = await createIsolatedBasicShopProject("wpsc-incremental-graph-");
-  const full = await buildProjectOnce(projectDir);
-  const graph = createRouteDependencyGraph(full.sitePlan);
+  const graph = createRouteDependencyGraph(createIncrementalFixtureSitePlan());
   const affected = graph.findAffectedRoutes([parseChangedItem("product:iphone-15")]);
 
   assert.equal(affected.includes("/iphone-15"), true);
@@ -41,9 +39,7 @@ test("route dependency graph maps changed products to product and archive routes
 });
 
 test("incremental plan maps taxonomy changes to slug-only archive routes", async () => {
-  const projectDir = await createIsolatedBasicShopProject("wpsc-incremental-plan-");
-  const full = await buildProjectOnce(projectDir);
-  const plan = planIncrementalBuild(full.sitePlan, [
+  const plan = planIncrementalBuild(createIncrementalFixtureSitePlan(), [
     parseChangedItem("term:product_cat:dien-thoai")
   ]);
 
@@ -57,22 +53,22 @@ test("incremental plan maps taxonomy changes to slug-only archive routes", async
 });
 
 test("buildProjectOnce supports changed item incremental builds", async () => {
-  const projectDir = await createIsolatedBasicShopProject("wpsc-incremental-build-");
+  const projectDir = await createIsolatedCommerceProject("wpsc-incremental-build-");
   await buildProjectOnce(projectDir);
   const incremental = await buildProjectOnce(projectDir, {
-    changed: ["product:iphone-15"]
+    changed: ["product:demo-product"]
   });
   const manifest = JSON.parse(await readFile(incremental.result.manifestPath, "utf8"));
 
   assert.equal(incremental.result.fullBuild, false);
-  assert.equal(incremental.result.pagesWritten, 2);
-  assert.deepEqual(incremental.result.changedRoutes, ["/iphone-15", "/dien-thoai"]);
-  assert.deepEqual(manifest.incremental.changedRoutes, ["/iphone-15", "/dien-thoai"]);
+  assert.equal(incremental.result.pagesWritten, 1);
+  assert.deepEqual(incremental.result.changedRoutes, ["/demo-product"]);
+  assert.deepEqual(manifest.incremental.changedRoutes, ["/demo-product"]);
 });
 
-async function createIsolatedBasicShopProject(prefix) {
+async function createIsolatedCommerceProject(prefix) {
   const projectDir = await mkdtemp(path.join(os.tmpdir(), prefix));
-  await cp("examples/basic-shop", projectDir, {
+  await cp("templates/commerce", projectDir, {
     filter(source) {
       return !source.includes(`${path.sep}dist`) && !source.includes(`${path.sep}.wpsc`);
     },
@@ -84,7 +80,10 @@ async function createIsolatedBasicShopProject(prefix) {
 
 test("cli build accepts repeated changed item flags", async () => {
   const projectDir = await mkdtemp(path.join(os.tmpdir(), "wpsc-incremental-cli-"));
-  await cp("examples/basic-shop", projectDir, {
+  await cp("templates/commerce", projectDir, {
+    filter(source) {
+      return !source.includes(`${path.sep}dist`) && !source.includes(`${path.sep}.wpsc`);
+    },
     recursive: true
   });
 
@@ -100,11 +99,104 @@ test("cli build accepts repeated changed item flags", async () => {
     "--project",
     projectDir,
     "--changed",
-    "product:iphone-15",
+    "product:demo-product",
     "--changed",
-    "term:product_cat:thoi-trang"
+    "page:home"
   ]);
 
-  assert.match(result.stdout, /Pages: 4/);
-  assert.match(result.stdout, /Incremental: \/iphone-15, \/ao-thun-basic, \/dien-thoai, \/thoi-trang/);
+  assert.match(result.stdout, /Pages: 2/);
+  assert.match(result.stdout, /Incremental: \/, \/demo-product/);
 });
+
+function createIncrementalFixtureSitePlan() {
+  const phoneTerm = {
+    id: "term-phone",
+    slug: "dien-thoai",
+    taxonomy: "product_cat"
+  };
+  const fashionTerm = {
+    id: "term-fashion",
+    slug: "thoi-trang",
+    taxonomy: "product_cat"
+  };
+  const product = {
+    id: "iphone-15",
+    type: "product",
+    slug: "iphone-15",
+    data: {
+      terms: [phoneTerm]
+    }
+  };
+  const unrelatedProduct = {
+    id: "ao-thun-basic",
+    type: "product",
+    slug: "ao-thun-basic",
+    data: {
+      terms: [fashionTerm]
+    }
+  };
+  const routes = [
+    {
+      content: product,
+      outputPath: "iphone-15.html",
+      path: "/iphone-15"
+    },
+    {
+      content: unrelatedProduct,
+      outputPath: "ao-thun-basic.html",
+      path: "/ao-thun-basic"
+    },
+    {
+      archive: {
+        term: phoneTerm
+      },
+      content: {
+        id: "archive:product_cat:dien-thoai",
+        type: "archive:product_cat",
+        slug: "dien-thoai",
+        data: {
+          archive: {
+            items: [product],
+            term: phoneTerm
+          },
+          items: [product],
+          term: phoneTerm
+        }
+      },
+      outputPath: "dien-thoai.html",
+      path: "/dien-thoai"
+    },
+    {
+      archive: {
+        term: fashionTerm
+      },
+      content: {
+        id: "archive:product_cat:thoi-trang",
+        type: "archive:product_cat",
+        slug: "thoi-trang",
+        data: {
+          archive: {
+            items: [unrelatedProduct],
+            term: fashionTerm
+          },
+          items: [unrelatedProduct],
+          term: fashionTerm
+        }
+      },
+      outputPath: "thoi-trang.html",
+      path: "/thoi-trang"
+    }
+  ];
+
+  return {
+    pages: routes.map((route) => ({
+      route
+    })),
+    routes,
+    theme: {
+      metadata: {
+        name: "Incremental Fixture"
+      }
+    }
+  };
+}
