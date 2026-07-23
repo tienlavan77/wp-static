@@ -9,7 +9,7 @@ In progress.
 | Commit | Scope | Status |
 | --- | --- | --- |
 | 001 | Installation Session | Done |
-| 002 | Wizard API | Pending |
+| 002 | Wizard API | Done |
 | 003 | Environment Validation | Pending |
 | 004 | Configuration Generator | Pending |
 | 005 | Build Orchestrator | Pending |

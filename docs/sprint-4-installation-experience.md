@@ -35,7 +35,7 @@ Browser
 | Commit | Scope | Status |
 | --- | --- | --- |
 | 001 | Installation Session | Done |
-| 002 | Wizard API | Pending |
+| 002 | Wizard API | Done |
 | 003 | Environment Validation | Pending |
 | 004 | Configuration Generator | Pending |
 | 005 | Build Orchestrator | Pending |
@@ -70,6 +70,27 @@ Commit 001 does not include:
 - filesystem writing
 - build execution
 - environment probing
+
+## Commit 002 - Wizard API
+
+Wizard API owns the browser-facing contract.
+
+Responsibilities:
+
+- create installation sessions
+- expose session state
+- update install input
+- expose progress
+- expose diagnostics
+- report structured action errors
+
+Commit 002 does not include:
+
+- HTTP routing
+- browser UI
+- environment probing
+- filesystem writing
+- build execution
 
 ## Boundary Rules
 
