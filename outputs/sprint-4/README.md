@@ -11,7 +11,7 @@ In progress.
 | 001 | Installation Session | Done |
 | 002 | Wizard API | Done |
 | 003 | Environment Validation | Done |
-| 004 | Configuration Generator | Pending |
+| 004 | Configuration Generator | Done |
 | 005 | Build Orchestrator | Pending |
 | 006 | Installation Report | Pending |
 | 007 | Web Installer UI | Pending |

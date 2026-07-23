@@ -37,7 +37,7 @@ Browser
 | 001 | Installation Session | Done |
 | 002 | Wizard API | Done |
 | 003 | Environment Validation | Done |
-| 004 | Configuration Generator | Pending |
+| 004 | Configuration Generator | Done |
 | 005 | Build Orchestrator | Pending |
 | 006 | Installation Report | Pending |
 | 007 | Web Installer UI | Pending |
@@ -109,6 +109,26 @@ Commit 003 does not include:
 
 - browser UI
 - filesystem config generation
+- build execution
+- WordPress API verification
+
+## Commit 004 - Configuration Generator
+
+Configuration Generator creates install configuration artifacts without writing them to disk.
+
+Responsibilities:
+
+- normalize installer input
+- generate project config shape
+- generate runtime config through Sprint 3 Runtime Configuration
+- generate file candidates for future write step
+- report placeholder warnings
+- return structured diagnostics
+
+Commit 004 does not include:
+
+- filesystem writes
+- browser UI
 - build execution
 - WordPress API verification
 
