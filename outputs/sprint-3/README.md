@@ -11,7 +11,7 @@ In progress.
 | 001 | Runtime Context | Done |
 | 002 | Service Container | Done |
 | 003 | Hook System | Done |
-| 004 | Plugin SDK Foundation | Pending |
+| 004 | Plugin SDK Foundation | Done |
 | 005 | Extension Loader | Pending |
 | 006 | Runtime Configuration | Pending |
 | 007 | Runtime Diagnostics | Pending |
