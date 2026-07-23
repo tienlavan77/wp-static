@@ -9,7 +9,7 @@ In progress.
 | Commit | Scope | Status |
 | --- | --- | --- |
 | 001 | Runtime Context | Done |
-| 002 | Service Container | Pending |
+| 002 | Service Container | Done |
 | 003 | Hook System | Pending |
 | 004 | Plugin SDK Foundation | Pending |
 | 005 | Extension Loader | Pending |
@@ -20,3 +20,7 @@ In progress.
 ## Sprint Rule
 
 Sprint 3 builds the execution platform without changing frozen Sprint 0 contracts unless a new ADR is created first.
+
+## Review Notes
+
+- Commit 001 recommendations captured in `outputs/sprint-3/recommendations/commit-001-review-recommendations.md`.

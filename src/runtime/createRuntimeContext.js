@@ -1,5 +1,6 @@
 import path from "node:path";
 import createLogger from "../shared/createLogger.js";
+import createServiceContainer from "./createServiceContainer.js";
 
 export const RUNTIME_CONTEXT_VERSION = "1.0";
 
@@ -83,6 +84,11 @@ export default function createRuntimeContext(options = {}) {
       quiet: options.quiet,
       verbose: options.verbose
     });
+  const services =
+    options.serviceContainer ||
+    createServiceContainer({
+      services: options.services
+    });
 
   return {
     cache: options.cache || {},
@@ -95,7 +101,7 @@ export default function createRuntimeContext(options = {}) {
     logger,
     paths,
     request: options.request || null,
-    services: options.services || {},
+    services,
     version: RUNTIME_CONTEXT_VERSION
   };
 }

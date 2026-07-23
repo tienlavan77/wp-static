@@ -70,7 +70,7 @@ test("createRuntimeContext creates a shared execution context", () => {
   assert.equal(context.paths.outputDir, path.resolve("/tmp/wpsc-site/dist"));
   assert.equal(context.environment.isDevelopment, true);
   assert.equal(context.logger, logger);
-  assert.equal(context.services, services);
+  assert.equal(context.services.resolve("auth"), services.auth);
   assert.equal(context.cache, cache);
   assert.deepEqual(context.diagnostics.errors, []);
   assert.deepEqual(context.diagnostics.warnings, []);
