@@ -39,7 +39,7 @@ Browser
 | 003 | Environment Validation | Done |
 | 004 | Configuration Generator | Done |
 | 005 | Build Orchestrator | Done |
-| 006 | Installation Report | Pending |
+| 006 | Installation Report | Done |
 | 007 | Web Installer UI | Pending |
 | 008 | Sprint Documentation and Final Review | Pending |
 
@@ -150,6 +150,26 @@ Commit 005 does not include:
 - filesystem config writes
 - browser UI
 - report generation
+
+## Commit 006 - Installation Report
+
+Installation Report creates a support-ready Markdown summary.
+
+Responsibilities:
+
+- summarize session state
+- summarize environment validation
+- summarize generated configuration
+- summarize runtime configuration
+- summarize build result
+- list generated file candidates
+- include warnings and errors
+
+Commit 006 does not include:
+
+- filesystem writes
+- browser UI
+- report download endpoint
 
 ## Boundary Rules
 

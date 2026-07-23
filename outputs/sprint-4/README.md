@@ -13,7 +13,7 @@ In progress.
 | 003 | Environment Validation | Done |
 | 004 | Configuration Generator | Done |
 | 005 | Build Orchestrator | Done |
-| 006 | Installation Report | Pending |
+| 006 | Installation Report | Done |
 | 007 | Web Installer UI | Pending |
 | 008 | Sprint Documentation and Final Review | Pending |
 
