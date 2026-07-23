@@ -2,7 +2,7 @@
 
 ## Status
 
-In progress.
+Completed.
 
 ## Commit Tracking
 
@@ -15,7 +15,7 @@ In progress.
 | 005 | Extension Loader | Done |
 | 006 | Runtime Configuration | Done |
 | 007 | Runtime Diagnostics | Done |
-| 008 | Sprint Documentation and Final Review | Pending |
+| 008 | Sprint Documentation and Final Review | Done |
 
 ## Sprint Rule
 
@@ -25,3 +25,8 @@ Sprint 3 builds the execution platform without changing frozen Sprint 0 contract
 
 - Commit 001 recommendations captured in `outputs/sprint-3/recommendations/commit-001-review-recommendations.md`.
 - Commit 002 recommendations captured in `outputs/sprint-3/recommendations/commit-002-review-recommendations.md`.
+
+## Final Output
+
+- Sprint documentation: `docs/sprint-3-execution-platform.md`
+- Final review: `outputs/sprint-3/final-review.md`
