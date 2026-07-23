@@ -16,7 +16,7 @@ test("createInstallConfiguration generates install files", async () => {
   });
 
   assert.equal(result.summary.error, 0);
-  assert.equal(result.summary.ok, 7);
+  assert.equal(result.summary.ok, 8);
   assert.equal(result.summary.warning, 0);
 
   await access(path.join(projectDir, ".env"));
@@ -24,11 +24,16 @@ test("createInstallConfiguration generates install files", async () => {
   await access(path.join(projectDir, "runtime.config.js"));
   await access(path.join(projectDir, "theme", "layout.js"));
   await access(path.join(projectDir, "theme", "components", "index.js"));
+  await access(path.join(projectDir, "install-report.md"));
 
   const env = await readFile(path.join(projectDir, ".env"), "utf8");
+  const report = await readFile(path.join(projectDir, "install-report.md"), "utf8");
 
   assert.match(env, /WPSC_WP_URL=https:\/\/api\.example\.com/);
   assert.match(env, /WPSC_SITE_URL=https:\/\/store\.example\.com/);
+  assert.match(report, /# WPSC Installation Report/);
+  assert.match(report, /WordPress URL \| https:\/\/api\.example\.com/);
+  assert.match(report, /Run `wpsc validate --project/);
 });
 
 test("createInstallConfiguration output passes config validation", async () => {
@@ -76,4 +81,27 @@ test("createInstallConfiguration reports placeholder warnings", async () => {
   assert.equal(result.summary.warning, 2);
   assert.equal(result.results.some((check) => check.name === "WordPress URL" && check.status === "warning"), true);
   assert.equal(result.results.some((check) => check.name === "Domain URL" && check.status === "warning"), true);
+});
+
+test("createInstallConfiguration supports custom relative report path", async () => {
+  const projectDir = await mkdtemp(path.join(os.tmpdir(), "wpsc-install-"));
+  const result = await createInstallConfiguration(projectDir, {
+    reportPath: "reports/install.md",
+    wordpressUrl: "https://api.example.com"
+  });
+
+  assert.equal(result.reportPath, path.join(projectDir, "reports", "install.md"));
+  await access(result.reportPath);
+});
+
+test("createInstallConfiguration rejects report paths outside project", async () => {
+  const projectDir = await mkdtemp(path.join(os.tmpdir(), "wpsc-install-"));
+
+  await assert.rejects(
+    () => createInstallConfiguration(projectDir, {
+      reportPath: "../install-report.md",
+      wordpressUrl: "https://api.example.com"
+    }),
+    /reportPath/
+  );
 });

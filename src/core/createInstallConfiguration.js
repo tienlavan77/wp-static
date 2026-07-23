@@ -18,6 +18,7 @@ export default async function createInstallConfiguration(projectDir, options = {
   const absoluteProjectDir = path.resolve(projectDir);
   const installOptions = normalizeInstallOptions(options);
   const files = createInstallFiles(installOptions);
+  const generatedFiles = [];
   const results = [];
 
   await mkdir(absoluteProjectDir, { recursive: true });
@@ -31,6 +32,7 @@ export default async function createInstallConfiguration(projectDir, options = {
       flag: installOptions.force ? "w" : "wx"
     });
 
+    generatedFiles.push(absolutePath);
     results.push(createOk(`Generated ${file.path}`, absolutePath, {
       category: "install",
       summary: `${file.path} was generated.`
@@ -53,10 +55,31 @@ export default async function createInstallConfiguration(projectDir, options = {
     }));
   }
 
-  return {
-    files: files.map((file) => path.join(absoluteProjectDir, file.path)),
+  const reportPath = path.join(absoluteProjectDir, installOptions.reportPath);
+  const report = createInstallReport({
+    files: generatedFiles,
     options: installOptions,
     projectDir: absoluteProjectDir,
+    results
+  });
+
+  await mkdir(path.dirname(reportPath), { recursive: true });
+  await writeFile(reportPath, report, {
+    encoding: "utf8",
+    flag: installOptions.force ? "w" : "wx"
+  });
+
+  generatedFiles.push(reportPath);
+  results.push(createOk(`Generated ${installOptions.reportPath}`, reportPath, {
+    category: "install",
+    summary: `${installOptions.reportPath} was generated.`
+  }));
+
+  return {
+    files: generatedFiles,
+    options: installOptions,
+    projectDir: absoluteProjectDir,
+    reportPath,
     results,
     summary: summarizeValidationResults(results)
   };
@@ -70,6 +93,7 @@ function normalizeInstallOptions(options = {}) {
     domain,
     force: Boolean(options.force),
     outputDir: normalizeOutputDir(options.outputDir),
+    reportPath: normalizeRelativePath(options.reportPath, "install-report.md", "reportPath"),
     siteName: normalizeText(options.siteName, DEFAULTS.siteName),
     theme: normalizeText(options.theme, DEFAULTS.theme),
     usesDefaultDomain: !options.domain,
@@ -110,6 +134,54 @@ function createInstallFiles(options) {
       contents: ""
     }
   ];
+}
+
+function createInstallReport(details) {
+  const warnings = details.results.filter((result) => result.status === "warning");
+  const errors = details.results.filter((result) => result.status === "error");
+
+  return `# WPSC Installation Report
+
+Generated: ${new Date().toISOString()}
+
+## Project
+
+| Field | Value |
+| --- | --- |
+| Project Directory | ${details.projectDir} |
+| Site Name | ${details.options.siteName} |
+| Site URL | ${details.options.domain} |
+| WordPress URL | ${details.options.wordpressUrl} |
+| WooCommerce URL | ${details.options.woocommerceUrl} |
+| Output Directory | ${details.options.outputDir} |
+| Theme | ${details.options.theme} |
+
+## Environment
+
+| Check | Value |
+| --- | --- |
+| Node.js | ${process.version} |
+| Platform | ${process.platform} |
+| Architecture | ${process.arch} |
+
+## Generated Files
+
+${details.files.map((file) => `- ${file}`).join("\n")}
+
+## Warnings
+
+${formatReportResults(warnings, "No warnings.")}
+
+## Errors
+
+${formatReportResults(errors, "No errors.")}
+
+## Next Steps
+
+1. Review \`.env\` and replace any \`change-me\` values.
+2. Run \`wpsc validate --project ${details.projectDir}\`.
+3. Run \`wpsc build --project ${details.projectDir}\` after validation passes.
+`;
 }
 
 function createEnvFile(options) {
@@ -203,11 +275,17 @@ function createThemeLayoutFile() {
 function normalizeOutputDir(value) {
   const outputDir = normalizeText(value, DEFAULTS.outputDir);
 
-  if (path.isAbsolute(outputDir)) {
-    throw new Error("Install option outputDir must be relative to the project directory.");
-  }
+  assertRelativePath(outputDir, "outputDir");
 
   return outputDir;
+}
+
+function normalizeRelativePath(value, fallback, optionName) {
+  const relativePath = normalizeText(value, fallback);
+
+  assertRelativePath(relativePath, optionName);
+
+  return relativePath;
 }
 
 function normalizeText(value, fallback) {
@@ -230,6 +308,28 @@ function normalizeUrl(value, fallback, optionName) {
   } catch {
     throw new Error(`Install option ${optionName} must be a valid http:// or https:// URL.`);
   }
+}
+
+function assertRelativePath(value, optionName) {
+  if (path.isAbsolute(value)) {
+    throw new Error(`Install option ${optionName} must be relative to the project directory.`);
+  }
+
+  if (value.split(/[\\/]/).includes("..")) {
+    throw new Error(`Install option ${optionName} must stay inside the project directory.`);
+  }
+}
+
+function formatReportResults(results, fallback) {
+  if (results.length === 0) {
+    return fallback;
+  }
+
+  return results.map((result) => {
+    const fix = result.fix ? ` Fix: ${result.fix}` : "";
+
+    return `- ${result.name}: ${result.summary}.${fix}`;
+  }).join("\n");
 }
 
 function quote(value) {

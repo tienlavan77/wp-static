@@ -85,6 +85,7 @@ async function main(cliArgs) {
       force: cliArgs.includes("--force"),
       format: cliArgs.includes("--json") ? "json" : "text",
       outputDir: readOptionalArg(cliArgs, "--output-dir"),
+      reportPath: readOptionalArg(cliArgs, "--report"),
       siteName: readOptionalArg(cliArgs, "--site-name"),
       theme: readOptionalArg(cliArgs, "--theme"),
       woocommerceUrl: readOptionalArg(cliArgs, "--woocommerce-url"),
@@ -258,6 +259,7 @@ async function installProject(projectArg, options = {}) {
   for (const file of result.files) {
     logger.info(`  ${file}`);
   }
+  logger.info(`Report: ${result.reportPath}`);
 
   const warnings = result.results.filter((check) => check.status === "warning");
 
@@ -370,7 +372,7 @@ function printHelp() {
   wpsc deploy rsync [--project <project-dir>] --target <user@host:/path/> [--dry-run]
   wpsc dev [--project <project-dir>] [--port <port>]
   wpsc doctor [--project <project-dir>] [--json]
-  wpsc install [--project <project-dir>] [--wordpress-url <url>] [--woocommerce-url <url>] [--domain <url>] [--output-dir <dir>] [--theme <name>] [--site-name <name>] [--force] [--json]
+  wpsc install [--project <project-dir>] [--wordpress-url <url>] [--woocommerce-url <url>] [--domain <url>] [--output-dir <dir>] [--theme <name>] [--site-name <name>] [--report <path>] [--force] [--json]
   wpsc serve [--project <project-dir>] [--port <port>]
   wpsc validate [--project <project-dir>] [--json]
   wpsc webhook [--project <project-dir>] [--port <port>] [--secret <secret>]

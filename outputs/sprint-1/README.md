@@ -19,7 +19,7 @@ include a diff summary and review file, following the Sprint 0 tracking style.
 003 - Done - Upgrade wpsc doctor diagnostics
 004 - Done - Add wpsc validate command
 005 - Done - Add install wizard skeleton and config generation
-006 - Add installation report generation
+006 - Done - Add installation report generation
 007 - Add create-wpsc scaffold templates
 008 - Add installation documentation and final Sprint 1 review
 ```
