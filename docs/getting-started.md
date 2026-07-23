@@ -13,6 +13,16 @@ npm run build:example
 node src/cli/index.js dev --project examples/basic-shop --port 8080
 ```
 
+For a new project, start with the Sprint 1 installer:
+
+```bash
+node src/cli/index.js create my-shop --template commerce
+node src/cli/index.js validate --project my-shop
+node src/cli/index.js build --project my-shop
+```
+
+For the full installation flow, see [Installation Guide](installation.md).
+
 ## Project Shape
 
 ```text
