@@ -13,6 +13,7 @@ import createWebhookServer from "../webhook/createWebhookServer.js";
 import { getPackageInfo } from "../index.js";
 import createLogger from "../shared/createLogger.js";
 import { formatValidationResults } from "../validation/formatValidationResults.js";
+import validateProjectConfig from "../validation/validateProjectConfig.js";
 
 const args = process.argv.slice(2);
 const logger = createLogger({
@@ -79,6 +80,13 @@ async function main(cliArgs) {
 
   if (cliArgs[0] === "serve") {
     await serveProject(readProjectArg(cliArgs), readPortArg(cliArgs));
+    return;
+  }
+
+  if (cliArgs[0] === "validate") {
+    await validateProject(readProjectArg(cliArgs), {
+      format: cliArgs.includes("--json") ? "json" : "text"
+    });
     return;
   }
 
@@ -202,6 +210,25 @@ async function doctor(projectArg, options = {}) {
   }
 }
 
+async function validateProject(projectArg, options = {}) {
+  const projectDir = path.resolve(projectArg);
+  const checks = await validateProjectConfig(projectDir);
+  const failed = checks.filter((check) => !check.ok);
+  const output = formatValidationResults(checks, {
+    format: options.format
+  });
+
+  if (options.format === "json") {
+    console.log(output);
+  } else {
+    logger.info(output);
+  }
+
+  if (failed.length > 0) {
+    process.exitCode = 1;
+  }
+}
+
 async function serveProject(projectArg, port) {
   const projectDir = path.resolve(projectArg);
   const config = await loadConfig(projectDir);
@@ -301,6 +328,7 @@ function printHelp() {
   wpsc dev [--project <project-dir>] [--port <port>]
   wpsc doctor [--project <project-dir>] [--json]
   wpsc serve [--project <project-dir>] [--port <port>]
+  wpsc validate [--project <project-dir>] [--json]
   wpsc webhook [--project <project-dir>] [--port <port>] [--secret <secret>]
   wpsc --help
   wpsc --version`);
