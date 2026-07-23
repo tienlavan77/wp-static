@@ -12,6 +12,7 @@ import runRsyncDeploy from "../deploy/runRsyncDeploy.js";
 import createWebhookServer from "../webhook/createWebhookServer.js";
 import { getPackageInfo } from "../index.js";
 import createLogger from "../shared/createLogger.js";
+import { formatValidationResults } from "../validation/formatValidationResults.js";
 
 const args = process.argv.slice(2);
 const logger = createLogger({
@@ -57,7 +58,9 @@ async function main(cliArgs) {
   }
 
   if (cliArgs[0] === "doctor") {
-    await doctor(readProjectArg(cliArgs));
+    await doctor(readProjectArg(cliArgs), {
+      format: cliArgs.includes("--json") ? "json" : "text"
+    });
     return;
   }
 
@@ -180,13 +183,18 @@ async function cleanProject(projectArg) {
   logger.info(`Cleaned ${outputDir}`);
 }
 
-async function doctor(projectArg) {
+async function doctor(projectArg, options = {}) {
   const projectDir = path.resolve(projectArg);
   const checks = await doctorProject(projectDir);
   const failed = checks.filter((check) => !check.ok);
+  const output = formatValidationResults(checks, {
+    format: options.format
+  });
 
-  for (const check of checks) {
-    logger.info(`${check.ok ? "OK" : "FAIL"} ${check.name}: ${check.detail}`);
+  if (options.format === "json") {
+    console.log(output);
+  } else {
+    logger.info(output);
   }
 
   if (failed.length > 0) {
@@ -291,7 +299,7 @@ function printHelp() {
   wpsc create <project-name>
   wpsc deploy rsync [--project <project-dir>] --target <user@host:/path/> [--dry-run]
   wpsc dev [--project <project-dir>] [--port <port>]
-  wpsc doctor [--project <project-dir>]
+  wpsc doctor [--project <project-dir>] [--json]
   wpsc serve [--project <project-dir>] [--port <port>]
   wpsc webhook [--project <project-dir>] [--port <port>] [--secret <secret>]
   wpsc --help
