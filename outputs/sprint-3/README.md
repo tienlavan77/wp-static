@@ -12,7 +12,7 @@ In progress.
 | 002 | Service Container | Done |
 | 003 | Hook System | Done |
 | 004 | Plugin SDK Foundation | Done |
-| 005 | Extension Loader | Pending |
+| 005 | Extension Loader | Done |
 | 006 | Runtime Configuration | Pending |
 | 007 | Runtime Diagnostics | Pending |
 | 008 | Sprint Documentation and Final Review | Pending |
