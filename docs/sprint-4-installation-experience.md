@@ -36,7 +36,7 @@ Browser
 | --- | --- | --- |
 | 001 | Installation Session | Done |
 | 002 | Wizard API | Done |
-| 003 | Environment Validation | Pending |
+| 003 | Environment Validation | Done |
 | 004 | Configuration Generator | Pending |
 | 005 | Build Orchestrator | Pending |
 | 006 | Installation Report | Pending |
@@ -91,6 +91,26 @@ Commit 002 does not include:
 - environment probing
 - filesystem writing
 - build execution
+
+## Commit 003 - Environment Validation
+
+Environment Validation checks hosting readiness before configuration and build steps.
+
+Responsibilities:
+
+- validate Node.js compatibility
+- validate PHP availability
+- validate writable output directory
+- validate SSL/domain readiness
+- validate Runtime Configuration compatibility
+- return structured diagnostics
+
+Commit 003 does not include:
+
+- browser UI
+- filesystem config generation
+- build execution
+- WordPress API verification
 
 ## Boundary Rules
 
