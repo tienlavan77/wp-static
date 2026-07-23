@@ -14,7 +14,7 @@ In progress.
 | 004 | Plugin SDK Foundation | Done |
 | 005 | Extension Loader | Done |
 | 006 | Runtime Configuration | Done |
-| 007 | Runtime Diagnostics | Pending |
+| 007 | Runtime Diagnostics | Done |
 | 008 | Sprint Documentation and Final Review | Pending |
 
 ## Sprint Rule

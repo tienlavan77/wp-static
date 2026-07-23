@@ -94,8 +94,8 @@ export default function createRuntimeContext(options = {}) {
     cache: options.cache || {},
     config: options.config || {},
     diagnostics: {
-      errors: [],
-      warnings: []
+      errors: [...(options.diagnostics?.errors || [])],
+      warnings: [...(options.diagnostics?.warnings || [])]
     },
     environment,
     logger,
