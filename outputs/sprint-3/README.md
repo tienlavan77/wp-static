@@ -10,7 +10,7 @@ In progress.
 | --- | --- | --- |
 | 001 | Runtime Context | Done |
 | 002 | Service Container | Done |
-| 003 | Hook System | Pending |
+| 003 | Hook System | Done |
 | 004 | Plugin SDK Foundation | Pending |
 | 005 | Extension Loader | Pending |
 | 006 | Runtime Configuration | Pending |
@@ -24,3 +24,4 @@ Sprint 3 builds the execution platform without changing frozen Sprint 0 contract
 ## Review Notes
 
 - Commit 001 recommendations captured in `outputs/sprint-3/recommendations/commit-001-review-recommendations.md`.
+- Commit 002 recommendations captured in `outputs/sprint-3/recommendations/commit-002-review-recommendations.md`.
