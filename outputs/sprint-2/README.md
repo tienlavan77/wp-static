@@ -12,7 +12,7 @@ docs/sprint-2-developer-workflow.md
 
 ```text
 001 - Done - Build Pipeline Foundation
-002 - Build Report
+002 - Done - Build Report
 003 - Incremental Build
 004 - Watch Mode
 005 - Asset Pipeline
