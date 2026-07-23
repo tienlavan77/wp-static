@@ -1,0 +1,22 @@
+# WPSC Sprint 3 - Runtime Execution Platform
+
+## Status
+
+In progress.
+
+## Commit Tracking
+
+| Commit | Scope | Status |
+| --- | --- | --- |
+| 001 | Runtime Context | Done |
+| 002 | Service Container | Pending |
+| 003 | Hook System | Pending |
+| 004 | Plugin SDK Foundation | Pending |
+| 005 | Extension Loader | Pending |
+| 006 | Runtime Configuration | Pending |
+| 007 | Runtime Diagnostics | Pending |
+| 008 | Sprint Documentation and Final Review | Pending |
+
+## Sprint Rule
+
+Sprint 3 builds the execution platform without changing frozen Sprint 0 contracts unless a new ADR is created first.
