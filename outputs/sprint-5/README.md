@@ -1,0 +1,24 @@
+# WPSC Sprint 5 - Production Installer & Release Package
+
+## Status
+
+In progress.
+
+## Commit Tracking
+
+| Commit | Scope | Status |
+| --- | --- | --- |
+| 001 | Release Package Structure | Done |
+| 002 | HTTP Installer | Pending |
+| 003 | Persistent Configuration | Pending |
+| 004 | Production Build | Pending |
+| 005 | Installation Lock | Pending |
+| 006 | Release Builder CLI | Pending |
+| 007 | Deployment Guide | Pending |
+| 008 | Installation Recovery | Pending |
+| 009 | Release Validation | Pending |
+| 010 | Documentation and Final Review | Pending |
+
+## Sprint Rule
+
+Sprint 5 connects the Sprint 4 Installation Experience to production hosting. It must not redesign Installer primitives, Runtime Kernel, Core Engine, or Build Platform.
