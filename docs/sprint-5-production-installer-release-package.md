@@ -53,7 +53,7 @@ The product must not promise runtime build support on hosting that cannot execut
 | 001 | Release Package Structure | Done |
 | 002 | HTTP Installer | Done |
 | 003 | Persistent Configuration | Done |
-| 004 | Production Build | Pending |
+| 004 | Production Build | Done |
 | 005 | Installation Lock | Pending |
 | 006 | Release Builder CLI | Pending |
 | 007 | Deployment Guide | Pending |
@@ -145,6 +145,25 @@ Commit 003 does not include:
 - enforcing lock checks
 - running production builds
 - wiring HTTP routes to persistence
+
+## Commit 004 - Production Build
+
+Production Build executes the real Build Platform from persisted installation configuration.
+
+Responsibilities:
+
+- read persisted `project.json` and `runtime.json`
+- call an injected production build runner
+- pass production build options
+- return structured build summaries
+- return structured failure diagnostics
+
+Commit 004 does not include:
+
+- implementing the Build Platform
+- enforcing installation lock
+- HTTP route wiring
+- release zip creation
 
 ## Immutable Release Package
 
