@@ -52,7 +52,7 @@ The product must not promise runtime build support on hosting that cannot execut
 | --- | --- | --- |
 | 001 | Release Package Structure | Done |
 | 002 | HTTP Installer | Done |
-| 003 | Persistent Configuration | Pending |
+| 003 | Persistent Configuration | Done |
 | 004 | Production Build | Pending |
 | 005 | Installation Lock | Pending |
 | 006 | Release Builder CLI | Pending |
@@ -119,6 +119,32 @@ Commit 002 does not include:
 - real production build execution
 - installation lock enforcement
 - PHP server adapter
+
+## Commit 003 - Persistent Configuration
+
+Persistent Configuration writes validated installation configuration to disk.
+
+Generated files:
+
+```text
+config/project.json
+config/runtime.json
+config/install-state.json
+```
+
+Responsibilities:
+
+- reject invalid generated configuration
+- write JSON using atomic temp-file replacement
+- keep persistent files under `config/`
+- preserve immutable release package rules
+
+Commit 003 does not include:
+
+- creating `config/install.lock`
+- enforcing lock checks
+- running production builds
+- wiring HTTP routes to persistence
 
 ## Immutable Release Package
 

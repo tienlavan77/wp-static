@@ -10,7 +10,7 @@ In progress.
 | --- | --- | --- |
 | 001 | Release Package Structure | Done |
 | 002 | HTTP Installer | Done |
-| 003 | Persistent Configuration | Pending |
+| 003 | Persistent Configuration | Done |
 | 004 | Production Build | Pending |
 | 005 | Installation Lock | Pending |
 | 006 | Release Builder CLI | Pending |
