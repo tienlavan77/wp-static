@@ -9,7 +9,7 @@ In progress.
 | Commit | Scope | Status |
 | --- | --- | --- |
 | 001 | Release Package Structure | Done |
-| 002 | HTTP Installer | Pending |
+| 002 | HTTP Installer | Done |
 | 003 | Persistent Configuration | Pending |
 | 004 | Production Build | Pending |
 | 005 | Installation Lock | Pending |

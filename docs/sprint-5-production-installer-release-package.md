@@ -51,7 +51,7 @@ The product must not promise runtime build support on hosting that cannot execut
 | Commit | Scope | Status |
 | --- | --- | --- |
 | 001 | Release Package Structure | Done |
-| 002 | HTTP Installer | Pending |
+| 002 | HTTP Installer | Done |
 | 003 | Persistent Configuration | Pending |
 | 004 | Production Build | Pending |
 | 005 | Installation Lock | Pending |
@@ -89,6 +89,36 @@ It does not:
 - expose HTTP routes
 - persist installation configuration
 - run production builds
+
+## Commit 002 - HTTP Installer
+
+HTTP Installer exposes the browser installation flow through route handlers.
+
+Routes:
+
+```text
+GET  /install
+POST /install/start
+POST /install/check
+POST /install/config
+POST /install/build
+GET  /install/report
+```
+
+Responsibilities:
+
+- serve Web Installer UI
+- call Wizard API actions
+- return structured HTTP-like responses
+- keep transport separate from business logic
+
+Commit 002 does not include:
+
+- persistent configuration writes
+- real environment check execution
+- real production build execution
+- installation lock enforcement
+- PHP server adapter
 
 ## Immutable Release Package
 
