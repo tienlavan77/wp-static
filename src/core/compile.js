@@ -16,6 +16,8 @@ import filterPublicContents from "../preview/filterPublicContents.js";
 import runLimitedParallel from "../performance/runLimitedParallel.js";
 import renderPage from "../renderer/renderPage.js";
 import resolveTheme from "../theme/resolveTheme.js";
+import resolveTemplateForRoute from "../templates/resolveTemplateForRoute.js";
+import renderLayout from "../visual-builder/renderLayout.js";
 
 export default async function compile(config, options = {}) {
   const projectDir = config._paths?.projectDir ?? options.projectDir ?? process.cwd();
@@ -36,19 +38,23 @@ export default async function compile(config, options = {}) {
   const adapterCacheKey = typeof adapter.getCacheKey === "function"
     ? await adapter.getCacheKey()
     : config.adapter;
-  const contentCache = createJsonFileCache({
-    cacheDir,
-    namespace: "content"
-  });
-  const collectionCache = createJsonFileCache({
-    cacheDir,
-    namespace: "collections"
-  });
+  const contentCache = options.freshContent
+    ? null
+    : createJsonFileCache({
+      cacheDir,
+      namespace: "content"
+    });
+  const collectionCache = options.freshContent
+    ? null
+    : createJsonFileCache({
+      cacheDir,
+      namespace: "collections"
+    });
   const contentCacheResult = await readThroughCache(
     contentCache,
     createCacheKey({
       adapter: adapterCacheKey,
-      cacheVersion: 2,
+      cacheVersion: 4,
       kind: "contents"
     }),
     () => adapter.getContents()
@@ -57,7 +63,7 @@ export default async function compile(config, options = {}) {
     collectionCache,
     createCacheKey({
       adapter: adapterCacheKey,
-      cacheVersion: 2,
+      cacheVersion: 4,
       kind: "collections"
     }),
     () => (typeof adapter.getCollections === "function" ? adapter.getCollections() : {})
@@ -89,9 +95,11 @@ export default async function compile(config, options = {}) {
     cacheBust: options.cacheBust
   });
   const rendererFingerprint = await createRendererFingerprint();
-  const routeRenderCache = createRouteRenderCache({
-    cacheDir
-  });
+  const routeRenderCache = options.disableRouteRenderCache
+    ? null
+    : createRouteRenderCache({
+      cacheDir
+    });
   const pages = await runLimitedParallel(routes, async (route) => {
     const html = await renderRoute(route, {
       config,
@@ -124,11 +132,16 @@ export default async function compile(config, options = {}) {
 }
 
 async function renderRoute(route, context) {
+  const template = await resolveTemplateForRoute(route, {
+    config: context.config,
+    projectDir: context.config._paths?.projectDir
+  });
   const cacheKey = route.path === "/"
     ? null
     : context.routeRenderCache?.createKey(route, {
       ...context.theme.metadata,
-      renderer: context.rendererFingerprint
+      renderer: context.rendererFingerprint,
+      template: template?.fingerprint ?? null
     });
   const cachedHtml = cacheKey ? await context.routeRenderCache.get(cacheKey) : null;
 
@@ -138,7 +151,7 @@ async function renderRoute(route, context) {
   }
 
   context.stats.routeRenderCacheMisses += 1;
-  const html = renderPage(route, context.theme.resolveLayout(route.content), {
+  const html = renderPage(route, createRouteLayout(route, context, template), {
     components: context.theme.components,
     graph: context.graph,
     site: context.config.site,
@@ -150,6 +163,29 @@ async function renderRoute(route, context) {
   }
 
   return html;
+}
+
+function createRouteLayout(route, context, template) {
+  if (!template) {
+    return context.theme.resolveLayout(route.content);
+  }
+
+  return ({ html }) => {
+    const result = renderLayout(template.raw, {
+      content: route.content,
+      graph: context.graph,
+      html,
+      route,
+      site: context.config.site,
+      theme: context.theme
+    });
+
+    return html`
+      <main class="wpsc-template wpsc-template--${template.raw.id ?? template.scope}" data-template-scope="${template.scope}">
+        ${html.raw(result.html)}
+      </main>
+    `;
+  };
 }
 
 async function createRendererFingerprint() {

@@ -1,0 +1,239 @@
+diff --git a/examples/basic-shop/layouts/templates/page.json b/examples/basic-shop/layouts/templates/page.json
+new file mode 100644
+--- /dev/null
++++ b/examples/basic-shop/layouts/templates/page.json
+@@ -0,0 +1,39 @@
++{
++  "contentTypes": [
++    "page"
++  ],
++  "id": "page-builder-template",
++  "name": "Page Builder Template",
++  "sections": [
++    {
++      "children": [
++        {
++          "blockName": "core/heading",
++          "bindings": {
++            "text": {
++              "path": "title",
++              "source": "content"
++            }
++          },
++          "id": "page-heading",
++          "type": "block"
++        },
++        {
++          "blockName": "core/content-text",
++          "bindings": {
++            "text": {
++              "path": "content",
++              "source": "content"
++            }
++          },
++          "id": "page-content",
++          "type": "block"
++        }
++      ],
++      "id": "page-main",
++      "settings": {
++        "width": "content"
++      },
++      "type": "section"
++    }
++  ],
++  "version": 1
++}
+diff --git a/examples/basic-shop/layouts/templates/post.json b/examples/basic-shop/layouts/templates/post.json
+new file mode 100644
+--- /dev/null
++++ b/examples/basic-shop/layouts/templates/post.json
+@@ -0,0 +1,39 @@
++{
++  "contentTypes": [
++    "post"
++  ],
++  "id": "post-builder-template",
++  "name": "Post Builder Template",
++  "sections": [
++    {
++      "children": [
++        {
++          "blockName": "core/heading",
++          "bindings": {
++            "text": {
++              "path": "title",
++              "source": "content"
++            }
++          },
++          "id": "post-heading",
++          "type": "block"
++        },
++        {
++          "blockName": "core/content-text",
++          "bindings": {
++            "text": {
++              "path": "content",
++              "source": "content"
++            }
++          },
++          "id": "post-content",
++          "type": "block"
++        }
++      ],
++      "id": "post-main",
++      "settings": {
++        "width": "content"
++      },
++      "type": "section"
++    }
++  ],
++  "version": 1
++}
+diff --git a/examples/basic-shop/layouts/templates/product.json b/examples/basic-shop/layouts/templates/product.json
+new file mode 100644
+--- /dev/null
++++ b/examples/basic-shop/layouts/templates/product.json
+@@ -0,0 +1,49 @@
++{
++  "contentTypes": [
++    "product"
++  ],
++  "id": "product-builder-template",
++  "name": "Product Builder Template",
++  "sections": [
++    {
++      "children": [
++        {
++          "blockName": "core/heading",
++          "bindings": {
++            "text": {
++              "path": "title",
++              "source": "content"
++            }
++          },
++          "id": "product-title",
++          "type": "block"
++        },
++        {
++          "blockName": "commerce/product-price",
++          "id": "product-price",
++          "type": "block"
++        },
++        {
++          "blockName": "core/content-text",
++          "bindings": {
++            "text": {
++              "path": "content",
++              "source": "content"
++            }
++          },
++          "id": "product-description",
++          "type": "block"
++        }
++      ],
++      "id": "product-summary",
++      "settings": {
++        "width": "content"
++      },
++      "type": "section"
++    }
++  ],
++  "version": 1
++}
+diff --git a/examples/basic-shop/layouts/templates/taxonomy.product_cat.json b/examples/basic-shop/layouts/templates/taxonomy.product_cat.json
+new file mode 100644
+--- /dev/null
++++ b/examples/basic-shop/layouts/templates/taxonomy.product_cat.json
+@@ -0,0 +1,39 @@
++{
++  "contentTypes": [
++    "product_cat"
++  ],
++  "id": "product-category-builder-template",
++  "name": "Product Category Builder Template",
++  "sections": [
++    {
++      "children": [
++        {
++          "blockName": "core/heading",
++          "bindings": {
++            "text": {
++              "path": "title",
++              "source": "content"
++            }
++          },
++          "id": "product-category-heading",
++          "type": "block"
++        },
++        {
++          "blockName": "commerce/archive-links",
++          "id": "product-category-links",
++          "type": "block"
++        }
++      ],
++      "id": "product-category-main",
++      "settings": {
++        "width": "content"
++      },
++      "type": "section"
++    }
++  ],
++  "version": 1
++}
+diff --git a/examples/basic-shop/layouts/templates/archive.json b/examples/basic-shop/layouts/templates/archive.json
+new file mode 100644
+--- /dev/null
++++ b/examples/basic-shop/layouts/templates/archive.json
+@@ -0,0 +1,39 @@
++{
++  "contentTypes": [
++    "archive"
++  ],
++  "id": "archive-builder-template",
++  "name": "Archive Builder Template",
++  "sections": [
++    {
++      "children": [
++        {
++          "blockName": "core/heading",
++          "bindings": {
++            "text": {
++              "path": "title",
++              "source": "content"
++            }
++          },
++          "id": "archive-heading",
++          "type": "block"
++        },
++        {
++          "blockName": "commerce/archive-links",
++          "id": "archive-links",
++          "type": "block"
++        }
++      ],
++      "id": "archive-main",
++      "settings": {
++        "width": "content"
++      },
++      "type": "section"
++    }
++  ],
++  "version": 1
++}
+diff --git a/test/templateResolution.test.js b/test/templateResolution.test.js
+--- a/test/templateResolution.test.js
++++ b/test/templateResolution.test.js
+@@ -91,6 +91,13 @@ test("compile renders homepage from builder template JSON", async () => {
+ 
+   assert.match(homePage.html, /data-template-scope="home"/);
+   assert.match(homePage.html, /Builder Template Home/);
++  assert.match(sitePlan.pages.find((page) => page.route.path === "/gioi-thieu").html, /data-template-scope="contentType:page"/);
++  assert.match(sitePlan.pages.find((page) => page.route.path === "/gioi-thieu").html, /page-builder-template/);
++  assert.match(sitePlan.pages.find((page) => page.route.path === "/iphone-15").html, /data-template-scope="contentType:product"/);
++  assert.match(sitePlan.pages.find((page) => page.route.path === "/iphone-15").html, /product-builder-template/);
++  assert.match(sitePlan.pages.find((page) => page.route.path === "/dien-thoai").html, /data-template-scope="taxonomy:product_cat"/);
++  assert.match(sitePlan.pages.find((page) => page.route.path === "/dien-thoai").html, /product-category-builder-template/);
+ 
+   const result = await buildSite(sitePlan, {
+     config: testConfig,

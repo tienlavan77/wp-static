@@ -18,6 +18,10 @@ test("normalizeWooCommerceProduct maps product data into Content input", async (
   assert.equal(content.data.salePrice, 249000);
   assert.equal(content.data.inStock, true);
   assert.equal(content.data.categories[0].slug, "thoi-trang");
+  assert.deepEqual(content.data.terms.map((term) => `${term.taxonomy}:${term.slug}`), [
+    "product_cat:thoi-trang",
+    "product_tag:basic"
+  ]);
   assert.equal(content.data.featuredImage.sourceUrl, "https://example.com/ao.jpg");
   assert.equal(content.data.acf.material, "Cotton");
   assert.equal(content.seo.title, "SEO Product Title");

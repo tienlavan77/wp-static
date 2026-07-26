@@ -1,6 +1,6 @@
 import path from "node:path";
 import { stat } from "node:fs/promises";
-import { pathToFileURL } from "node:url";
+import importProjectModule from "../shared/importProjectModule.js";
 
 export default async function resolveTheme(config, projectDir, options = {}) {
   const themeConfig = config.theme ?? {};
@@ -110,8 +110,7 @@ async function importDefaultModule(absolutePath, options = {}) {
 }
 
 async function importDefaultExport(absolutePath, options = {}) {
-  const cacheSuffix = options.cacheBust ? `?t=${options.cacheBust}` : "";
-  const module = await import(`${pathToFileURL(absolutePath).href}${cacheSuffix}`);
+  const module = await importProjectModule(absolutePath, options);
   return module.default ?? module;
 }
 

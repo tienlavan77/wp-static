@@ -7,7 +7,14 @@ export default function createWebhookServer(options = {}) {
   const server = http.createServer(async (incoming, outgoing) => {
     const request = createRequest(incoming);
     const url = new URL(request.url);
-    const response = url.pathname === pathname
+    const response = url.pathname === "/health"
+      ? new Response(JSON.stringify({ ok: true }), {
+        headers: {
+          "content-type": "application/json; charset=utf-8"
+        },
+        status: 200
+      })
+      : url.pathname === pathname
       ? await receiver.handle(request)
       : new Response(JSON.stringify({ error: "Not found" }), {
         headers: {
@@ -34,11 +41,16 @@ function createRequest(incoming) {
   const protocol = incoming.headers["x-forwarded-proto"] ?? "http";
   const host = incoming.headers.host ?? "localhost";
   const url = `${protocol}://${host}${incoming.url}`;
-
-  return new Request(url, {
-    body: incoming,
-    duplex: "half",
+  const method = incoming.method ?? "GET";
+  const init = {
     headers: incoming.headers,
-    method: incoming.method
-  });
+    method
+  };
+
+  if (method !== "GET" && method !== "HEAD") {
+    init.body = incoming;
+    init.duplex = "half";
+  }
+
+  return new Request(url, init);
 }

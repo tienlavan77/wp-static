@@ -13,6 +13,10 @@ export default function resolveCustomerSession(request, sessionStore) {
   };
 }
 
+export function clearCustomerSessionCookie() {
+  return `${SESSION_COOKIE}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0`;
+}
+
 function readCookie(cookieHeader, name) {
   const cookies = cookieHeader.split(";").map((cookie) => cookie.trim());
   const prefix = `${name}=`;

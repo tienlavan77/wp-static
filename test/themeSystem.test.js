@@ -46,6 +46,9 @@ test("theme resolver falls back to theme.layout when content type layout is miss
   const config = await loadConfig("examples/basic-shop");
   const testConfig = {
     ...config,
+    templates: {
+      dir: "./missing-templates"
+    },
     theme: {
       ...config.theme,
       layouts: {

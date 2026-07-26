@@ -1,126 +1,85 @@
+import handleAccountRoutes from "../account/handleAccountRoutes.js";
+import {
+  defaultAccountAddressUpdate,
+  defaultAccountLookup,
+  defaultAccountOrderLookup,
+  defaultAccountPasswordChange,
+  defaultAccountPasswordReset,
+  defaultAccountProfileUpdate
+} from "../account/defaultAccountHandlers.js";
+import normalizeApiPath from "../api/normalizeApiPath.js";
+import { json } from "../api/runtimeResponse.js";
+import handleAuthRoutes from "../auth/handleAuthRoutes.js";
+import {
+  defaultAuthLogin,
+  defaultAuthLogout,
+  defaultAuthPasswordResetConfirm,
+  defaultAuthRegister,
+  defaultAuthResendVerification,
+  defaultAuthVerifyEmail
+} from "../auth/defaultAuthHandlers.js";
+import handleCartRoutes from "../cart/handleCartRoutes.js";
+import handleCheckoutRoutes from "../checkout/handleCheckoutRoutes.js";
+import { defaultCheckoutProxy } from "../checkout/defaultCheckoutHandlers.js";
 import createSessionStore from "./createSessionStore.js";
+import handleOrderRoutes from "../order/handleOrderRoutes.js";
+import { defaultOrderLookup } from "../order/defaultOrderHandlers.js";
 import resolveCustomerSession from "./sessionMiddleware.js";
 
 export default function createCommerceRuntime(options = {}) {
   const sessionStore = options.sessionStore ?? createSessionStore();
-  const checkoutProxy = options.checkoutProxy ?? defaultCheckoutProxy;
-  const orderLookup = options.orderLookup ?? defaultOrderLookup;
+  const context = {
+    accountAddressUpdate: options.accountAddressUpdate ?? defaultAccountAddressUpdate,
+    accountLookup: options.accountLookup ?? defaultAccountLookup,
+    accountOrderLookup: options.accountOrderLookup ?? defaultAccountOrderLookup,
+    accountPasswordChange: options.accountPasswordChange ?? defaultAccountPasswordChange,
+    accountPasswordReset: options.accountPasswordReset ?? defaultAccountPasswordReset,
+    accountProfileUpdate: options.accountProfileUpdate ?? defaultAccountProfileUpdate,
+    authLogin: options.authLogin ?? defaultAuthLogin,
+    authLogout: options.authLogout ?? defaultAuthLogout,
+    authPasswordResetConfirm: options.authPasswordResetConfirm ?? defaultAuthPasswordResetConfirm,
+    authRegister: options.authRegister ?? defaultAuthRegister,
+    authResendVerification: options.authResendVerification ?? defaultAuthResendVerification,
+    authVerifyEmail: options.authVerifyEmail ?? defaultAuthVerifyEmail,
+    checkoutProxy: options.checkoutProxy ?? defaultCheckoutProxy,
+    orderLookup: options.orderLookup ?? defaultOrderLookup,
+    sessionStore
+  };
 
   return {
     async handle(request) {
-      return handleCommerceRequest(request, {
-        checkoutProxy,
-        orderLookup,
-        sessionStore
-      });
+      return handleCommerceRequest(request, context);
     },
     sessionStore
   };
 }
 
-async function handleCommerceRequest(request, context) {
+async function handleCommerceRequest(request, baseContext) {
   const url = new URL(request.url);
-  const { cookieHeader, session } = resolveCustomerSession(request, context.sessionStore);
+  const pathname = normalizeApiPath(url.pathname);
+  const { cookieHeader, session } = resolveCustomerSession(request, baseContext.sessionStore);
   const headers = {
     "content-type": "application/json; charset=utf-8"
+  };
+  const context = {
+    ...baseContext,
+    headers,
+    request,
+    session
   };
 
   if (cookieHeader) {
     headers["set-cookie"] = cookieHeader;
   }
 
-  if (url.pathname === "/health" && request.method === "GET") {
+  if (pathname === "/health" && request.method === "GET") {
     return json({ ok: true }, { headers });
   }
 
-  if (url.pathname === "/cart" && request.method === "GET") {
-    return json({ items: session.cart }, { headers });
-  }
-
-  if (url.pathname === "/cart/items" && request.method === "POST") {
-    const item = await readJson(request);
-    const cartItem = normalizeCartItem(item);
-    const existing = session.cart.find((entry) => entry.productId === cartItem.productId);
-
-    if (existing) {
-      existing.quantity += cartItem.quantity;
-    } else {
-      session.cart.push(cartItem);
-    }
-
-    return json({ items: session.cart }, { headers, status: 201 });
-  }
-
-  if (url.pathname.startsWith("/cart/items/") && request.method === "DELETE") {
-    const productId = decodeURIComponent(url.pathname.replace("/cart/items/", ""));
-    session.cart = session.cart.filter((item) => String(item.productId) !== productId);
-
-    return json({ items: session.cart }, { headers });
-  }
-
-  if (url.pathname === "/checkout" && request.method === "POST") {
-    const payload = await readJson(request);
-    const checkout = await context.checkoutProxy({
-      cart: session.cart,
-      payload,
-      session
-    });
-
-    return json(checkout, { headers, status: checkout.status ?? 200 });
-  }
-
-  if (url.pathname.startsWith("/orders/") && request.method === "GET") {
-    const orderId = decodeURIComponent(url.pathname.replace("/orders/", ""));
-    const order = await context.orderLookup({
-      orderId,
-      session
-    });
-
-    return json(order, { headers });
-  }
-
-  return json({ error: "Not found" }, { headers, status: 404 });
-}
-
-async function readJson(request) {
-  try {
-    return await request.json();
-  } catch {
-    return {};
-  }
-}
-
-function normalizeCartItem(item) {
-  const productId = item.productId ?? item.id;
-  const quantity = Number(item.quantity ?? 1);
-
-  if (!productId) {
-    throw new Error('Cart item field "productId" is required.');
-  }
-
-  return {
-    productId,
-    quantity: Number.isFinite(quantity) && quantity > 0 ? quantity : 1
-  };
-}
-
-function defaultCheckoutProxy() {
-  return {
-    error: "Checkout proxy is not configured.",
-    status: 501
-  };
-}
-
-function defaultOrderLookup() {
-  return {
-    error: "Order lookup is not configured.",
-    status: 501
-  };
-}
-
-function json(payload, options = {}) {
-  return new Response(JSON.stringify(payload), {
-    headers: options.headers,
-    status: options.status ?? 200
-  });
+  return await handleAuthRoutes(pathname, request, context)
+    ?? await handleAccountRoutes(pathname, request, context)
+    ?? await handleCartRoutes(pathname, request, context)
+    ?? await handleCheckoutRoutes(pathname, request, context)
+    ?? await handleOrderRoutes(pathname, request, context)
+    ?? json({ error: "Not found" }, { headers, status: 404 });
 }

@@ -1,0 +1,35 @@
+{
+  "contentTypes": [
+    "product_cat"
+  ],
+  "id": "product-category-builder-template",
+  "name": "Product Category Builder Template",
+  "sections": [
+    {
+      "children": [
+        {
+          "blockName": "core/heading",
+          "bindings": {
+            "text": {
+              "path": "title",
+              "source": "content"
+            }
+          },
+          "id": "product-category-heading",
+          "type": "block"
+        },
+        {
+          "blockName": "commerce/archive-links",
+          "id": "product-category-links",
+          "type": "block"
+        }
+      ],
+      "id": "product-category-main",
+      "settings": {
+        "width": "content"
+      },
+      "type": "section"
+    }
+  ],
+  "version": 1
+}

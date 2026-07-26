@@ -40,6 +40,10 @@ export default function createBuildManifest(sitePlan, buildResult, options = {})
       manifestPath: buildResult.routeData?.manifestPath ?? null,
       routesWritten: buildResult.routeData?.routesWritten ?? 0
     },
+    templates: {
+      manifestPath: buildResult.templateManifest?.manifestPath ?? null,
+      templates: buildResult.templateManifest?.templates?.length ?? 0
+    },
     fragments: {
       manifestPath: buildResult.fragmentOutputs?.manifestPath ?? null,
       written: buildResult.fragmentOutputs?.fragmentsWritten ?? 0

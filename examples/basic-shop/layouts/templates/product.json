@@ -1,0 +1,46 @@
+{
+  "contentTypes": [
+    "product"
+  ],
+  "id": "product-builder-template",
+  "name": "Product Builder Template",
+  "sections": [
+    {
+      "children": [
+        {
+          "blockName": "core/heading",
+          "bindings": {
+            "text": {
+              "path": "title",
+              "source": "content"
+            }
+          },
+          "id": "product-title",
+          "type": "block"
+        },
+        {
+          "blockName": "commerce/product-price",
+          "id": "product-price",
+          "type": "block"
+        },
+        {
+          "blockName": "core/content-text",
+          "bindings": {
+            "text": {
+              "path": "content",
+              "source": "content"
+            }
+          },
+          "id": "product-description",
+          "type": "block"
+        }
+      ],
+      "id": "product-summary",
+      "settings": {
+        "width": "content"
+      },
+      "type": "section"
+    }
+  ],
+  "version": 1
+}

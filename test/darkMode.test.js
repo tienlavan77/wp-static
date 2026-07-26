@@ -5,7 +5,7 @@ import createContent from "../src/core/createContent.js";
 import createRoutes from "../src/router/createRoutes.js";
 import renderPage from "../src/renderer/renderPage.js";
 
-test("renderPage includes a working dark mode toggle in the site header", async () => {
+test("renderPage keeps dark mode bootstrap without hard-coded site chrome", async () => {
   const content = createContent({
     id: "page-home",
     type: "page",
@@ -18,8 +18,9 @@ test("renderPage includes a working dark mode toggle in the site header", async 
   const rendered = renderPage(route, ({ html }) => html`<main>ok</main>`);
   const css = await readFile("examples/basic-shop/public/style.css", "utf8");
 
-  assert.match(rendered, /class="theme-toggle"/);
-  assert.match(rendered, /href="\/builder\.html"/);
+  assert.doesNotMatch(rendered, /class="site-header"/);
+  assert.doesNotMatch(rendered, /class="theme-toggle"/);
+  assert.doesNotMatch(rendered, /href="\/builder\.html"/);
   assert.match(rendered, /\/style\.css\?v=darkmode-1/);
   assert.match(rendered, /\/storefront\.css\?v=ui-3/);
   assert.match(rendered, /localStorage\.getItem\("wpsc-theme"\)/);

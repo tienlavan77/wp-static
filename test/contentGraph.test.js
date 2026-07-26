@@ -17,7 +17,14 @@ test("createContentGraph indexes content by id, slug, type, and term", () => {
         alt: "Áo"
       },
       terms: [{
+        count: 8,
+        description: "Sản phẩm thời trang",
         id: 7,
+        image: {
+          alt: "Ảnh thời trang",
+          sourceUrl: "https://example.com/thoi-trang.jpg"
+        },
+        menuOrder: 2,
         name: "Thời trang",
         slug: "thoi-trang",
         taxonomy: "product_cat"
@@ -47,6 +54,10 @@ test("createContentGraph indexes content by id, slug, type, and term", () => {
   assert.equal(graph.findContentsByType("product").length, 1);
   assert.equal(graph.findContentsByTerm("thoi-trang")[0].id, "product-ao-thun");
   assert.equal(graph.terms.bySlug["thoi-trang"].taxonomy, "product_cat");
+  assert.equal(graph.terms.bySlug["thoi-trang"].description, "Sản phẩm thời trang");
+  assert.equal(graph.terms.bySlug["thoi-trang"].image.sourceUrl, "https://example.com/thoi-trang.jpg");
+  assert.equal(graph.terms.bySlug["thoi-trang"].count, 8);
+  assert.equal(graph.terms.bySlug["thoi-trang"].menuOrder, 2);
   assert.equal(graph.media.byId["11"].sourceUrl, "https://example.com/ao.jpg");
   assert.equal(graph.menus.bySlug.primary.name, "Primary");
   assert.equal(Object.isFrozen(graph.contents.items), true);

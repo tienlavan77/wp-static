@@ -31,7 +31,11 @@ test("build pipeline writes html files and manifest", async () => {
   const contentManifest = JSON.parse(await readFile(path.join(outputDir, "data", "content", "manifest.json"), "utf8"));
   const homeFragment = await readFile(path.join(outputDir, "fragments", "index", "main.html"), "utf8");
   const productFragment = await readFile(path.join(outputDir, "fragments", "iphone-15", "main.html"), "utf8");
+  const productServeAlias = await readFile(path.join(outputDir, "iphone-15", "index.html"), "utf8");
   const enhancedNavigation = await readFile(path.join(outputDir, "wpsc-enhanced-navigation.js"), "utf8");
+  const adminHtml = await readFile(path.join(outputDir, "admin.html"), "utf8");
+  const adminScript = await readFile(path.join(outputDir, "admin-assets", "admin.js"), "utf8");
+  const adminConfig = JSON.parse(await readFile(path.join(outputDir, "admin-assets", "config.json"), "utf8"));
 
   assert.equal(result.pagesWritten, 7);
   assert.equal(result.totalPages, 7);
@@ -56,5 +60,15 @@ test("build pipeline writes html files and manifest", async () => {
   assert.equal(productData.runtime.fragmentUrl, "/fragments/iphone-15/main.html");
   assert.match(homeFragment, /^<main\b/);
   assert.match(productFragment, /^<main\b/);
+  assert.match(productServeAlias, /data-template-scope="contentType:product"/);
   assert.match(enhancedNavigation, /wpsc:navigation/);
+  assert.equal(result.adminApp.outputPath, "admin.html");
+  assert.match(adminHtml, /data-login-form/);
+  assert.match(adminHtml, /data-logout/);
+  assert.match(adminHtml, /data-route-list/);
+  assert.match(adminHtml, /data-stat-routes/);
+  assert.match(adminScript, /wpsc_admin_session/);
+  assert.match(adminScript, /fetchJson\("\/data\/manifest\.json"\)/);
+  assert.match(adminScript, /data-route-path/);
+  assert.equal(adminConfig.auth.tokenEnv, "WPSC_BUILDER_TOKEN");
 });

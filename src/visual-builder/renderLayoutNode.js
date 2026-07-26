@@ -41,7 +41,7 @@ function renderBlockNode(node, context, options) {
       ...error,
       nodeId: node.id
     })),
-    html: rendered.html || renderFallback(options, node, "")
+    html: wrapRenderedNode(node, rendered.html || renderFallback(options, node, ""), "wpsc-block")
   };
 }
 
@@ -49,15 +49,63 @@ function renderSectionNode(node, context, options) {
   const renderedChildren = (node.children ?? []).map((child) => renderLayoutNode(child, context, options));
   const childrenHtml = renderedChildren.map((child) => child.html).join("");
   const errors = renderedChildren.flatMap((child) => child.errors);
+  const kind = node.settings?.kind;
   const className = [
-    "wpsc-section",
-    node.settings?.width ? `wpsc-section--${safeClassName(node.settings.width)}` : ""
+    kind === "row" ? "wpsc-row" : kind === "column" ? "wpsc-column" : "wpsc-section",
+    node.settings?.width ? `wpsc-section--${safeClassName(node.settings.width)}` : "",
+    node.settings?.className ?? ""
   ].filter(Boolean).join(" ");
+  const style = kind === "row"
+    ? createStyleAttribute({
+      ...createCommonStyleValues(node.settings),
+      "--wpsc-row-columns": String((node.children ?? []).length || node.settings?.columns || 2),
+      "--wpsc-row-content-max-width": node.settings?.contentMaxWidth ?? null,
+      "--wpsc-row-content-width": node.settings?.contentWidth ?? null,
+      "--wpsc-row-gap": node.settings?.gap ?? null
+    })
+    : createStyleAttribute(createCommonStyleValues(node.settings));
 
   return {
     errors,
-    html: `<section class="${className}" data-layout-node="${escapeAttribute(node.id)}">${childrenHtml}</section>`
+    html: kind === "row"
+      ? `<section class="${className}"${style} data-layout-node="${escapeAttribute(node.id)}"><div class="wpsc-row__inner">${childrenHtml}</div></section>`
+      : `<section class="${className}"${style} data-layout-node="${escapeAttribute(node.id)}">${childrenHtml}</section>`
   };
+}
+
+function wrapRenderedNode(node, html, baseClassName) {
+  if (!html) {
+    return "";
+  }
+
+  const className = [
+    baseClassName,
+    node.settings?.className ?? ""
+  ].filter(Boolean).join(" ");
+  const style = createStyleAttribute(createCommonStyleValues(node.settings));
+
+  return `<div class="${escapeAttribute(className)}"${style} data-layout-node="${escapeAttribute(node.id)}">${html}</div>`;
+}
+
+function createCommonStyleValues(settings = {}) {
+  return {
+    "background": settings.background ?? null,
+    "color": settings.color ?? null,
+    "height": settings.height ?? null,
+    "margin": settings.margin ?? null,
+    "max-width": settings.maxWidth ?? null,
+    "padding": settings.padding ?? null,
+    "width": settings.width ?? null
+  };
+}
+
+function createStyleAttribute(values) {
+  const style = Object.entries(values)
+    .filter(([, value]) => value !== null && value !== undefined && value !== "")
+    .map(([key, value]) => `${key}: ${escapeAttribute(value)}`)
+    .join("; ");
+
+  return style ? ` style="${style}"` : "";
 }
 
 function resolveLayoutBindings(bindings = {}, context = {}) {

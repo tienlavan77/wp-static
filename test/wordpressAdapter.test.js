@@ -77,6 +77,28 @@ test("WordPress repository fetches pages, posts, and custom post types", async (
   assert.equal(contents[2].type, "du-an");
 });
 
+test("WordPress repository normalizes collection taxonomy names", async () => {
+  const client = {
+    async getCollection(pathname) {
+      return [{
+        id: pathname.endsWith("categories") ? 1 : 2,
+        name: pathname.endsWith("categories") ? "Tin tức" : "Khuyến mãi",
+        parent: 0,
+        slug: pathname.endsWith("categories") ? "tin-tuc" : "khuyen-mai"
+      }];
+    }
+  };
+  const repository = createWordPressRepository(client, {
+    taxonomies: ["categories", "tags"]
+  });
+  const terms = await repository.getTerms();
+
+  assert.deepEqual(terms.map((term) => `${term.taxonomy}:${term.slug}`), [
+    "category:tin-tuc",
+    "post_tag:khuyen-mai"
+  ]);
+});
+
 test("WordPress client tolerates PHP warnings before JSON", async () => {
   const { default: createWordPressClient } = await import("../src/adapters/wordpress/wordpressClient.js");
   const client = createWordPressClient({

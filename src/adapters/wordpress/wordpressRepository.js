@@ -28,13 +28,22 @@ export default function createWordPressRepository(client, options = {}) {
       const taxonomies = options.taxonomies ?? [];
       const collections = taxonomies.map(async (taxonomy) => {
         const terms = await client.getCollection(`/wp-json/wp/v2/${taxonomy}`);
+        const normalizedTaxonomy = normalizeTaxonomyName(taxonomy);
 
         return terms.map((term) => ({
+          count: term.count ?? 0,
+          description: term.description ?? "",
           id: term.id,
+          link: term.link ?? null,
           name: term.name,
           parentId: term.parent ?? null,
           slug: term.slug,
-          taxonomy
+          taxonomy: normalizedTaxonomy,
+          data: {
+            count: term.count ?? 0,
+            description: term.description ?? "",
+            link: term.link ?? null
+          }
         }));
       });
 
@@ -61,6 +70,18 @@ export default function createWordPressRepository(client, options = {}) {
       }
     }
   };
+}
+
+function normalizeTaxonomyName(taxonomy) {
+  if (taxonomy === "categories") {
+    return "category";
+  }
+
+  if (taxonomy === "tags") {
+    return "post_tag";
+  }
+
+  return taxonomy;
 }
 
 async function fetchContentCollection(client, pathname, type) {

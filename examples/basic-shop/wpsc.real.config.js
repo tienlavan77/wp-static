@@ -1,3 +1,14 @@
+const wordpressAuth =
+  process.env.WPSC_WP_USERNAME && process.env.WPSC_WP_APP_PASSWORD
+    ? {
+        auth: {
+          type: "applicationPassword",
+          usernameEnv: "WPSC_WP_USERNAME",
+          passwordEnv: "WPSC_WP_APP_PASSWORD"
+        }
+      }
+    : {};
+
 export default {
   name: "Tin Sinh Phat",
   homepage: "homepage",
@@ -14,11 +25,7 @@ export default {
       seo: {
         provider: "rankmath"
       },
-      auth: {
-        type: "applicationPassword",
-        usernameEnv: "WPSC_WP_USERNAME",
-        passwordEnv: "WPSC_WP_APP_PASSWORD"
-      }
+      ...wordpressAuth
     },
     woocommerce: {
       baseUrl: "https://api.tinsinhphat.com",
@@ -45,10 +52,14 @@ export default {
     title: "Tin Sinh Phat",
     description: "Website tĩnh tạo bởi WPSC từ WordPress và WooCommerce"
   },
+  templates: {
+    enabled: false
+  },
   theme: {
     layout: "./theme/layout.js",
     blocks: "./theme/blocks.js",
     layouts: {
+      "archive:product_cat": "./theme/layouts/archive.js",
       page: "./theme/layouts/page.js",
       product: "./theme/layouts/product.js"
     },

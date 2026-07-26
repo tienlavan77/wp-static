@@ -22,7 +22,8 @@ test("route data exposes hierarchical breadcrumbs while keeping flat archive URL
     contents: [product],
     terms: [parentTerm, childTerm]
   });
-  const archive = createArchiveRoutes([product], graph.terms.items)[0];
+  const archive = createArchiveRoutes([product], graph.terms.items)
+    .find((route) => route.path === "/hop-giay");
   const archivePayload = createRouteDataPayload(archive, { graph });
   const productPayload = createRouteDataPayload({
     content: product,

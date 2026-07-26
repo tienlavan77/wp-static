@@ -26,6 +26,33 @@ export default function createWooCommerceClient(options = {}) {
       }
 
       return items;
+    },
+
+    async getResource(pathname, query = {}) {
+      const response = await getWooCommerceResponse(fetchImpl, baseUrl, pathname, credentials, query);
+      return parseJsonResponse(response, pathname);
+    },
+
+    async createResource(pathname, payload = {}, query = {}) {
+      const response = await getWooCommerceResponse(fetchImpl, baseUrl, pathname, credentials, query, {
+        body: JSON.stringify(payload),
+        headers: {
+          "content-type": "application/json"
+        },
+        method: "POST"
+      });
+      return parseJsonResponse(response, pathname);
+    },
+
+    async updateResource(pathname, payload = {}, query = {}) {
+      const response = await getWooCommerceResponse(fetchImpl, baseUrl, pathname, credentials, query, {
+        body: JSON.stringify(payload),
+        headers: {
+          "content-type": "application/json"
+        },
+        method: "PUT"
+      });
+      return parseJsonResponse(response, pathname);
     }
   };
 }
@@ -39,6 +66,19 @@ function assertCollection(items, pathname) {
 }
 
 async function getCollectionPage(fetchImpl, baseUrl, pathname, credentials, query, page) {
+  const response = await getWooCommerceResponse(fetchImpl, baseUrl, pathname, credentials, {
+    ...query,
+    page,
+    per_page: query.per_page ?? 100
+  });
+
+  return {
+    headers: response.headers,
+    items: await parseJsonResponse(response, pathname)
+  };
+}
+
+async function getWooCommerceResponse(fetchImpl, baseUrl, pathname, credentials, query = {}, init = {}) {
   const url = new URL(`${baseUrl}${pathname}`);
 
   for (const [key, value] of Object.entries(query)) {
@@ -55,19 +95,13 @@ async function getCollectionPage(fetchImpl, baseUrl, pathname, credentials, quer
     url.searchParams.set("consumer_secret", credentials.consumerSecret);
   }
 
-  url.searchParams.set("page", String(page));
-  url.searchParams.set("per_page", String(query.per_page ?? 100));
-
-  const response = await fetchImpl(url);
+  const response = await fetchImpl(url, init);
 
   if (!response.ok) {
     throw new AdapterError(`WooCommerce request failed: ${response.status} ${response.statusText}`);
   }
 
-  return {
-    headers: response.headers,
-    items: await parseJsonResponse(response, pathname)
-  };
+  return response;
 }
 
 async function parseJsonResponse(response, pathname) {

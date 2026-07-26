@@ -14,6 +14,9 @@ test("package boundary entrypoints export expected APIs", async () => {
   assert.equal(typeof shared.escapeHtml, "function");
   assert.equal(typeof core.compile, "function");
   assert.equal(typeof core.applyAdvancedCommerceData, "function");
+  assert.equal(typeof core.createTemplateManifest, "function");
+  assert.equal(typeof core.resolveTemplateForRoute, "function");
+  assert.equal(typeof core.writeTemplateManifest, "function");
   assert.equal(typeof adapters.createWordPressAdapter, "function");
   assert.equal(typeof adapters.createWordPressWooCommerceAdapter, "function");
   assert.equal(typeof router.createRoutes, "function");

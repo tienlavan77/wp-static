@@ -9,9 +9,14 @@ export default function createRoutes(contents, config = {}) {
   const homepage = config.homepage ?? "home";
   const terms = config.terms ?? [];
 
+  const contentRoutes = contents.map((content) => createRoute(content, homepage));
+  const reservedPaths = new Set(contentRoutes.map((route) => route.path));
   const routes = [
-    ...contents.map((content) => createRoute(content, homepage)),
-    ...createArchiveRoutes(contents, terms, config)
+    ...contentRoutes,
+    ...createArchiveRoutes(contents, terms, {
+      ...config,
+      reservedPaths
+    })
   ];
 
   assertUniqueRoutePaths(routes);

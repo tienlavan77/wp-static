@@ -63,10 +63,33 @@ function mergeCollections(wordpressCollections = {}, woocommerceCollections = {}
 
 function normalizeProductTerms(items, taxonomy) {
   return items.map((item) => ({
+    count: item.count ?? 0,
+    description: item.description ?? "",
     id: item.id,
+    image: normalizeTermImage(item.image),
+    menuOrder: item.menu_order ?? 0,
     name: item.name,
     parentId: item.parent ?? null,
     slug: item.slug,
-    taxonomy
+    taxonomy,
+    data: {
+      count: item.count ?? 0,
+      description: item.description ?? "",
+      image: normalizeTermImage(item.image),
+      menuOrder: item.menu_order ?? 0
+    }
   }));
+}
+
+function normalizeTermImage(image) {
+  if (!image) {
+    return null;
+  }
+
+  return {
+    alt: image.alt ?? "",
+    id: image.id ?? null,
+    name: image.name ?? "",
+    sourceUrl: image.src ?? image.sourceUrl ?? image.url ?? null
+  };
 }

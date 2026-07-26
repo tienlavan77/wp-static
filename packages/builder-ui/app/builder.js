@@ -15,6 +15,35 @@ const blocks = [
     }
   },
   {
+    blockName: "site/logo",
+    label: "Site Logo",
+    props: {
+      href: "/",
+      text: "Tin Sinh Phát"
+    }
+  },
+  {
+    blockName: "site/nav",
+    label: "Site Navigation",
+    props: {
+      ariaLabel: "Primary",
+      items: [{
+        href: "/",
+        label: "Trang chủ"
+      }, {
+        href: "/lien-he",
+        label: "Liên hệ"
+      }]
+    }
+  },
+  {
+    blockName: "site/dark-mode-toggle",
+    label: "Dark Mode Toggle",
+    props: {
+      label: "Đổi giao diện sáng tối"
+    }
+  },
+  {
     blockName: "commerce/product-price",
     label: "Product Price",
     props: {
@@ -170,6 +199,10 @@ function renderPreview() {
           body { margin: 0; padding: 28px; color: #162019; font-family: system-ui, sans-serif; }
           h1, h2, h3, p { margin: 0 0 14px; }
           .price { color: #0f7a5f; font-size: 28px; font-weight: 800; }
+          .wpsc-site-logo { color: #0a5c48; font-size: 22px; font-weight: 800; text-decoration: none; }
+          .wpsc-site-nav { display: flex; gap: 10px; flex-wrap: wrap; margin: 14px 0; }
+          .wpsc-site-nav a { border: 1px solid #d8dfd8; border-radius: 6px; padding: 7px 10px; color: #0a5c48; text-decoration: none; }
+          .theme-toggle { min-height: 36px; border: 1px solid #d8dfd8; border-radius: 6px; padding: 0 12px; background: #fff; color: #162019; }
           .archive-links { display: flex; gap: 8px; flex-wrap: wrap; }
           .archive-links a { border: 1px solid #d8dfd8; border-radius: 6px; padding: 7px 10px; color: #0a5c48; text-decoration: none; }
         </style>
@@ -246,6 +279,22 @@ function renderPreviewNode(node) {
     return `<p>${escapeHtml(node.props.fallback)}</p>`;
   }
 
+  if (node.blockName === "site/logo") {
+    return `<a class="wpsc-site-logo" href="${escapeAttribute(normalizeHref(node.props.href))}">${escapeHtml(node.props.text || "Site")}</a>`;
+  }
+
+  if (node.blockName === "site/nav") {
+    const items = Array.isArray(node.props.items) ? node.props.items : [];
+
+    return `<nav class="wpsc-site-nav" aria-label="${escapeAttribute(node.props.ariaLabel || "Primary")}">${items.map((item) => (
+      `<a href="${escapeAttribute(normalizeHref(item.href))}">${escapeHtml(item.label)}</a>`
+    )).join("")}</nav>`;
+  }
+
+  if (node.blockName === "site/dark-mode-toggle") {
+    return `<button class="theme-toggle" type="button" aria-label="${escapeAttribute(node.props.label)}" aria-pressed="false"><span aria-hidden="true">L</span><span aria-hidden="true">D</span></button>`;
+  }
+
   if (node.blockName === "commerce/product-price") {
     return `<p class="price">${new Intl.NumberFormat("vi-VN", { currency: node.props.currency || "VND", style: "currency" }).format(19900000)}</p>`;
   }
@@ -255,6 +304,20 @@ function renderPreviewNode(node) {
   }
 
   return "";
+}
+
+function normalizeHref(value) {
+  const href = String(value ?? "").trim();
+
+  if (!href) {
+    return "#";
+  }
+
+  if (href.startsWith("#") || href.startsWith("/") || href.startsWith("http://") || href.startsWith("https://")) {
+    return href;
+  }
+
+  return `/${href.replace(/^\/+/, "")}`;
 }
 
 function escapeHtml(value) {

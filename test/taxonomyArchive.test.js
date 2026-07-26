@@ -54,17 +54,35 @@ test("createArchiveRoutes paginates archive items", () => {
   assert.equal(routes[1].content.data.pagination.pageCount, 2);
 });
 
-test("createRoutes includes archive routes and detects conflicts", () => {
-  assert.throws(
-    () => createRoutes([
-      product("product-iphone-15", "iphone-15", "dien-thoai"),
-      page("page-conflict", "dien-thoai")
-    ], {
-      homepage: "home",
-      terms: [term("dien-thoai", "Điện thoại", "product_cat")]
-    }),
-    /Duplicate route "\/dien-thoai"/
-  );
+test("createArchiveRoutes includes items from child taxonomy terms", () => {
+  const routes = createArchiveRoutes([
+    product("product-hop-giay", "hop-giay-a", "hop-giay")
+  ], [
+    term("bao-bi", "Bao bì", "product_cat"),
+    term("hop-giay", "Hộp giấy", "product_cat", "product_cat:bao-bi")
+  ]);
+
+  const parentArchive = routes.find((route) => route.path === "/bao-bi");
+  const childArchive = routes.find((route) => route.path === "/hop-giay");
+
+  assert.equal(parentArchive.content.data.items[0].slug, "hop-giay-a");
+  assert.equal(childArchive.content.data.items[0].slug, "hop-giay-a");
+});
+
+test("createRoutes includes archive routes and skips archive paths reserved by content", () => {
+  const routes = createRoutes([
+    product("product-iphone-15", "iphone-15", "dien-thoai"),
+    page("page-conflict", "dien-thoai")
+  ], {
+    homepage: "home",
+    terms: [term("dien-thoai", "Điện thoại", "product_cat")]
+  });
+
+  assert.deepEqual(routes.map((route) => route.path), [
+    "/iphone-15",
+    "/dien-thoai"
+  ]);
+  assert.equal(routes.find((route) => route.path === "/dien-thoai").content.id, "page-conflict");
 });
 
 test("compile includes taxonomy archive pages in the site plan and sitemap", async () => {
@@ -131,10 +149,12 @@ function product(id, slug, termSlug) {
   });
 }
 
-function term(slug, name, taxonomy) {
+function term(slug, name, taxonomy, parentKey = "") {
+  const [parentTaxonomy, parentSlug] = String(parentKey).split(":");
   return {
     id: `${taxonomy}:${slug}`,
     name,
+    parentSlug: parentTaxonomy === taxonomy ? parentSlug : null,
     slug,
     taxonomy
   };

@@ -1,0 +1,35 @@
+{
+  "contentTypes": [
+    "archive"
+  ],
+  "id": "archive-builder-template",
+  "name": "Archive Builder Template",
+  "sections": [
+    {
+      "children": [
+        {
+          "blockName": "core/heading",
+          "bindings": {
+            "text": {
+              "path": "title",
+              "source": "content"
+            }
+          },
+          "id": "archive-heading",
+          "type": "block"
+        },
+        {
+          "blockName": "commerce/archive-links",
+          "id": "archive-links",
+          "type": "block"
+        }
+      ],
+      "id": "archive-main",
+      "settings": {
+        "width": "content"
+      },
+      "type": "section"
+    }
+  ],
+  "version": 1
+}

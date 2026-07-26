@@ -1,5 +1,6 @@
 import buildProjectOnce from "../dev-server/buildProjectOnce.js";
-import createRebuildQueue from "./createRebuildQueue.js";
+import createFreshBuildOptions from "../invalidate/createFreshBuildOptions.js";
+import createRebuildQueue from "../queue/createRebuildQueue.js";
 import mapWebhookChanges from "./mapWebhookChanges.js";
 import normalizeWebhookPayload from "./normalizeWebhookPayload.js";
 
@@ -9,6 +10,7 @@ export default function createWebhookReceiver(options = {}) {
     logger: options.logger,
     rebuild: options.rebuild ?? createProjectRebuild(options)
   });
+  const waitUntilBuilt = options.waitUntilBuilt !== false;
 
   return {
     async handle(request) {
@@ -29,11 +31,26 @@ export default function createWebhookReceiver(options = {}) {
       }
 
       const changes = mapWebhookChanges(payload);
-      const rebuildResult = await queue.enqueue({
+      logReceivedWebhook(options.logger, payload, changes);
+      const rebuildRequest = {
         changes,
         payload,
         reason: changes.map((change) => change.reason).join(", ")
-      });
+      };
+
+      if (!waitUntilBuilt) {
+        void queue.enqueue(rebuildRequest);
+
+        return json({
+          changes,
+          eventId: payload.eventId,
+          rebuild: "queued"
+        }, {
+          status: 202
+        });
+      }
+
+      const rebuildResult = await queue.enqueue(rebuildRequest);
 
       return json({
         changes,
@@ -47,12 +64,43 @@ export default function createWebhookReceiver(options = {}) {
   };
 }
 
+function logReceivedWebhook(logger, payload, changes) {
+  const summary = changes.map((change) => {
+    const label = change.taxonomy ?? change.type;
+    const slugOrId = change.routeSlug || change.id || "unknown";
+
+    return `${payload.action} ${label} ${slugOrId}`;
+  }).join(", ");
+
+  logger?.info?.(`Webhook received: ${summary || payload.eventId}`);
+}
+
 function createProjectRebuild(options) {
-  return async () => buildProjectOnce(options.projectDir ?? process.cwd(), {
+  return async (request = {}) => buildProjectOnce(options.projectDir ?? process.cwd(), createFreshBuildOptions({
     cacheBust: Date.now(),
+    changed: createChangedArgs(request.changes),
+    onProgress(event) {
+      options.logger?.info?.(`Build progress: ${event.message}`);
+    },
     preview: options.preview,
     previewToken: options.previewToken
-  });
+  }));
+}
+
+function createChangedArgs(changes = []) {
+  return changes
+    .map((change) => {
+      if (!change?.routeSlug) {
+        return null;
+      }
+
+      if (change.type === "term") {
+        return change.taxonomy ? `term:${change.taxonomy}:${change.routeSlug}` : null;
+      }
+
+      return `${change.type}:${change.routeSlug}`;
+    })
+    .filter(Boolean);
 }
 
 function isAuthorized(request, secret) {

@@ -54,6 +54,51 @@ The v1 layout context fields are frozen and exported from the root package as
 helpers through the `components` context. Component helpers should return values for the
 layout template to render. Template values are HTML-escaped by default.
 
+## Storefront Component Structure
+
+The basic shop theme now keeps storefront UI in small component modules under
+`examples/basic-shop/theme/components`.
+
+```text
+components/
+  account/
+  archive/
+  category/
+  commerce/
+  footer/
+  header/
+  navigation/
+  product/
+  sections/
+  shared/
+  banner.js
+  pageHeading.js
+  siteShell.js
+  storefrontShell.js
+  index.js
+```
+
+`index.js` is the named export barrel for new layout code. `storefrontShell.js`
+is kept as a compatibility layer for layouts that still import the previous
+shared helpers.
+
+Theme components must not call WordPress, WooCommerce, runtime APIs, or read
+environment variables directly. Data should arrive through the layout context,
+route content, graph data, or normalized helpers supplied by the framework.
+
+When a shared component changes, build and smoke test representative routes:
+
+```text
+/
+/in-brochure
+/to-roi-a4-giay-couche-150gsm
+/cart
+/checkout
+/account
+/search
+/404
+```
+
 ## Assets
 
 Files in `theme.assets` are copied to `dist/theme`. Public assets are still copied to the

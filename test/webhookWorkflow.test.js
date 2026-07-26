@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import createRebuildQueue from "../src/webhook/createRebuildQueue.js";
+import createRebuildQueue from "../src/queue/createRebuildQueue.js";
 import createWebhookReceiver from "../src/webhook/createWebhookReceiver.js";
 import mapWebhookChanges from "../src/webhook/mapWebhookChanges.js";
 import normalizeWebhookPayload from "../src/webhook/normalizeWebhookPayload.js";

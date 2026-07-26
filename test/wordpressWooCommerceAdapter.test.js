@@ -13,7 +13,10 @@ test("WordPress WooCommerce adapter merges content and collections", async () =>
       excerpt: { rendered: "" }
     }]],
     ["/wp-json/wp/v2/categories", [{
+      count: 4,
+      description: "Tin tức doanh nghiệp",
       id: 2,
+      link: "https://example.com/category/tin-tuc/",
       name: "Tin tức",
       parent: 9,
       slug: "tin-tuc"
@@ -33,7 +36,16 @@ test("WordPress WooCommerce adapter merges content and collections", async () =>
       images: []
     }]],
     ["/wp-json/wc/v3/products/categories", [{
+      count: 8,
+      description: "Sản phẩm thời trang",
       id: 5,
+      image: {
+        alt: "Ảnh thời trang",
+        id: 99,
+        name: "thoi-trang.jpg",
+        src: "https://example.com/thoi-trang.jpg"
+      },
+      menu_order: 3,
       name: "Thời trang",
       parent: 2,
       slug: "thoi-trang"
@@ -83,9 +95,14 @@ test("WordPress WooCommerce adapter merges content and collections", async () =>
   assert.equal(collections.productCategories[0].slug, "thoi-trang");
   assert.equal(collections.productTags[0].slug, "sale");
   assert.equal(collections.terms.find((term) => term.slug === "tin-tuc").parentId, 9);
+  assert.equal(collections.terms.find((term) => term.slug === "tin-tuc").description, "Tin tức doanh nghiệp");
   assert.equal(collections.terms.find((term) => term.slug === "thoi-trang").parentId, 2);
+  assert.equal(collections.terms.find((term) => term.slug === "thoi-trang").description, "Sản phẩm thời trang");
+  assert.equal(collections.terms.find((term) => term.slug === "thoi-trang").image.sourceUrl, "https://example.com/thoi-trang.jpg");
+  assert.equal(collections.terms.find((term) => term.slug === "thoi-trang").count, 8);
+  assert.equal(collections.terms.find((term) => term.slug === "thoi-trang").menuOrder, 3);
   assert.deepEqual(collections.terms.map((term) => term.taxonomy), [
-    "categories",
+    "category",
     "product_cat",
     "product_tag"
   ]);

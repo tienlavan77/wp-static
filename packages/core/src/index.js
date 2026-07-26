@@ -17,3 +17,7 @@ export { default as renderSeoTags } from "../../../src/seo/renderSeoTags.js";
 export { default as createPluginContext } from "../../../src/plugins/createPluginContext.js";
 export { default as loadPlugins } from "../../../src/plugins/loadPlugins.js";
 export { runPluginEvent, runPluginHook } from "../../../src/plugins/runPluginHook.js";
+export { default as loadTemplateDocument } from "../../../src/templates/loadTemplateDocument.js";
+export { createTemplateScope, default as createTemplateManifest } from "../../../src/templates/createTemplateManifest.js";
+export { default as resolveTemplateForRoute, createTemplateCandidates } from "../../../src/templates/resolveTemplateForRoute.js";
+export { default as writeTemplateManifest } from "../../../src/templates/writeTemplateManifest.js";

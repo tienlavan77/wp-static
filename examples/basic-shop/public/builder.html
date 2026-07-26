@@ -4,37 +4,51 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>WPSC Builder</title>
-    <link rel="stylesheet" href="/builder-ui/builder.css">
+    <link rel="stylesheet" href="/builder-ui/builder.css?v=row-builder-1">
   </head>
   <body>
     <main class="builder-shell" data-builder-root>
       <aside class="builder-sidebar">
         <h1>Builder</h1>
+        <section class="route-context" data-route-context>
+          <p class="route-context__eyebrow">Route</p>
+          <strong data-route-title>Chưa chọn route</strong>
+          <span data-route-path>Mở từ Admin để nạp dữ liệu thật.</span>
+        </section>
         <div class="builder-tabs" role="tablist" aria-label="Builder tools">
-          <button class="is-active" type="button" data-panel-button="blocks">Blocks</button>
+          <button class="is-active" type="button" data-panel-button="route">Route</button>
+          <button type="button" data-panel-button="blocks">Blocks</button>
           <button type="button" data-panel-button="props">Props</button>
         </div>
-        <section class="builder-panel is-active" data-panel="blocks">
+        <section class="builder-panel is-active" data-panel="route">
+          <div class="route-meta" data-route-meta></div>
+          <div class="builder-sidebar-actions">
+            <strong data-layout-name>Default Page</strong>
+            <span class="builder-draft-status" data-draft-status>Draft chưa lưu</span>
+          </div>
+        </section>
+        <section class="builder-panel" data-panel="blocks">
           <div class="block-palette" data-block-palette></div>
         </section>
         <section class="builder-panel" data-panel="props">
           <form class="props-panel" data-props-panel></form>
         </section>
       </aside>
-      <section class="builder-canvas-wrap">
-        <div class="builder-toolbar">
-          <strong data-layout-name>Default Page</strong>
-          <button type="button" data-save-layout>Save JSON</button>
-        </div>
-        <div class="builder-canvas" data-canvas></div>
-      </section>
       <aside class="builder-preview-wrap">
         <div class="builder-toolbar">
-          <strong>Preview</strong>
+          <strong>Live Preview</strong>
+          <span>Thả component vào preview, click để chọn.</span>
+          <div class="builder-toolbar__actions">
+            <button type="button" data-apply-header-demo>Header Demo</button>
+            <button type="button" data-save-layout>Save Draft</button>
+            <button type="button" data-build-route-preview>Build Route Preview</button>
+            <button type="button" data-export-layout>Export JSON</button>
+            <button type="button" data-reset-layout>Reset</button>
+          </div>
         </div>
         <iframe title="Live preview" data-preview></iframe>
       </aside>
     </main>
-    <script type="module" src="/builder-ui/builder.js"></script>
+    <script type="module" src="/builder-ui/builder.js?v=row-builder-1"></script>
   </body>
 </html>

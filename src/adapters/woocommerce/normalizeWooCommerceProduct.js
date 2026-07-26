@@ -23,9 +23,14 @@ export default function normalizeWooCommerceProduct(rawProduct = {}) {
       regularPrice: parsePrice(rawProduct.regular_price),
       salePrice: parsePrice(rawProduct.sale_price),
       shortDescription: stripTags(rawProduct.short_description ?? ""),
+      shortDescriptionHtml: rawProduct.short_description ?? "",
       sku: rawProduct.sku ?? "",
       stockQuantity: rawProduct.stock_quantity ?? null,
       tags: normalizeTaxonomy(rawProduct.tags),
+      terms: [
+        ...normalizeTaxonomy(rawProduct.categories, "product_cat"),
+        ...normalizeTaxonomy(rawProduct.tags, "product_tag")
+      ],
       variants: normalizeVariations(rawProduct.variations, slug),
       variations: rawProduct.variations ?? []
     },
@@ -46,11 +51,12 @@ function normalizeImages(images = []) {
   }));
 }
 
-function normalizeTaxonomy(items = []) {
+function normalizeTaxonomy(items = [], taxonomy = null) {
   return items.map((item) => ({
     id: item.id,
     name: item.name,
-    slug: item.slug
+    slug: item.slug,
+    ...(taxonomy ? { taxonomy } : {})
   }));
 }
 

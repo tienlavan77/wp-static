@@ -1,5 +1,5 @@
 import path from "node:path";
-import { pathToFileURL } from "node:url";
+import importProjectModule from "../shared/importProjectModule.js";
 
 export default async function loadPlugins(config, options = {}) {
   const projectDir = config._paths?.projectDir ?? options.projectDir ?? process.cwd();
@@ -26,8 +26,7 @@ async function loadPlugin(pluginConfig, projectDir, options) {
   }
 
   const absolutePath = path.resolve(projectDir, pluginPath);
-  const cacheSuffix = options.cacheBust ? `?t=${options.cacheBust}` : "";
-  const module = await import(`${pathToFileURL(absolutePath).href}${cacheSuffix}`);
+  const module = await importProjectModule(absolutePath, options);
   const factoryOrPlugin = module.default ?? module;
   const plugin = typeof factoryOrPlugin === "function"
     ? await factoryOrPlugin(pluginConfig.options ?? {})

@@ -3,7 +3,7 @@ import { mkdtemp } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import createRebuildQueue from "../src/webhook/createRebuildQueue.js";
+import createRebuildQueue from "../src/queue/createRebuildQueue.js";
 import assertBuilderEditorAccess from "../src/visual-builder/production/assertBuilderEditorAccess.js";
 import createBuilderWorkflow from "../src/visual-builder/production/createBuilderWorkflow.js";
 import createLayoutRevisionStore from "../src/visual-builder/production/createLayoutRevisionStore.js";

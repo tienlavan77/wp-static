@@ -27,6 +27,14 @@ export default function createSessionStore() {
 
     getOrCreate(id) {
       return this.get(id) ?? this.create();
+    },
+
+    destroy(id) {
+      if (!id) {
+        return false;
+      }
+
+      return sessions.delete(id);
     }
   };
 }

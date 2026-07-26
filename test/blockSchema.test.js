@@ -2,7 +2,14 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import createBlockRegistry from "../src/blocks/createBlockRegistry.js";
 import createBlockSchema from "../src/blocks/createBlockSchema.js";
-import coreCommerceBlocks, { archiveLinksBlock, productPriceBlock } from "../src/blocks/core/commerceBlocks.js";
+import coreCommerceBlocks, {
+  archiveLinksBlock,
+  darkModeToggleBlock,
+  productPriceBlock,
+  siteHeaderBlock,
+  siteLogoBlock,
+  siteNavBlock
+} from "../src/blocks/core/commerceBlocks.js";
 import renderBlock from "../src/blocks/renderBlock.js";
 import resolveBlockBindings from "../src/blocks/resolveBlockBindings.js";
 import validateBlockProps from "../src/blocks/validateBlockProps.js";
@@ -107,10 +114,81 @@ test("core commerce blocks render bound content", () => {
   assert.match(archives.html, /href="\/dien-thoai"/);
 });
 
+test("site blocks render reusable header pieces", () => {
+  const logo = renderBlock(siteLogoBlock, {}, {
+    html,
+    site: {
+      title: "Tin Sinh Phát"
+    }
+  });
+  const nav = renderBlock(siteNavBlock, {
+    props: {
+      items: [{
+        href: "/",
+        label: "Trang chủ"
+      }, {
+        href: "/lien-he",
+        label: "Liên hệ"
+      }]
+    }
+  }, {
+    html
+  });
+  const toggle = renderBlock(darkModeToggleBlock, {}, {
+    html
+  });
+  const header = renderBlock(siteHeaderBlock, {
+    props: {
+      logoText: "Tin Sinh Phát",
+      navItems: [{
+        href: "/",
+        label: "Trang chủ"
+      }],
+      rows: [{
+        columns: [{
+          children: [{
+            blockName: "site/logo",
+            props: {
+              href: "/",
+              text: "Tin Sinh Phát"
+            }
+          }]
+        }, {
+          children: [{
+            blockName: "site/nav",
+            props: {
+              items: [{
+                href: "/",
+                label: "Trang chủ"
+              }]
+            }
+          }]
+        }]
+      }],
+      showDarkMode: true
+    }
+  }, {
+    html
+  });
+
+  assert.match(logo.html, /Tin Sinh Phát/);
+  assert.match(nav.html, /href="\/lien-he"/);
+  assert.match(toggle.html, /class="theme-toggle"/);
+  assert.match(toggle.html, /localStorage\.setItem\("wpsc-theme"/);
+  assert.match(header.html, /class="wpsc-site-header"/);
+  assert.match(header.html, /class="wpsc-site-header__row"/);
+  assert.match(header.html, /class="wpsc-site-header__column"/);
+  assert.match(header.html, /href="\/"/);
+});
+
 test("createBlockRegistry exposes core commerce blocks", () => {
   const registry = createBlockRegistry(coreCommerceBlocks);
 
   assert.equal(registry.has("commerce/product-price"), true);
   assert.equal(registry.get("commerce/archive-links").label, "Archive Links");
-  assert.equal(registry.all().length >= 4, true);
+  assert.equal(registry.has("site/logo"), true);
+  assert.equal(registry.has("site/nav"), true);
+  assert.equal(registry.has("site/dark-mode-toggle"), true);
+  assert.equal(registry.has("site/header"), true);
+  assert.equal(registry.all().length >= 8, true);
 });

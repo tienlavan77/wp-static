@@ -450,6 +450,7 @@ async function devProject(projectArg, port) {
 async function webhookProject(projectArg, port, options = {}) {
   const projectDir = path.resolve(projectArg);
   const webhookServer = createWebhookServer({
+    waitUntilBuilt: false,
     logger,
     projectDir,
     secret: options.secret

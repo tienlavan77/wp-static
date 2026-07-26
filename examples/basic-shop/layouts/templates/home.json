@@ -1,0 +1,10 @@
+{
+  "contentTypes": [
+    "home",
+    "page"
+  ],
+  "id": "home-builder-template",
+  "name": "Home Builder Template",
+  "sections": [],
+  "version": 1
+}
