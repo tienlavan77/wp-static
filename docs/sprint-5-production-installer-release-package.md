@@ -56,7 +56,7 @@ The product must not promise runtime build support on hosting that cannot execut
 | 004 | Production Build | Done |
 | 005 | Installation Lock | Done |
 | 006 | Release Builder CLI | Done |
-| 007 | Deployment Guide | Pending |
+| 007 | Deployment Guide | Done |
 | 008 | Installation Recovery | Pending |
 | 009 | Release Validation | Pending |
 | 010 | Documentation and Final Review | Pending |
@@ -221,6 +221,33 @@ Commit 006 does not include:
 - deployment guide
 - release validation
 - installation recovery
+
+## Commit 007 - Deployment Guide
+
+Deployment Guide documents how a user deploys a WPSC release package to production.
+
+Document:
+
+```text
+docs/release-deployment-guide.md
+```
+
+Responsibilities:
+
+- explain `vps` and `shared-hosting` deployment modes
+- show `wpsc release build` usage
+- show rsync upload workflow
+- provide Nginx example for release packages
+- list required server secrets
+- define post-install checks
+- document rollback and troubleshooting basics
+
+Commit 007 does not include:
+
+- new installer code
+- recovery flow
+- release validation
+- zip archive generation
 
 ## Immutable Release Package
 
