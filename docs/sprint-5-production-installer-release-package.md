@@ -58,7 +58,7 @@ The product must not promise runtime build support on hosting that cannot execut
 | 006 | Release Builder CLI | Done |
 | 007 | Deployment Guide | Done |
 | 008 | Installation Recovery | Done |
-| 009 | Release Validation | Pending |
+| 009 | Release Validation | Done |
 | 010 | Documentation and Final Review | Pending |
 
 ## Commit 001 - Release Package Structure
@@ -273,6 +273,33 @@ Commit 008 does not include:
 - automatic recovery decision making
 - release validation
 - zip archive generation
+
+## Commit 009 - Release Validation
+
+Release Validation checks whether a generated release package is ready for production deployment.
+
+Command:
+
+```bash
+wpsc release validate --release-dir <release-dir>
+```
+
+Responsibilities:
+
+- verify release root exists
+- verify required release directories
+- verify required bootstrap files
+- verify `release-manifest.json`
+- verify writable runtime directories
+- report installation lock state
+- return structured JSON output for automated checks
+
+Commit 009 does not include:
+
+- automatic fixes
+- deployment execution
+- browser validation UI
+- final Sprint 5 summary
 
 ## Immutable Release Package
 

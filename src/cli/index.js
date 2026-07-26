@@ -14,6 +14,7 @@ import watchBuildProject from "../dev-server/watchBuildProject.js";
 import runRsyncDeploy from "../deploy/runRsyncDeploy.js";
 import createInstallationLock from "../release/createInstallationLock.js";
 import buildReleasePackage from "../release/buildReleasePackage.js";
+import validateReleasePackage from "../release/validateReleasePackage.js";
 import createWebhookServer from "../webhook/createWebhookServer.js";
 import { getPackageInfo } from "../index.js";
 import createLogger from "../shared/createLogger.js";
@@ -122,6 +123,13 @@ async function main(cliArgs) {
       confirmed: cliArgs.includes("--confirm"),
       format: cliArgs.includes("--json") ? "json" : "text",
       reason: readOptionalArg(cliArgs, "--reason")
+    });
+    return;
+  }
+
+  if (cliArgs[0] === "release" && cliArgs[1] === "validate") {
+    await releaseValidate(readOptionalArg(cliArgs, "--release-dir") || readProjectArg(cliArgs), {
+      format: cliArgs.includes("--json") ? "json" : "text"
     });
     return;
   }
@@ -403,6 +411,25 @@ async function releaseRecover(releaseDir, options = {}) {
   logger.info(`Reason: ${result.reason}`);
 }
 
+async function releaseValidate(releaseDir, options = {}) {
+  const result = await validateReleasePackage({
+    releaseDir
+  });
+
+  if (options.format === "json") {
+    console.log(JSON.stringify(result, null, 2));
+  } else {
+    logger.info(`Release validation: ${result.ok ? "OK" : "Error"}`);
+    for (const checkResult of result.checks) {
+      logger.info(`  [${checkResult.status}] ${checkResult.message}`);
+    }
+  }
+
+  if (!result.ok) {
+    process.exitCode = 1;
+  }
+}
+
 async function devProject(projectArg, port) {
   const projectDir = path.resolve(projectArg);
   const devServer = await startDevServer(projectDir, {
@@ -467,6 +494,7 @@ function printHelp() {
   wpsc install [--project <project-dir>] [--wordpress-url <url>] [--woocommerce-url <url>] [--domain <url>] [--output-dir <dir>] [--theme <name>] [--site-name <name>] [--report <path>] [--force] [--json]
   wpsc release build [--project <project-dir>] [--output-dir <dir>] [--package-name <name>] [--mode vps|shared-hosting] [--clean] [--json]
   wpsc release recover [--release-dir <release-dir>] [--reason <text>] --confirm [--json]
+  wpsc release validate [--release-dir <release-dir>] [--json]
   wpsc serve [--project <project-dir>] [--port <port>]
   wpsc validate [--project <project-dir>] [--json]
   wpsc webhook [--project <project-dir>] [--port <port>] [--secret <secret>]

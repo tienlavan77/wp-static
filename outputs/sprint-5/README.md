@@ -16,7 +16,7 @@ In progress.
 | 006 | Release Builder CLI | Done |
 | 007 | Deployment Guide | Done |
 | 008 | Installation Recovery | Done |
-| 009 | Release Validation | Pending |
+| 009 | Release Validation | Done |
 | 010 | Documentation and Final Review | Pending |
 
 ## Sprint Rule
