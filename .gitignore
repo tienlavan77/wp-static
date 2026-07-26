@@ -12,4 +12,4 @@ examples/*/dist/
 examples/*/dist-local-preview/
 examples/*/release/
 examples/*/.wpsc/
-release/
+/release/

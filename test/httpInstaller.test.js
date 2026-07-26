@@ -128,3 +128,75 @@ test("createHttpInstaller blocks installer API when installation is locked", asy
   assert.equal(response.body.ok, false);
   assert.equal(response.body.error.code, "install.lock.exists");
 });
+
+test("createHttpInstaller completes install build with default executor", async () => {
+  const writes = [];
+  const locks = [];
+  const installer = createHttpInstaller({
+    installationLock: {
+      create: async (details) => {
+        locks.push(details);
+        return {
+          installed: true,
+          installedAt: "2026-07-26T00:00:00.000Z"
+        };
+      },
+      read: async () => ({
+        installed: false
+      })
+    },
+    persistConfiguration: async (options) => {
+      writes.push(options);
+      return {
+        ok: true,
+        projectPath: "/release/config/project.json",
+        runtimePath: "/release/config/runtime.json"
+      };
+    },
+    releaseDir: "/release"
+  });
+  const start = await installer.handle({
+    body: {
+      domain: "https://example.com",
+      siteName: "Example",
+      wordpressUrl: "https://api.example.com"
+    },
+    method: "POST",
+    path: "/install/start"
+  });
+  const sessionId = start.body.state.id;
+  await installer.handle({
+    body: {
+      sessionId
+    },
+    method: "POST",
+    path: "/install/check"
+  });
+  await installer.handle({
+    body: {
+      sessionId
+    },
+    method: "POST",
+    path: "/install/config"
+  });
+  const build = await installer.handle({
+    body: {
+      sessionId
+    },
+    method: "POST",
+    path: "/install/build"
+  });
+  const report = await installer.handle({
+    method: "GET",
+    path: "/install/report"
+  });
+
+  assert.equal(build.status, 200);
+  assert.equal(build.body.ok, true);
+  assert.equal(build.body.state.step, "FINISH");
+  assert.equal(build.body.state.progress.percent, 100);
+  assert.equal(writes.length, 1);
+  assert.equal(writes[0].releaseDir, "/release");
+  assert.equal(locks.length, 1);
+  assert.equal(report.body.report.production.ok, true);
+});

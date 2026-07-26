@@ -1,5 +1,7 @@
 import createWebInstallerUi from "../installer/createWebInstallerUi.js";
+import createInstallationConfigGenerator from "../installer/createInstallationConfigGenerator.js";
 import createWizardApi from "../installer/createWizardApi.js";
+import persistInstallationConfiguration from "./persistInstallationConfiguration.js";
 
 export const HTTP_INSTALLER_VERSION = "1.0";
 
@@ -63,9 +65,95 @@ function alreadyInstalledHtml(lock = {}) {
 </html>`;
 }
 
+async function runDefaultInstallExecutor({
+  body,
+  configurationGenerator,
+  installationLock,
+  persistConfiguration,
+  productionBuild,
+  releaseDir,
+  wizard
+}) {
+  const sessionId = body.sessionId;
+  const validate = wizard.transition(sessionId, "VALIDATE", {
+    reason: "http-install-validate"
+  });
+
+  if (!validate.ok) {
+    return validate;
+  }
+
+  const build = wizard.transition(sessionId, "BUILD", {
+    reason: "http-install-build"
+  });
+
+  if (!build.ok) {
+    return build;
+  }
+
+  try {
+    const input = build.state.input || {};
+    const configuration = configurationGenerator({
+      ...input,
+      mode: "production",
+      outputDir: "public",
+      projectDir: releaseDir,
+      woocommerceUrl: input.woocommerceUrl || input.wordpressUrl
+    });
+    const persistedConfiguration = await persistConfiguration({
+      configuration,
+      releaseDir
+    });
+    const production = productionBuild
+      ? await productionBuild.run(persistedConfiguration, {
+        projectDir: releaseDir
+      })
+      : {
+        build: {
+          skipped: true,
+          reason: "No production build runner was configured."
+        },
+        ok: true
+      };
+
+    if (production.ok === false) {
+      return wizard.fail(
+        sessionId,
+        "install.production_build.failed",
+        production.diagnostics?.errors?.[0]?.message || "Production build failed.",
+        production
+      );
+    }
+
+    const lock = installationLock
+      ? await installationLock.create({
+        build: production.build || null,
+        source: "http-installer"
+      })
+      : null;
+
+    return wizard.finish(sessionId, {
+      lock,
+      persistedConfiguration,
+      production,
+      reason: "http-install-finished"
+    });
+  } catch (error) {
+    return wizard.fail(sessionId, "install.executor.failed", error.message, {
+      message: error.message
+    });
+  }
+}
+
 export default function createHttpInstaller(options = {}) {
   const wizard = options.wizardApi || createWizardApi();
   const installationLock = options.installationLock || null;
+  const releaseDir = options.releaseDir || process.cwd();
+  const configurationGenerator = options.configurationGenerator || createInstallationConfigGenerator;
+  const persistConfiguration = options.persistConfiguration || persistInstallationConfiguration;
+  const productionBuild = options.productionBuild || null;
+  const installExecutor = options.installExecutor || runDefaultInstallExecutor;
+  let report = options.report || null;
   const ui = options.ui || createWebInstallerUi({
     apiBase: "/install"
   });
@@ -122,15 +210,25 @@ export default function createHttpInstaller(options = {}) {
 
     if (methodIs(request, "POST") && pathname === "/install/build") {
       const body = request.body || {};
-      return jsonResponse(200, wizard.transition(body.sessionId, "VALIDATE", {
-        reason: "http-install-validate"
-      }));
+      const result = await installExecutor({
+        body,
+        configurationGenerator,
+        installationLock,
+        persistConfiguration,
+        productionBuild,
+        releaseDir,
+        wizard
+      });
+      if (result.ok && result.state?.step === "FINISH") {
+        report = result.state.result;
+      }
+      return jsonResponse(result.ok ? 200 : 500, result);
     }
 
     if (methodIs(request, "GET") && pathname === "/install/report") {
       return jsonResponse(200, {
         ok: true,
-        report: options.report || null
+        report
       });
     }
 
