@@ -2,7 +2,7 @@
 
 ## Status
 
-In progress.
+Completed.
 
 ## Commit Tracking
 
@@ -17,8 +17,12 @@ In progress.
 | 007 | Deployment Guide | Done |
 | 008 | Installation Recovery | Done |
 | 009 | Release Validation | Done |
-| 010 | Documentation and Final Review | Pending |
+| 010 | Documentation and Final Review | Done |
 
 ## Sprint Rule
 
 Sprint 5 connects the Sprint 4 Installation Experience to production hosting. It must not redesign Installer primitives, Runtime Kernel, Core Engine, or Build Platform.
+
+## Final Review
+
+See `outputs/sprint-5/final-review.md`.

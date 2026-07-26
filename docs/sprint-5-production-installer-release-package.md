@@ -1,7 +1,7 @@
 # WPSC Sprint 5 - Production Installer & Release Package
 
 **Version:** 1.0 Roadmap  
-**Status:** In Progress  
+**Status:** Completed  
 **Prerequisite:** Sprint 4 Installation Experience Completed
 
 ## Overview
@@ -59,7 +59,7 @@ The product must not promise runtime build support on hosting that cannot execut
 | 007 | Deployment Guide | Done |
 | 008 | Installation Recovery | Done |
 | 009 | Release Validation | Done |
-| 010 | Documentation and Final Review | Pending |
+| 010 | Documentation and Final Review | Done |
 
 ## Commit 001 - Release Package Structure
 
@@ -301,6 +301,34 @@ Commit 009 does not include:
 - browser validation UI
 - final Sprint 5 summary
 
+## Commit 010 - Documentation and Final Review
+
+Documentation and Final Review closes Sprint 5.
+
+Documents:
+
+```text
+outputs/sprint-5/final-review.md
+outputs/sprint-5/commit-010-documentation-final-review.diff.md
+outputs/sprint-5/reviews/commit-010-review.md
+```
+
+Responsibilities:
+
+- mark Sprint 5 as completed
+- summarize all Sprint 5 deliverables
+- document the release package command flow
+- document verification commands
+- identify what remains out of scope
+- confirm architecture boundaries were preserved
+
+Commit 010 does not include:
+
+- new installer code
+- new release commands
+- zip archive generation
+- deployment automation
+
 ## Immutable Release Package
 
 During installation WPSC may create:
@@ -329,3 +357,54 @@ Sprint 5 is complete when:
 - production builds execute successfully where supported
 - installation is protected against repeated execution
 - documentation enables deployment without developer assistance
+
+## Final Command Flow
+
+Build a release package:
+
+```bash
+wpsc release build --project <project-dir> --output-dir <release-dir> --mode vps --clean
+```
+
+Validate the release:
+
+```bash
+wpsc release validate --release-dir <release-dir>
+```
+
+Deploy to a VPS:
+
+```bash
+rsync -av --delete <release-dir>/ user@host:/path/to/site/
+```
+
+Recover an interrupted installation only when needed:
+
+```bash
+wpsc release recover --release-dir <release-dir> --reason <reason> --confirm
+```
+
+## Final Review
+
+Sprint 5 completes the production installer and release package foundation.
+
+Delivered:
+
+- release package structure
+- HTTP installer surface
+- persistent installation configuration
+- production install build primitive
+- installation lock
+- controlled recovery
+- release builder CLI
+- deployment guide
+- release validation
+- final review documentation
+
+Still intentionally out of scope:
+
+- zip archive generation
+- provider-specific deployment automation
+- browser recovery UI
+- cloud release dashboard
+- shared-hosting runtime build guarantee
