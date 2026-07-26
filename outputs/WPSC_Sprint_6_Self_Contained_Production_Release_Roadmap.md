@@ -156,6 +156,55 @@ location / {
 }
 ```
 
+## Release Kernel Refactor Guardrails
+
+The initial `public/index.php` may stay thin during early Sprint 6 commits, but it must not grow into a large procedural controller.
+
+Before Commit 006-008 add build, verification, install lock finalization, health, maintenance, or webhook behavior, split release request handling into explicit runtime pieces:
+
+```text
+public/index.php
+-> ReleaseKernel
+-> InstallerDetector
+-> StaticDispatcher
+-> Response
+```
+
+Static file serving must also be isolated before adding cache or delivery features:
+
+```text
+StaticDispatcher
+-> StaticFileResponder
+```
+
+`StaticFileResponder` is the future owner for:
+
+- `readfile()` usage
+- content type
+- cache headers
+- security headers
+- gzip or precompressed output
+- ETag or conditional responses
+
+`installer/setup.php` must remain a view only.
+
+Allowed:
+
+- render setup shell
+- render setup form
+- load static setup assets
+
+Forbidden:
+
+- handle POST logic
+- validate credentials
+- write config files
+- run build
+- create install lock
+- process webhook
+
+All setup actions must go through installer API/service code shared with the future Production CLI.
+
 ## Setup Inputs
 
 The setup UI must collect:

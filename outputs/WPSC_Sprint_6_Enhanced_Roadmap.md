@@ -62,3 +62,26 @@ Upload -> wpsc verify -> wpsc setup -> wpsc build -> Lock -> Online
 
 Support both Browser-first and CLI-first deployment using the same
 installation services.
+
+## Release Front Controller Guardrails
+
+`public/index.php` must remain a thin front controller.
+
+Before Sprint 6 adds source verification, build execution, installer
+locking, webhook rebuilds, health checks, preview, or maintenance behavior,
+release request handling should move behind:
+
+``` text
+public/index.php
+-> ReleaseKernel
+-> InstallerDetector
+-> StaticDispatcher
+-> Response
+```
+
+Static file delivery should later move into `StaticFileResponder` so cache,
+security headers, gzip, and ETag support do not expand the front controller.
+
+`installer/setup.php` must remain a view only. It may render setup UI, but it
+must not handle POST, validate credentials, write config, run build, create
+locks, or process webhooks.
