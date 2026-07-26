@@ -29,8 +29,20 @@ test("createReleasePackageStructure includes release bootstrap files", () => {
     RELEASE_PACKAGE_FILES.map((file) => file.path)
   );
   assert.match(
-    structure.files.find((file) => file.path === "index.php").contents,
-    /installer\/bootstrap.php/
+    structure.files.find((file) => file.path === "public/index.php").contents,
+    /config\/install\.lock/
+  );
+  assert.match(
+    structure.files.find((file) => file.path === "public/index.php").contents,
+    /installer\/setup\.php/
+  );
+  assert.match(
+    structure.files.find((file) => file.path === "installer/bootstrap.php").contents,
+    /data-wpsc-already-installed/
+  );
+  assert.match(
+    structure.files.find((file) => file.path === "installer/setup.php").contents,
+    /data-wpsc-setup-fallback/
   );
   assert.match(
     structure.files.find((file) => file.path === "config/install-state.json").contents,
