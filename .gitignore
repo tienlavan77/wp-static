@@ -13,3 +13,6 @@ examples/*/dist-local-preview/
 examples/*/release/
 examples/*/.wpsc/
 /release/
+sites/*/dist/
+sites/*/.wpsc/
+*.swp
