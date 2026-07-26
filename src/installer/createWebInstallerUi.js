@@ -16,6 +16,7 @@ const stateEl = document.querySelector("[data-wpsc-installer-state]");
 const progressEl = document.querySelector("[data-wpsc-installer-progress]");
 const diagnosticsEl = document.querySelector("[data-wpsc-installer-diagnostics]");
 const form = document.querySelector("[data-wpsc-installer-form]");
+const submitButton = form.querySelector("button[type='submit']");
 
 function renderState(payload) {
   const state = payload.state || {};
@@ -33,6 +34,10 @@ function renderState(payload) {
   }
 }
 
+function renderError(error) {
+  diagnosticsEl.insertAdjacentHTML("beforeend", "<li class=\\"error\\">" + (error.message || "Installation failed.") + "</li>");
+}
+
 async function postJson(path, body) {
   const response = await fetch(apiBase + path, {
     method: "POST",
@@ -42,15 +47,47 @@ async function postJson(path, body) {
     body: JSON.stringify(body)
   });
 
-  return response.json();
+  const payload = await response.json();
+
+  if (!response.ok || payload.ok === false) {
+    const message = payload.error?.message || payload.state?.diagnostics?.errors?.[0]?.message || "Installer request failed.";
+    throw new Error(message);
+  }
+
+  return payload;
+}
+
+async function runInstall(payload) {
+  const start = await postJson("/start", payload);
+  renderState(start);
+
+  const sessionId = start.state?.id;
+  if (!sessionId) {
+    throw new Error("Installer session was not created.");
+  }
+
+  for (const path of ["/check", "/config", "/build"]) {
+    const result = await postJson(path, { sessionId });
+    renderState(result);
+  }
 }
 
 form.addEventListener("submit", async (event) => {
   event.preventDefault();
   const formData = new FormData(form);
   const payload = Object.fromEntries(formData.entries());
-  const result = await postJson("/start", payload);
-  renderState(result);
+  submitButton.disabled = true;
+  submitButton.textContent = "Installing...";
+  diagnosticsEl.innerHTML = "";
+
+  try {
+    await runInstall(payload);
+  } catch (error) {
+    renderError(error);
+  } finally {
+    submitButton.disabled = false;
+    submitButton.textContent = "Start installation";
+  }
 });
 `;
 }

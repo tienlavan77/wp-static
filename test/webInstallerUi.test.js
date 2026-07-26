@@ -26,6 +26,8 @@ test("createWebInstallerUi exposes separate css and js assets", () => {
   assert.match(ui.assets.css, /#0c6349/);
   assert.match(ui.assets.js, /fetch\(apiBase \+ path/);
   assert.match(ui.assets.js, /renderState/);
+  assert.match(ui.assets.js, /runInstall/);
+  assert.match(ui.assets.js, /"\/check", "\/config", "\/build"/);
 });
 
 test("createWebInstallerUi escapes title and api base", () => {
