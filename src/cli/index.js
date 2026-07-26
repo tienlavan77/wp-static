@@ -12,6 +12,7 @@ import serveStatic from "../dev-server/serveStatic.js";
 import startDevServer from "../dev-server/startDevServer.js";
 import watchBuildProject from "../dev-server/watchBuildProject.js";
 import runRsyncDeploy from "../deploy/runRsyncDeploy.js";
+import buildReleasePackage from "../release/buildReleasePackage.js";
 import createWebhookServer from "../webhook/createWebhookServer.js";
 import { getPackageInfo } from "../index.js";
 import createLogger from "../shared/createLogger.js";
@@ -100,6 +101,17 @@ async function main(cliArgs) {
       theme: readOptionalArg(cliArgs, "--theme"),
       woocommerceUrl: readOptionalArg(cliArgs, "--woocommerce-url"),
       wordpressUrl: readOptionalArg(cliArgs, "--wordpress-url")
+    });
+    return;
+  }
+
+  if (cliArgs[0] === "release" && cliArgs[1] === "build") {
+    await releaseBuild(readProjectArg(cliArgs), {
+      clean: cliArgs.includes("--clean"),
+      format: cliArgs.includes("--json") ? "json" : "text",
+      mode: readOptionalArg(cliArgs, "--mode"),
+      outputDir: readOptionalArg(cliArgs, "--output-dir"),
+      packageName: readOptionalArg(cliArgs, "--package-name")
     });
     return;
   }
@@ -335,6 +347,29 @@ async function deployRsync(projectArg, options = {}) {
   logger.info(`Deployed ${config.name} to ${options.target}${options.dryRun ? " (dry run)" : ""}`);
 }
 
+async function releaseBuild(projectArg, options = {}) {
+  const result = await buildReleasePackage({
+    clean: options.clean,
+    mode: options.mode,
+    outputDir: options.outputDir,
+    packageName: options.packageName,
+    projectDir: projectArg
+  });
+
+  if (options.format === "json") {
+    console.log(JSON.stringify(result, null, 2));
+    return;
+  }
+
+  logger.info(`Release package created: ${result.outputDir}`);
+  logger.info(`Mode: ${result.structure.mode}`);
+  logger.info(`Manifest: ${result.manifestPath}`);
+  logger.info("Copied:");
+  for (const [name, targetPath] of Object.entries(result.copied)) {
+    logger.info(`  ${name}: ${targetPath || "not found"}`);
+  }
+}
+
 async function devProject(projectArg, port) {
   const projectDir = path.resolve(projectArg);
   const devServer = await startDevServer(projectDir, {
@@ -397,6 +432,7 @@ function printHelp() {
   wpsc dev [--project <project-dir>] [--port <port>]
   wpsc doctor [--project <project-dir>] [--json]
   wpsc install [--project <project-dir>] [--wordpress-url <url>] [--woocommerce-url <url>] [--domain <url>] [--output-dir <dir>] [--theme <name>] [--site-name <name>] [--report <path>] [--force] [--json]
+  wpsc release build [--project <project-dir>] [--output-dir <dir>] [--package-name <name>] [--mode vps|shared-hosting] [--clean] [--json]
   wpsc serve [--project <project-dir>] [--port <port>]
   wpsc validate [--project <project-dir>] [--json]
   wpsc webhook [--project <project-dir>] [--port <port>] [--secret <secret>]

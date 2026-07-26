@@ -13,7 +13,7 @@ In progress.
 | 003 | Persistent Configuration | Done |
 | 004 | Production Build | Done |
 | 005 | Installation Lock | Done |
-| 006 | Release Builder CLI | Pending |
+| 006 | Release Builder CLI | Done |
 | 007 | Deployment Guide | Pending |
 | 008 | Installation Recovery | Pending |
 | 009 | Release Validation | Pending |

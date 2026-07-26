@@ -55,7 +55,7 @@ The product must not promise runtime build support on hosting that cannot execut
 | 003 | Persistent Configuration | Done |
 | 004 | Production Build | Done |
 | 005 | Installation Lock | Done |
-| 006 | Release Builder CLI | Pending |
+| 006 | Release Builder CLI | Done |
 | 007 | Deployment Guide | Pending |
 | 008 | Installation Recovery | Pending |
 | 009 | Release Validation | Pending |
@@ -190,6 +190,37 @@ Commit 005 does not include:
 - release zip creation
 - deployment guide
 - writing the lock automatically from the production build route
+
+## Commit 006 - Release Builder CLI
+
+Release Builder CLI creates a deployable release directory from a project.
+
+Command:
+
+```bash
+wpsc release build --project <project-dir> --output-dir <release-dir>
+```
+
+Options:
+
+- `--package-name <name>`
+- `--mode vps|shared-hosting`
+- `--clean`
+- `--json`
+
+Responsibilities:
+
+- create the release package structure from Commit 001
+- copy optional project `public/`, `themes/`, and `plugins/` directories
+- generate `release-manifest.json`
+- expose clear text and JSON CLI output
+
+Commit 006 does not include:
+
+- zip archive generation
+- deployment guide
+- release validation
+- installation recovery
 
 ## Immutable Release Package
 
