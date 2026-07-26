@@ -54,7 +54,7 @@ The product must not promise runtime build support on hosting that cannot execut
 | 002 | HTTP Installer | Done |
 | 003 | Persistent Configuration | Done |
 | 004 | Production Build | Done |
-| 005 | Installation Lock | Pending |
+| 005 | Installation Lock | Done |
 | 006 | Release Builder CLI | Pending |
 | 007 | Deployment Guide | Pending |
 | 008 | Installation Recovery | Pending |
@@ -164,6 +164,32 @@ Commit 004 does not include:
 - enforcing installation lock
 - HTTP route wiring
 - release zip creation
+
+## Commit 005 - Installation Lock
+
+Installation Lock prevents repeated browser installation after a production install has completed.
+
+Generated file:
+
+```text
+config/install.lock
+```
+
+Responsibilities:
+
+- read unlocked, locked, and corrupt lock states
+- create lock files using atomic temp-file replacement
+- treat corrupt lock files as installed for safety
+- expose `assertNotInstalled()` for installer guards
+- redirect `GET /install` to `GET /install/already-installed`
+- return structured `409` responses for locked installer API calls
+
+Commit 005 does not include:
+
+- recovery or unlock workflow
+- release zip creation
+- deployment guide
+- writing the lock automatically from the production build route
 
 ## Immutable Release Package
 

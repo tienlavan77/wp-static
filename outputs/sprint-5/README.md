@@ -12,7 +12,7 @@ In progress.
 | 002 | HTTP Installer | Done |
 | 003 | Persistent Configuration | Done |
 | 004 | Production Build | Done |
-| 005 | Installation Lock | Pending |
+| 005 | Installation Lock | Done |
 | 006 | Release Builder CLI | Pending |
 | 007 | Deployment Guide | Pending |
 | 008 | Installation Recovery | Pending |

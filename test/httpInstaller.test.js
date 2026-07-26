@@ -81,3 +81,50 @@ test("createHttpInstaller returns report and structured not found responses", as
   assert.equal(missing.body.ok, false);
   assert.equal(missing.body.error.code, "http.installer.not_found");
 });
+
+test("createHttpInstaller redirects install UI when installation is locked", async () => {
+  const installer = createHttpInstaller({
+    installationLock: {
+      read: async () => ({
+        installed: true,
+        installedAt: "2026-07-26T00:00:00.000Z",
+        lockPath: "/release/config/install.lock"
+      })
+    }
+  });
+
+  const response = await installer.handle({
+    method: "GET",
+    path: "/install"
+  });
+  const alreadyInstalled = await installer.handle({
+    method: "GET",
+    path: "/install/already-installed"
+  });
+
+  assert.equal(response.status, 303);
+  assert.equal(response.headers.location, "/install/already-installed");
+  assert.equal(alreadyInstalled.status, 200);
+  assert.match(alreadyInstalled.body, /data-wpsc-already-installed/);
+});
+
+test("createHttpInstaller blocks installer API when installation is locked", async () => {
+  const installer = createHttpInstaller({
+    installationLock: {
+      read: async () => ({
+        installed: true,
+        lockPath: "/release/config/install.lock"
+      })
+    }
+  });
+
+  const response = await installer.handle({
+    body: {},
+    method: "POST",
+    path: "/install/start"
+  });
+
+  assert.equal(response.status, 409);
+  assert.equal(response.body.ok, false);
+  assert.equal(response.body.error.code, "install.lock.exists");
+});
