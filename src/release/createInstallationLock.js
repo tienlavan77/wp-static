@@ -19,6 +19,10 @@ async function writeJsonAtomic(filePath, value) {
   return filePath;
 }
 
+function safeTimestamp(value) {
+  return String(value).replace(/[^0-9A-Za-z.-]/g, "-");
+}
+
 export default function createInstallationLock(options = {}) {
   const releaseDir = path.resolve(options.releaseDir || process.cwd());
   const configDir = path.resolve(releaseDir, options.configDir || "config");
@@ -113,6 +117,52 @@ export default function createInstallationLock(options = {}) {
     return lock;
   }
 
+  async function recover(options = {}) {
+    const lock = await read();
+    const recoveredAt = options.recoveredAt || new Date().toISOString();
+    const reason = options.reason || "manual-recovery";
+
+    if (!lock.exists) {
+      return {
+        action: "none",
+        archivedPath: null,
+        lock,
+        ok: true,
+        recoveredAt,
+        reason
+      };
+    }
+
+    if (options.confirmed !== true) {
+      throw createLockError(
+        "install.recovery.confirmation_required",
+        "Installation recovery requires explicit confirmation.",
+        {
+          lockPath,
+          reason
+        }
+      );
+    }
+
+    const archivedPath = path.join(
+      configDir,
+      `install.lock.recovered.${safeTimestamp(recoveredAt)}.json`
+    );
+    await mkdir(configDir, {
+      recursive: true
+    });
+    await rename(lockPath, archivedPath);
+
+    return {
+      action: "archived-lock",
+      archivedPath,
+      lock,
+      ok: true,
+      recoveredAt,
+      reason
+    };
+  }
+
   return {
     assertNotInstalled,
     configDir,
@@ -120,6 +170,7 @@ export default function createInstallationLock(options = {}) {
     isInstalled,
     lockPath,
     read,
+    recover,
     releaseDir,
     version: INSTALLATION_LOCK_VERSION
   };

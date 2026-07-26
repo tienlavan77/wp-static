@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtemp, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -88,4 +88,62 @@ test("createInstallationLock treats corrupt lock as installed", async () => {
   await assert.rejects(() => lock.assertNotInstalled(), {
     code: "install.lock.corrupt"
   });
+});
+
+test("createInstallationLock recovery requires explicit confirmation", async () => {
+  const releaseDir = await fixtureDir();
+  const lock = createInstallationLock({
+    releaseDir
+  });
+
+  await lock.create({
+    installedAt: "2026-07-26T00:00:00.000Z"
+  });
+
+  await assert.rejects(() => lock.recover(), {
+    code: "install.recovery.confirmation_required"
+  });
+  assert.equal((await lock.read()).installed, true);
+});
+
+test("createInstallationLock recovery archives lock instead of deleting it", async () => {
+  const releaseDir = await fixtureDir();
+  const lock = createInstallationLock({
+    releaseDir
+  });
+
+  await lock.create({
+    buildId: "build-001",
+    installedAt: "2026-07-26T00:00:00.000Z"
+  });
+  const result = await lock.recover({
+    confirmed: true,
+    reason: "broken-install",
+    recoveredAt: "2026-07-26T01:00:00.000Z"
+  });
+  const archived = JSON.parse(await readFile(result.archivedPath, "utf8"));
+  const state = await lock.read();
+
+  assert.equal(result.ok, true);
+  assert.equal(result.action, "archived-lock");
+  assert.equal(result.reason, "broken-install");
+  assert.equal(archived.buildId, "build-001");
+  assert.equal(state.installed, false);
+  assert.equal(state.exists, false);
+});
+
+test("createInstallationLock recovery is a no-op when no lock exists", async () => {
+  const releaseDir = await fixtureDir();
+  const lock = createInstallationLock({
+    releaseDir
+  });
+
+  const result = await lock.recover({
+    confirmed: true,
+    reason: "no-lock"
+  });
+
+  assert.equal(result.ok, true);
+  assert.equal(result.action, "none");
+  assert.equal(result.archivedPath, null);
 });

@@ -12,6 +12,7 @@ import serveStatic from "../dev-server/serveStatic.js";
 import startDevServer from "../dev-server/startDevServer.js";
 import watchBuildProject from "../dev-server/watchBuildProject.js";
 import runRsyncDeploy from "../deploy/runRsyncDeploy.js";
+import createInstallationLock from "../release/createInstallationLock.js";
 import buildReleasePackage from "../release/buildReleasePackage.js";
 import createWebhookServer from "../webhook/createWebhookServer.js";
 import { getPackageInfo } from "../index.js";
@@ -112,6 +113,15 @@ async function main(cliArgs) {
       mode: readOptionalArg(cliArgs, "--mode"),
       outputDir: readOptionalArg(cliArgs, "--output-dir"),
       packageName: readOptionalArg(cliArgs, "--package-name")
+    });
+    return;
+  }
+
+  if (cliArgs[0] === "release" && cliArgs[1] === "recover") {
+    await releaseRecover(readOptionalArg(cliArgs, "--release-dir") || readProjectArg(cliArgs), {
+      confirmed: cliArgs.includes("--confirm"),
+      format: cliArgs.includes("--json") ? "json" : "text",
+      reason: readOptionalArg(cliArgs, "--reason")
     });
     return;
   }
@@ -370,6 +380,29 @@ async function releaseBuild(projectArg, options = {}) {
   }
 }
 
+async function releaseRecover(releaseDir, options = {}) {
+  const lock = createInstallationLock({
+    releaseDir
+  });
+  const result = await lock.recover({
+    confirmed: options.confirmed,
+    reason: options.reason || "cli-release-recovery"
+  });
+
+  if (options.format === "json") {
+    console.log(JSON.stringify(result, null, 2));
+    return;
+  }
+
+  if (result.action === "none") {
+    logger.info(`No installation lock found in ${lock.configDir}`);
+    return;
+  }
+
+  logger.info(`Installation lock archived: ${result.archivedPath}`);
+  logger.info(`Reason: ${result.reason}`);
+}
+
 async function devProject(projectArg, port) {
   const projectDir = path.resolve(projectArg);
   const devServer = await startDevServer(projectDir, {
@@ -433,6 +466,7 @@ function printHelp() {
   wpsc doctor [--project <project-dir>] [--json]
   wpsc install [--project <project-dir>] [--wordpress-url <url>] [--woocommerce-url <url>] [--domain <url>] [--output-dir <dir>] [--theme <name>] [--site-name <name>] [--report <path>] [--force] [--json]
   wpsc release build [--project <project-dir>] [--output-dir <dir>] [--package-name <name>] [--mode vps|shared-hosting] [--clean] [--json]
+  wpsc release recover [--release-dir <release-dir>] [--reason <text>] --confirm [--json]
   wpsc serve [--project <project-dir>] [--port <port>]
   wpsc validate [--project <project-dir>] [--json]
   wpsc webhook [--project <project-dir>] [--port <port>] [--secret <secret>]

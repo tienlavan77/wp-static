@@ -15,7 +15,7 @@ In progress.
 | 005 | Installation Lock | Done |
 | 006 | Release Builder CLI | Done |
 | 007 | Deployment Guide | Done |
-| 008 | Installation Recovery | Pending |
+| 008 | Installation Recovery | Done |
 | 009 | Release Validation | Pending |
 | 010 | Documentation and Final Review | Pending |
 

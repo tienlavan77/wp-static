@@ -57,7 +57,7 @@ The product must not promise runtime build support on hosting that cannot execut
 | 005 | Installation Lock | Done |
 | 006 | Release Builder CLI | Done |
 | 007 | Deployment Guide | Done |
-| 008 | Installation Recovery | Pending |
+| 008 | Installation Recovery | Done |
 | 009 | Release Validation | Pending |
 | 010 | Documentation and Final Review | Pending |
 
@@ -246,6 +246,31 @@ Commit 007 does not include:
 
 - new installer code
 - recovery flow
+- release validation
+- zip archive generation
+
+## Commit 008 - Installation Recovery
+
+Installation Recovery provides a controlled way to recover an interrupted or broken installation.
+
+Command:
+
+```bash
+wpsc release recover --release-dir <release-dir> --confirm
+```
+
+Responsibilities:
+
+- require explicit confirmation before modifying the lock
+- archive `config/install.lock` instead of deleting it
+- preserve the previous lock for audit/debugging
+- return a no-op result when no lock exists
+- expose structured JSON output for support workflows
+
+Commit 008 does not include:
+
+- browser recovery UI
+- automatic recovery decision making
 - release validation
 - zip archive generation
 
