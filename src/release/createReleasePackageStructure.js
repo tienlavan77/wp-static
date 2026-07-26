@@ -112,6 +112,52 @@ require __DIR__ . '/setup.php';
       background: #eef6f3;
       padding: 2px 6px;
     }
+    form {
+      display: grid;
+      gap: 20px;
+    }
+    fieldset {
+      border: 1px solid #d9e5e1;
+      margin: 0;
+      padding: 20px;
+    }
+    legend {
+      color: #0c6349;
+      font-weight: 600;
+      padding: 0 8px;
+    }
+    .grid {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    label {
+      display: grid;
+      gap: 8px;
+    }
+    input {
+      border: 1px solid #b8cbc5;
+      border-radius: 0;
+      font: inherit;
+      padding: 12px;
+    }
+    button {
+      border: 0;
+      border-radius: 0;
+      background: #0c6349;
+      color: #fff;
+      cursor: pointer;
+      font: inherit;
+      padding: 12px 18px;
+    }
+    small {
+      color: #5d756d;
+    }
+    @media (max-width: 760px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 <body>
@@ -119,9 +165,42 @@ require __DIR__ . '/setup.php';
     <section>
       <h1>WPSC Setup</h1>
       <p>This release is not installed yet.</p>
-      <p>The setup app will run here on first visit without requiring a custom virtual host route.</p>
-      <p>Next step: connect this fallback to the shared Browser Wizard and Production CLI service layer.</p>
-      <p>Expected generated lock: <code>config/install.lock</code></p>
+      <form method="post" action="/setup" data-wpsc-release-setup-form>
+        <fieldset>
+          <legend>Site</legend>
+          <div class="grid">
+            <label>Site name <input name="siteName" type="text" required></label>
+            <label>Site domain <input name="domain" type="url" required></label>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>WordPress source</legend>
+          <div class="grid">
+            <label>WordPress API URL <input name="wordpressUrl" type="url" required></label>
+            <label>WooCommerce API URL <input name="woocommerceUrl" type="url" required></label>
+            <label>WordPress username <input name="wordpressUsername" type="text" autocomplete="username" required></label>
+            <label>WordPress application password <input name="wordpressApplicationPassword" type="password" autocomplete="current-password" required></label>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>WooCommerce credentials</legend>
+          <div class="grid">
+            <label>Consumer key <input name="wooConsumerKey" type="password" autocomplete="off" required></label>
+            <label>Consumer secret <input name="wooConsumerSecret" type="password" autocomplete="off" required></label>
+          </div>
+        </fieldset>
+        <fieldset>
+          <legend>Runtime secrets</legend>
+          <div class="grid">
+            <label>Session secret <input name="sessionSecret" type="password" autocomplete="off" required></label>
+            <label>Auth bridge secret <input name="authBridgeSecret" type="password" autocomplete="off" required></label>
+            <label>Webhook secret <input name="webhookSecret" type="password" autocomplete="off" required></label>
+            <label>Runtime port <input name="runtimePort" type="number" min="1" max="65535" placeholder="8787"></label>
+          </div>
+        </fieldset>
+        <small>Expected generated lock: <code>config/install.lock</code>. Secrets must never be written to public output.</small>
+        <button type="submit">Start installation</button>
+      </form>
     </section>
   </main>
 </body>

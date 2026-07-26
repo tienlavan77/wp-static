@@ -19,12 +19,37 @@ test("createWebInstallerUi renders installer shell", () => {
   assert.match(ui.html, /\/install-api/);
 });
 
+test("createWebInstallerUi renders production setup input fields", () => {
+  const ui = createWebInstallerUi();
+
+  for (const field of [
+    "siteName",
+    "domain",
+    "wordpressUrl",
+    "woocommerceUrl",
+    "wordpressUsername",
+    "wordpressApplicationPassword",
+    "wooConsumerKey",
+    "wooConsumerSecret",
+    "sessionSecret",
+    "authBridgeSecret",
+    "webhookSecret",
+    "runtimePort"
+  ]) {
+    assert.match(ui.html, new RegExp(`name="${field}"`));
+  }
+
+  assert.match(ui.html, /Secrets stay out of public output/);
+});
+
 test("createWebInstallerUi exposes separate css and js assets", () => {
   const ui = createWebInstallerUi();
 
   assert.match(ui.assets.css, /\.wpsc-installer/);
   assert.match(ui.assets.css, /#0c6349/);
   assert.match(ui.assets.js, /fetch\(apiBase \+ path/);
+  assert.match(ui.assets.js, /requiredFields/);
+  assert.match(ui.assets.js, /Missing setup fields/);
   assert.match(ui.assets.js, /renderState/);
   assert.match(ui.assets.js, /runInstall/);
   assert.match(ui.assets.js, /"\/check", "\/config", "\/build"/);

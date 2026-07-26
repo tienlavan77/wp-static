@@ -45,6 +45,14 @@ test("createReleasePackageStructure includes release bootstrap files", () => {
     /data-wpsc-setup-fallback/
   );
   assert.match(
+    structure.files.find((file) => file.path === "installer/setup.php").contents,
+    /name="wooConsumerKey"/
+  );
+  assert.match(
+    structure.files.find((file) => file.path === "installer/setup.php").contents,
+    /name="webhookSecret"/
+  );
+  assert.match(
     structure.files.find((file) => file.path === "config/install-state.json").contents,
     /"installed": false/
   );
