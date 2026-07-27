@@ -23,4 +23,10 @@ test("createSiteUuid rejects invalid UUIDs", () => {
     }),
     /Invalid site uuid/
   );
+  assert.throws(
+    () => createSiteUuid({
+      uuid: "8d20de63-68f1-13cf-a28f-f62a347695a1"
+    }),
+    /Invalid site uuid/
+  );
 });

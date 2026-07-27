@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtemp, rm } from "node:fs/promises";
+import { mkdir, mkdtemp, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -20,6 +20,18 @@ test("createSiteLoader loads metadata and site-local paths", async () => {
 
   try {
     await repository.writeMetadata("tinsinhphat", metadata);
+    await mkdir(path.join(workspaceDir, "sites", "tinsinhphat", "storage"), {
+      recursive: true
+    });
+    await mkdir(path.join(workspaceDir, "sites", "tinsinhphat", "public"), {
+      recursive: true
+    });
+    await mkdir(path.join(workspaceDir, "sites", "tinsinhphat", "themes"), {
+      recursive: true
+    });
+    await mkdir(path.join(workspaceDir, "sites", "tinsinhphat", "plugins"), {
+      recursive: true
+    });
     const loader = createSiteLoader({
       repository
     });
@@ -29,6 +41,33 @@ test("createSiteLoader loads metadata and site-local paths", async () => {
     assert.deepEqual(site.metadata, metadata);
     assert.equal(site.pathPolicy.isAllowed(site.paths.publicDist), true);
     assert.equal(site.pathPolicy.isAllowed(path.join(workspaceDir, "sites", "other")), false);
+  } finally {
+    await rm(workspaceDir, {
+      force: true,
+      recursive: true
+    });
+  }
+});
+
+test("createSiteLoader rejects incomplete site folders", async () => {
+  const workspaceDir = await mkdtemp(path.join(os.tmpdir(), "wpsc-site-loader-missing-"));
+  const repository = createSiteRepository({
+    workspaceDir
+  });
+
+  try {
+    await repository.writeMetadata("tinsinhphat", createSiteMetadata({
+      name: "tinsinhphat",
+      uuid: "8d20de63-68f1-43cf-a28f-f62a347695a1"
+    }));
+    const loader = createSiteLoader({
+      repository
+    });
+
+    await assert.rejects(
+      () => loader.load("tinsinhphat"),
+      /Missing required site directory: storage/
+    );
   } finally {
     await rm(workspaceDir, {
       force: true,

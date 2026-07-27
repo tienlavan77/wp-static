@@ -60,6 +60,7 @@ export { default as createSeoMetadata } from "./seo/createSeoMetadata.js";
 export {
   SITE_METADATA_VERSION,
   SITE_STATUSES,
+  SiteState,
   default as createSiteMetadata
 } from "./site/createSiteMetadata.js";
 export {

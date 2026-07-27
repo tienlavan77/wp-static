@@ -1,14 +1,14 @@
-import { SITE_STATUSES } from "./createSiteMetadata.js";
+import { SITE_STATUSES, SiteState } from "./createSiteMetadata.js";
 
 export const SITE_STATE_TRANSITIONS = {
-  BUILDING: ["RUNNING", "READY", "ERROR", "DISABLED"],
-  CREATED: ["SETUP_REQUIRED", "DISABLED"],
-  DISABLED: ["SETUP_REQUIRED"],
-  ERROR: ["SETUP_REQUIRED", "READY", "DISABLED"],
-  READY: ["BUILDING", "RUNNING", "ERROR", "DISABLED"],
-  REGISTERING_SOURCE: ["READY", "ERROR", "DISABLED"],
-  RUNNING: ["BUILDING", "ERROR", "DISABLED"],
-  SETUP_REQUIRED: ["REGISTERING_SOURCE", "ERROR", "DISABLED"]
+  [SiteState.BUILDING]: [SiteState.RUNNING, SiteState.READY, SiteState.ERROR, SiteState.DISABLED],
+  [SiteState.CREATED]: [SiteState.SETUP_REQUIRED, SiteState.DISABLED],
+  [SiteState.DISABLED]: [SiteState.SETUP_REQUIRED],
+  [SiteState.ERROR]: [SiteState.SETUP_REQUIRED, SiteState.READY, SiteState.DISABLED],
+  [SiteState.READY]: [SiteState.BUILDING, SiteState.RUNNING, SiteState.ERROR, SiteState.DISABLED],
+  [SiteState.REGISTERING_SOURCE]: [SiteState.READY, SiteState.ERROR, SiteState.DISABLED],
+  [SiteState.RUNNING]: [SiteState.BUILDING, SiteState.ERROR, SiteState.DISABLED],
+  [SiteState.SETUP_REQUIRED]: [SiteState.REGISTERING_SOURCE, SiteState.ERROR, SiteState.DISABLED]
 };
 
 function assertKnownStatus(status) {

@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtemp, rm } from "node:fs/promises";
+import { mkdir, mkdtemp, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -22,6 +22,13 @@ test("createSiteRegistry lists sites and finds by UUID", async () => {
       name: "company-b",
       uuid: "a489abcf-7f73-476e-9ddd-e55db4f66a55"
     }));
+    for (const siteId of ["company-a", "company-b"]) {
+      for (const directory of ["storage", "public", "themes", "plugins"]) {
+        await mkdir(path.join(workspaceDir, "sites", siteId, directory), {
+          recursive: true
+        });
+      }
+    }
 
     const registry = createSiteRegistry({
       repository
@@ -32,6 +39,11 @@ test("createSiteRegistry lists sites and finds by UUID", async () => {
     assert.deepEqual(ids, ["company-a", "company-b"]);
     assert.equal(site.id, "company-b");
     assert.equal(site.metadata.name, "company-b");
+    assert.equal(site.relativePath, "sites/company-b");
+    assert.equal(site.relativePath.includes(workspaceDir), false);
+
+    const loaded = await registry.loadSite("company-b");
+    assert.equal(loaded.paths.root, path.join(workspaceDir, "sites", "company-b"));
   } finally {
     await rm(workspaceDir, {
       force: true,

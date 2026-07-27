@@ -1,4 +1,5 @@
 import { readdir } from "node:fs/promises";
+import path from "node:path";
 import createSiteLoader from "./createSiteLoader.js";
 import createSiteRepository from "./createSiteRepository.js";
 
@@ -24,10 +25,20 @@ export default function createSiteRegistry(options = {}) {
     const sites = [];
 
     for (const siteId of siteIds) {
-      sites.push(await loader.load(siteId));
+      const metadata = await repository.readMetadata(siteId);
+      sites.push({
+        id: siteId,
+        metadata,
+        name: metadata.name,
+        relativePath: path.posix.join("sites", siteId)
+      });
     }
 
     return sites;
+  }
+
+  async function loadSite(siteId) {
+    return loader.load(siteId);
   }
 
   async function findByUuid(uuid) {
@@ -39,6 +50,7 @@ export default function createSiteRegistry(options = {}) {
     findByUuid,
     listSiteIds,
     listSites,
+    loadSite,
     loader,
     repository
   };
