@@ -57,6 +57,11 @@ export { default as createProgressReporter } from "./progress/createProgressRepo
 export { default as renderPage } from "./renderer/renderPage.js";
 export { default as renderSeoTags } from "./seo/renderSeoTags.js";
 export { default as createSeoMetadata } from "./seo/createSeoMetadata.js";
+export {
+  SITE_METADATA_VERSION,
+  SITE_STATUSES,
+  default as createSiteMetadata
+} from "./site/createSiteMetadata.js";
 export { default as collectAssetUrls } from "./assets/collectAssetUrls.js";
 export { default as processAssetPipeline } from "./assets/processAssetPipeline.js";
 export { default as generateRobotsTxt } from "./seo/generateRobotsTxt.js";
