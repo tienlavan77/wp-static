@@ -89,6 +89,14 @@ export {
   default as createProvisioningService,
   planCreateSite
 } from "./provision/createProvisioningService.js";
+export {
+  PROVISIONING_SECRET_BYTES,
+  PROVISIONING_SECRET_VERSION,
+  ProvisioningSecretName,
+  createSecret,
+  default as createProvisioningSecrets,
+  validateProvisioningSecrets
+} from "./provision/createProvisioningSecrets.js";
 export { default as collectAssetUrls } from "./assets/collectAssetUrls.js";
 export { default as processAssetPipeline } from "./assets/processAssetPipeline.js";
 export { default as generateRobotsTxt } from "./seo/generateRobotsTxt.js";
