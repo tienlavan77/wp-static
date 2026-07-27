@@ -4,6 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import createProvisioningService, {
+  ProvisioningEvent,
   PROVISIONING_SERVICE_VERSION,
   SITE_PROVISIONING_DIRECTORIES
 } from "../src/provision/createProvisioningService.js";
@@ -16,7 +17,9 @@ test("createProvisioningService creates an isolated site skeleton", async () => 
   const repository = createSiteRepository({
     workspaceDir
   });
+  const observedEvents = [];
   const service = createProvisioningService({
+    onEvent: (event) => observedEvents.push(event),
     repository
   });
 
@@ -32,6 +35,18 @@ test("createProvisioningService creates an isolated site skeleton", async () => 
     assert.equal(result.siteId, "tin-sinh-phat");
     assert.equal(result.metadata.status, SiteState.SETUP_REQUIRED);
     assert.equal(result.metadata.uuid, "8d20de63-68f1-43cf-a28f-f62a347695a1");
+    assert.deepEqual(
+      result.events.map((event) => event.type),
+      [
+        ProvisioningEvent.STARTED,
+        ...SITE_PROVISIONING_DIRECTORIES.map(() => ProvisioningEvent.DIRECTORY_CREATED),
+        ProvisioningEvent.METADATA_GENERATED,
+        ProvisioningEvent.METADATA_VALIDATED,
+        ProvisioningEvent.METADATA_WRITTEN,
+        ProvisioningEvent.COMPLETED
+      ]
+    );
+    assert.deepEqual(observedEvents, result.events);
 
     for (const directory of SITE_PROVISIONING_DIRECTORIES) {
       await access(path.join(workspaceDir, "sites", "tin-sinh-phat", directory));
@@ -61,6 +76,10 @@ test("createProvisioningService reports missing site id", async () => {
     const result = await service.createSite({});
 
     assert.equal(result.ok, false);
+    assert.deepEqual(
+      result.events.map((event) => event.type),
+      [ProvisioningEvent.FAILED]
+    );
     assert.deepEqual(
       result.diagnostics.errors.map((error) => error.code),
       ["provision.site_id.required"]

@@ -82,6 +82,7 @@ export {
   default as createSiteRegistry
 } from "./site/createSiteRegistry.js";
 export {
+  ProvisioningEvent,
   PROVISIONING_SERVICE_VERSION,
   SITE_PROVISIONING_DIRECTORIES,
   default as createProvisioningService

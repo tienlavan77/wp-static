@@ -9,6 +9,16 @@ import createSiteUuid from "../site/createSiteUuid.js";
 
 export const PROVISIONING_SERVICE_VERSION = "1.0";
 
+export const ProvisioningEvent = Object.freeze({
+  COMPLETED: "provision.completed",
+  DIRECTORY_CREATED: "provision.directory.created",
+  FAILED: "provision.failed",
+  METADATA_GENERATED: "provision.metadata.generated",
+  METADATA_VALIDATED: "provision.metadata.validated",
+  METADATA_WRITTEN: "provision.metadata.written",
+  STARTED: "provision.started"
+});
+
 export const SITE_PROVISIONING_DIRECTORIES = Object.freeze([
   "config",
   "storage",
@@ -32,11 +42,36 @@ function normalizeSiteId(input) {
 
 export default function createProvisioningService(options = {}) {
   const repository = options.repository || createSiteRepository(options);
+  const onEvent = typeof options.onEvent === "function" ? options.onEvent : null;
+
+  function createEventRecorder() {
+    const events = [];
+
+    function emit(type, payload = {}) {
+      const event = {
+        payload,
+        timestamp: payload.timestamp || null,
+        type
+      };
+      events.push(event);
+      onEvent?.(event);
+      return event;
+    }
+
+    return {
+      emit,
+      events
+    };
+  }
 
   async function createSite(input = {}) {
+    const eventRecorder = createEventRecorder();
     const siteId = normalizeSiteId(input.siteId || input.name);
 
     if (!siteId) {
+      eventRecorder.emit(ProvisioningEvent.FAILED, {
+        reason: "missing-site-id"
+      });
       return {
         diagnostics: {
           errors: [
@@ -47,9 +82,14 @@ export default function createProvisioningService(options = {}) {
           ],
           warnings: []
         },
+        events: eventRecorder.events,
         ok: false
       };
     }
+
+    eventRecorder.emit(ProvisioningEvent.STARTED, {
+      siteId
+    });
 
     const siteRoot = repository.resolveSiteRoot(siteId);
     const pathPolicy = createSitePathPolicy({
@@ -59,6 +99,10 @@ export default function createProvisioningService(options = {}) {
     for (const directory of SITE_PROVISIONING_DIRECTORIES) {
       await mkdir(pathPolicy.resolve(directory), {
         recursive: true
+      });
+      eventRecorder.emit(ProvisioningEvent.DIRECTORY_CREATED, {
+        directory,
+        siteId
       });
     }
 
@@ -73,25 +117,49 @@ export default function createProvisioningService(options = {}) {
         uuid: input.uuid
       })
     });
+    eventRecorder.emit(ProvisioningEvent.METADATA_GENERATED, {
+      siteId,
+      uuid: metadata.uuid
+    });
+
     const validation = validateSiteMetadata(metadata);
 
     if (!validation.ok) {
+      eventRecorder.emit(ProvisioningEvent.FAILED, {
+        errors: validation.errors,
+        reason: "metadata-validation-failed",
+        siteId
+      });
       return {
         diagnostics: {
           errors: validation.errors,
           warnings: []
         },
+        events: eventRecorder.events,
         ok: false
       };
     }
 
+    eventRecorder.emit(ProvisioningEvent.METADATA_VALIDATED, {
+      siteId
+    });
+
     const write = await repository.writeMetadata(siteId, metadata);
+    eventRecorder.emit(ProvisioningEvent.METADATA_WRITTEN, {
+      path: write.path,
+      siteId
+    });
+
+    eventRecorder.emit(ProvisioningEvent.COMPLETED, {
+      siteId
+    });
 
     return {
       diagnostics: {
         errors: [],
         warnings: []
       },
+      events: eventRecorder.events,
       metadata,
       ok: true,
       paths: {
