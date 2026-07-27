@@ -3,7 +3,7 @@ import test from "node:test";
 import createProvisioningSecrets from "../src/provision/createProvisioningSecrets.js";
 import createProvisioningConfig, {
   PROVISIONING_CONFIG_SCHEMA,
-  PROVISIONING_CONFIG_VERSION,
+  PROVISIONING_CONFIG_SCHEMA_VERSION,
   validateProvisioningConfig
 } from "../src/provision/createProvisioningConfig.js";
 
@@ -16,6 +16,7 @@ test("createProvisioningConfig creates an isolated, versioned provisioning confi
   const result = createProvisioningConfig({
     createdAt: "2026-07-27T00:00:00.000Z",
     environment,
+    frameworkVersion: "2.0.0",
     secrets,
     site: { id: "company-a", name: "Company A" },
     source
@@ -23,14 +24,21 @@ test("createProvisioningConfig creates an isolated, versioned provisioning confi
 
   assert.equal(result.ok, true);
   assert.equal(result.config.schema, PROVISIONING_CONFIG_SCHEMA);
-  assert.equal(result.config.version, PROVISIONING_CONFIG_VERSION);
+  assert.equal(result.config.schemaVersion, PROVISIONING_CONFIG_SCHEMA_VERSION);
+  assert.equal(result.config.frameworkVersion, "2.0.0");
   assert.deepEqual(result.diagnostics, { errors: [], warnings: [] });
   assert.notEqual(result.config.environment, environment);
   assert.notEqual(result.config.source, source);
   assert.notEqual(result.config.secrets, secrets);
+  assert.equal(Object.isFrozen(result.config), true);
+  assert.equal(Object.isFrozen(result.config.source), true);
+  assert.equal(Object.isFrozen(result.config.secrets), true);
 
   source.url = "https://changed.example.test";
   assert.equal(result.config.source.url, "https://example.test");
+  assert.throws(() => {
+    result.config.source.url = "https://mutated.example.test";
+  }, TypeError);
 });
 
 test("createProvisioningConfig returns diagnostics for incomplete configuration", () => {
@@ -53,4 +61,25 @@ test("createProvisioningConfig returns diagnostics for incomplete configuration"
     ]
   );
   assert.equal(validateProvisioningConfig(result.config).ok, false);
+});
+
+test("validateProvisioningConfig requires its versioned schema contract", () => {
+  const validation = validateProvisioningConfig({
+    environment: {},
+    frameworkVersion: 2,
+    schema: "other-config",
+    schemaVersion: 2,
+    secrets: {},
+    site: { id: "company-a", name: "Company A" },
+    source: {}
+  });
+
+  assert.deepEqual(
+    validation.errors.map((error) => error.code),
+    [
+      "provision.config.schema.invalid",
+      "provision.config.schema_version.invalid",
+      "provision.config.framework_version.invalid"
+    ]
+  );
 });

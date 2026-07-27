@@ -6,6 +6,24 @@ import { summarizeValidationResults } from "../validation/createValidationResult
 
 export const PROVISIONING_ENVIRONMENT_VERSION = "1.0";
 
+export const ProvisioningEnvironmentSeverity = Object.freeze({
+  ERROR: "error",
+  INFO: "info",
+  WARNING: "warning"
+});
+
+function toSeverity(status) {
+  if (status === "error") {
+    return ProvisioningEnvironmentSeverity.ERROR;
+  }
+
+  if (status === "warning") {
+    return ProvisioningEnvironmentSeverity.WARNING;
+  }
+
+  return ProvisioningEnvironmentSeverity.INFO;
+}
+
 function createResultCode(result) {
   return `provision.environment.${result.category}.${result.name}`
     .toLowerCase()
@@ -21,6 +39,7 @@ function toDiagnostic(result) {
     fix: result.fix,
     message: result.summary,
     name: result.name,
+    severity: toSeverity(result.status),
     status: result.status
   };
 }

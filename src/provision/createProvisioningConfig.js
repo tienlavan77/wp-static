@@ -1,5 +1,7 @@
-export const PROVISIONING_CONFIG_VERSION = "1.0";
-export const PROVISIONING_CONFIG_SCHEMA = "provisioning-config/v1";
+import deepFreeze from "../shared/deepFreeze.js";
+
+export const PROVISIONING_CONFIG_SCHEMA = "provisioning-config";
+export const PROVISIONING_CONFIG_SCHEMA_VERSION = 1;
 
 function clone(value) {
   return value == null
@@ -15,6 +17,30 @@ function isObject(value) {
 
 export function validateProvisioningConfig(config = {}) {
   const errors = [];
+
+  if (config.schema !== PROVISIONING_CONFIG_SCHEMA) {
+    errors.push({
+      code: "provision.config.schema.invalid",
+      field: "schema",
+      message: "Provisioning config schema is invalid."
+    });
+  }
+
+  if (config.schemaVersion !== PROVISIONING_CONFIG_SCHEMA_VERSION) {
+    errors.push({
+      code: "provision.config.schema_version.invalid",
+      field: "schemaVersion",
+      message: "Provisioning config schema version is invalid."
+    });
+  }
+
+  if (config.frameworkVersion !== null && typeof config.frameworkVersion !== "string") {
+    errors.push({
+      code: "provision.config.framework_version.invalid",
+      field: "frameworkVersion",
+      message: "Framework version must be a string or null."
+    });
+  }
 
   if (!isObject(config.site)) {
     errors.push({
@@ -83,7 +109,8 @@ export default function createProvisioningConfig(options = {}) {
 
   const config = {
     schema: PROVISIONING_CONFIG_SCHEMA,
-    version: PROVISIONING_CONFIG_VERSION,
+    schemaVersion: PROVISIONING_CONFIG_SCHEMA_VERSION,
+    frameworkVersion: options.frameworkVersion || null,
     createdAt,
 
     site: {
@@ -98,7 +125,8 @@ export default function createProvisioningConfig(options = {}) {
     secrets: clone(options.secrets)
   };
 
-  const validation = validateProvisioningConfig(config);
+  const immutableConfig = deepFreeze(config);
+  const validation = validateProvisioningConfig(immutableConfig);
 
   if (!validation.ok) {
     return {
@@ -107,7 +135,7 @@ export default function createProvisioningConfig(options = {}) {
         errors: validation.errors,
         warnings: []
       },
-      config
+      config: immutableConfig
     };
   }
 
@@ -117,6 +145,6 @@ export default function createProvisioningConfig(options = {}) {
       errors: [],
       warnings: []
     },
-    config
+    config: immutableConfig
   };
 }

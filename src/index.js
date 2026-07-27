@@ -103,12 +103,13 @@ export {
 } from "./provision/createProvisioningSecrets.js";
 export {
   PROVISIONING_CONFIG_SCHEMA,
-  PROVISIONING_CONFIG_VERSION,
+  PROVISIONING_CONFIG_SCHEMA_VERSION,
   default as createProvisioningConfig,
   validateProvisioningConfig
 } from "./provision/createProvisioningConfig.js";
 export {
   PROVISIONING_ENVIRONMENT_VERSION,
+  ProvisioningEnvironmentSeverity,
   default as validateProvisioningEnvironment
 } from "./provision/validateProvisioningEnvironment.js";
 

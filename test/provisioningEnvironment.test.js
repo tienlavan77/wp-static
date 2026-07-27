@@ -5,7 +5,8 @@ import path from "node:path";
 import test from "node:test";
 import { createError, createOk } from "../src/validation/createValidationResult.js";
 import validateProvisioningEnvironment, {
-  PROVISIONING_ENVIRONMENT_VERSION
+  PROVISIONING_ENVIRONMENT_VERSION,
+  ProvisioningEnvironmentSeverity
 } from "../src/provision/validateProvisioningEnvironment.js";
 
 test("validateProvisioningEnvironment accepts a supported runtime and writable sites directory", async () => {
@@ -30,6 +31,10 @@ test("validateProvisioningEnvironment accepts a supported runtime and writable s
     assert.equal(result.version, PROVISIONING_ENVIRONMENT_VERSION);
     assert.deepEqual(result.summary, { error: 0, ok: 2, total: 2, warning: 0 });
   assert.deepEqual(result.diagnostics, { errors: [], warnings: [] });
+  assert.deepEqual(
+    result.results.map((item) => item.severity),
+    [ProvisioningEnvironmentSeverity.INFO, ProvisioningEnvironmentSeverity.INFO]
+  );
   } finally {
     await rm(workspaceDir, { force: true, recursive: true });
   }
@@ -59,6 +64,7 @@ test("validateProvisioningEnvironment returns normalized diagnostics for failed 
     fix: "Upgrade Node.js.",
     message: "Node.js is unsupported.",
     name: "Node.js >= 20",
+    severity: ProvisioningEnvironmentSeverity.ERROR,
     status: "error"
   }]);
 });
