@@ -62,6 +62,10 @@ export {
   SITE_STATUSES,
   default as createSiteMetadata
 } from "./site/createSiteMetadata.js";
+export {
+  SITE_STATE_TRANSITIONS,
+  default as createSiteStateManager
+} from "./site/createSiteStateManager.js";
 export { default as collectAssetUrls } from "./assets/collectAssetUrls.js";
 export { default as processAssetPipeline } from "./assets/processAssetPipeline.js";
 export { default as generateRobotsTxt } from "./seo/generateRobotsTxt.js";
