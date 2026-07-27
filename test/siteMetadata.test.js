@@ -1,9 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import createSiteMetadata, {
+  SITE_METADATA_REQUIRED_FIELDS,
   SITE_METADATA_VERSION,
   SITE_STATUSES,
-  SiteState
+  SiteState,
+  validateSiteMetadata
 } from "../src/site/createSiteMetadata.js";
 
 test("createSiteMetadata creates architecture v2 site metadata", () => {
@@ -30,6 +32,36 @@ test("createSiteMetadata creates architecture v2 site metadata", () => {
   assert.equal(metadata.status, SiteState.SETUP_REQUIRED);
   assert.equal(metadata.uuid, "8d20de63-68f1-43cf-a28f-f62a347695a1");
   assert.equal(metadata.framework_version, "1.0.0");
+  assert.equal(validateSiteMetadata(metadata).ok, true);
+});
+
+test("validateSiteMetadata validates required metadata schema", () => {
+  const result = validateSiteMetadata({
+    name: "",
+    status: "BAD",
+    uuid: "not-a-uuid"
+  });
+
+  assert.deepEqual(SITE_METADATA_REQUIRED_FIELDS, [
+    "uuid",
+    "name",
+    "status",
+    "framework_version",
+    "created_at",
+    "updated_at"
+  ]);
+  assert.equal(result.ok, false);
+  assert.deepEqual(
+    result.errors.map((error) => error.code),
+    [
+      "site.metadata.field.required",
+      "site.metadata.field.required",
+      "site.metadata.field.required",
+      "site.metadata.field.required",
+      "site.metadata.uuid.invalid",
+      "site.metadata.status.invalid"
+    ]
+  );
 });
 
 test("createSiteMetadata exposes the architecture v2 state list", () => {

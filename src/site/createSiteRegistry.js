@@ -3,6 +3,10 @@ import path from "node:path";
 import createSiteLoader from "./createSiteLoader.js";
 import createSiteRepository from "./createSiteRepository.js";
 
+export function createSiteRelativePath(siteId) {
+  return path.posix.join("sites", String(siteId));
+}
+
 export default function createSiteRegistry(options = {}) {
   const repository = options.repository || createSiteRepository(options);
   const loader = options.loader || createSiteLoader({
@@ -30,7 +34,7 @@ export default function createSiteRegistry(options = {}) {
         id: siteId,
         metadata,
         name: metadata.name,
-        relativePath: path.posix.join("sites", siteId)
+        relativePath: createSiteRelativePath(siteId)
       });
     }
 

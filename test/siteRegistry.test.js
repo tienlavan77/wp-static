@@ -4,7 +4,9 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import createSiteMetadata from "../src/site/createSiteMetadata.js";
-import createSiteRegistry from "../src/site/createSiteRegistry.js";
+import createSiteRegistry, {
+  createSiteRelativePath
+} from "../src/site/createSiteRegistry.js";
 import createSiteRepository from "../src/site/createSiteRepository.js";
 
 test("createSiteRegistry lists sites and finds by UUID", async () => {
@@ -36,6 +38,7 @@ test("createSiteRegistry lists sites and finds by UUID", async () => {
     const ids = await registry.listSiteIds();
     const site = await registry.findByUuid("a489abcf-7f73-476e-9ddd-e55db4f66a55");
 
+    assert.equal(createSiteRelativePath("company-b"), "sites/company-b");
     assert.deepEqual(ids, ["company-a", "company-b"]);
     assert.equal(site.id, "company-b");
     assert.equal(site.metadata.name, "company-b");
