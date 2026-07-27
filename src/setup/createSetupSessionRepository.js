@@ -2,21 +2,21 @@ export default function createSetupSessionRepository(options = {}) {
   const sessions = options.sessions || new Map();
 
   return {
-    has(sessionId) {
-      return sessions.has(sessionId);
+    create(session) {
+      sessions.set(session.id, session);
+      return session;
+    },
+
+    delete(sessionId) {
+      return sessions.delete(sessionId);
+    },
+
+    find(sessionId) {
+      return sessions.get(sessionId) || null;
     },
 
     list() {
       return [...sessions.values()];
-    },
-
-    read(sessionId) {
-      return sessions.get(sessionId) || null;
-    },
-
-    write(session) {
-      sessions.set(session.id, session);
-      return session;
     }
   };
 }

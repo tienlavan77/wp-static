@@ -5,6 +5,7 @@ import createSetupSessionManager, {
   validateSetupSession
 } from "../src/setup/createSetupSessionManager.js";
 import createSetupSessionRepository from "../src/setup/createSetupSessionRepository.js";
+import { isSiteUuid } from "../src/site/createSiteUuid.js";
 
 const validContext = Object.freeze({ client: "browser", siteId: "company-a" });
 const validateContext = (context) => ({
@@ -24,9 +25,11 @@ test("createSetupSessionManager stores immutable session snapshots in its reposi
 
   assert.equal(manager.version, SETUP_SESSION_VERSION);
   assert.equal(Object.isFrozen(session), true);
-  assert.equal(repository.read(session.id), session);
+  assert.equal(repository.find(session.id), session);
   assert.deepEqual(manager.list(), [session]);
   assert.equal(validateSetupSession(session, validateContext).ok, true);
+  assert.equal(repository.delete(session.id), true);
+  assert.equal(repository.find(session.id), null);
 });
 
 test("createSetupSessionManager rejects duplicate identifiers and invalid contexts", () => {
@@ -49,4 +52,13 @@ test("createSetupSessionManager rejects duplicate identifiers and invalid contex
     assert.deepEqual(error.diagnostics.map((item) => item.code), ["setup.context.invalid"]);
     return true;
   });
+});
+
+test("createSetupSessionManager uses framework-compatible UUID v4 session ids", () => {
+  const manager = createSetupSessionManager({
+    now: () => "2026-07-27T00:00:00.000Z",
+    validateContext
+  });
+
+  assert.equal(isSiteUuid(manager.create(validContext).id), true);
 });

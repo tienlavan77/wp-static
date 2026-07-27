@@ -4,6 +4,7 @@ import createSetupService, {
   SETUP_SERVICE_VERSION,
   SetupClient,
   SetupEvent,
+  SetupState,
   validateSetupContext
 } from "../src/setup/createSetupService.js";
 
@@ -63,6 +64,8 @@ test("Setup Service owns the runtime session lifecycle", () => {
 
   assert.equal(started.ok, true);
   assert.equal(started.session.id, "setup-session-1");
+  assert.equal(started.session.currentStateId, SetupState.NOT_STARTED);
+  assert.equal(started.session.expiresAt, null);
   assert.equal(started.session.context, started.context);
   assert.equal(Object.hasOwn(started.context, "session"), false);
   assert.equal(Object.isFrozen(started.session), true);
@@ -79,6 +82,20 @@ test("Setup Service owns the runtime session lifecycle", () => {
   assert.equal(ended.session.endedAt, "2026-07-27T02:00:00.000Z");
   assert.deepEqual(ended.events.map((event) => event.type), [SetupEvent.SESSION_ENDED]);
   assert.equal(service.endSession("setup-session-1").diagnostics.errors[0].code, "setup.session.ended");
+});
+
+test("Setup Service delegates workflow transitions to the state machine", () => {
+  const service = createSetupService({
+    createSessionId: () => "setup-state-session",
+    now: () => "2026-07-27T03:00:00.000Z"
+  });
+  const started = service.start({ client: SetupClient.BROWSER, siteId: "company-a" });
+  const transitioned = service.transition(started.session.id, SetupState.VALIDATING);
+
+  assert.equal(transitioned.ok, true);
+  assert.equal(transitioned.session.currentStateId, SetupState.VALIDATING);
+  assert.deepEqual(transitioned.events.map((event) => event.type), [SetupEvent.STATE_CHANGED]);
+  assert.equal(service.transition(started.session.id, SetupState.READY).ok, false);
 });
 
 test("Setup Service does not create a session for rejected context", () => {

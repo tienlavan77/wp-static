@@ -1,5 +1,8 @@
 import deepFreeze from "../shared/deepFreeze.js";
 import createSetupSessionManager from "./createSetupSessionManager.js";
+import createSetupStateMachine, { SetupState } from "./createSetupStateMachine.js";
+
+export { SetupState };
 
 export const SETUP_SERVICE_VERSION = "1.0";
 
@@ -14,7 +17,8 @@ export const SetupEvent = Object.freeze({
   CONTEXT_REJECTED: "setup.context.rejected",
   SESSION_CREATED: "setup.session.created",
   SESSION_ENDED: "setup.session.ended",
-  STARTED: "setup.started"
+  STARTED: "setup.started",
+  STATE_CHANGED: "setup.state.changed"
 });
 
 function createDiagnostic(code, message) {
@@ -52,6 +56,7 @@ export default function createSetupService(options = {}) {
     now: options.now,
     validateContext: validateSetupContext
   });
+  const stateMachines = new Map();
 
   function emit(events, type, payload = {}) {
     const event = deepFreeze({
@@ -117,6 +122,7 @@ export default function createSetupService(options = {}) {
     let session;
     try {
       session = sessionManager.create(contextResult.context);
+      stateMachines.set(session.id, createSetupStateMachine());
     } catch (error) {
       return {
         ...contextResult,
@@ -166,6 +172,7 @@ export default function createSetupService(options = {}) {
 
     try {
       const session = sessionManager.end(sessionId);
+      stateMachines.delete(session.id);
       emit(events, SetupEvent.SESSION_ENDED, {
         sessionId: session.id,
         siteId: session.context.siteId
@@ -187,11 +194,68 @@ export default function createSetupService(options = {}) {
     }
   }
 
+  function transition(sessionId, nextState) {
+    const sessionResult = getSession(sessionId);
+    if (!sessionResult.ok) {
+      return sessionResult;
+    }
+
+    const machine = stateMachines.get(sessionId);
+    if (!machine) {
+      return {
+        diagnostics: {
+          errors: [{
+            code: "setup.state.machine.not_found",
+            message: "Setup state machine was not found.",
+            severity: "error"
+          }],
+          warnings: []
+        },
+        ok: false
+      };
+    }
+
+    try {
+      const state = machine.transition(nextState);
+      const session = sessionManager.update(sessionId, {
+        currentStateId: state.currentStateId
+      });
+      const events = [];
+      emit(events, SetupEvent.STATE_CHANGED, {
+        currentStateId: state.currentStateId,
+        previousStateId: state.previousStateId,
+        revision: state.revision,
+        sessionId
+      });
+      return {
+        diagnostics: { errors: [], warnings: [] },
+        events,
+        ok: true,
+        session,
+        state
+      };
+    } catch (error) {
+      return {
+        diagnostics: {
+          errors: [{
+            code: error.code || "setup.state.transition.failed",
+            message: error.message,
+            severity: "error"
+          }],
+          warnings: []
+        },
+        events: [],
+        ok: false
+      };
+    }
+  }
+
   return {
     createContext,
     endSession,
     getSession,
     start,
+    transition,
     version: SETUP_SERVICE_VERSION
   };
 }

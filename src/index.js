@@ -116,6 +116,7 @@ export {
   SETUP_SERVICE_VERSION,
   SetupClient,
   SetupEvent,
+  SetupState,
   default as createSetupService,
   validateSetupContext
 } from "./setup/createSetupService.js";

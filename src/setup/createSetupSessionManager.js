@@ -34,12 +34,31 @@ export function validateSetupSession(session = {}, validateContext = () => ({ ok
     });
   }
 
+  if (typeof session.currentStateId !== "string" || session.currentStateId.trim() === "") {
+    errors.push({
+      code: "setup.session.current_state_id.required",
+      message: "Setup session current state id is required.",
+      severity: "error"
+    });
+  }
+
+  if (
+    session.expiresAt !== null
+    && (typeof session.expiresAt !== "string" || session.expiresAt.trim() === "")
+  ) {
+    errors.push({
+      code: "setup.session.expires_at.invalid",
+      message: "Setup session expiration must be an ISO timestamp string or null.",
+      severity: "error"
+    });
+  }
+
   return { errors, ok: errors.length === 0 };
 }
 
 export default function createSetupSessionManager(options = {}) {
   const repository = options.repository || createSetupSessionRepository();
-  const createId = options.createId || (() => `setup-${randomUUID()}`);
+  const createId = options.createId || randomUUID;
   const now = options.now || (() => new Date().toISOString());
   const validateContext = options.validateContext || (() => ({ errors: [], ok: true }));
 
@@ -50,6 +69,8 @@ export default function createSetupSessionManager(options = {}) {
       createdAt: timestamp,
       endedAt: null,
       id: assertSessionId(createId()),
+      currentStateId: options.initialState || "NOT_STARTED",
+      expiresAt: options.expiresAt || null,
       updatedAt: timestamp,
       version: SETUP_SESSION_VERSION
     });
@@ -62,18 +83,18 @@ export default function createSetupSessionManager(options = {}) {
       throw error;
     }
 
-    if (repository.has(session.id)) {
+    if (repository.find(session.id)) {
       const error = new Error(`Setup session "${session.id}" already exists.`);
       error.code = "setup.session.duplicate";
       throw error;
     }
 
-    return repository.write(session);
+    return repository.create(session);
   }
 
   function get(sessionId) {
     const id = assertSessionId(sessionId);
-    const session = repository.read(id);
+    const session = repository.find(id);
 
     if (!session) {
       const error = new Error(`Setup session "${id}" was not found.`);
@@ -99,12 +120,23 @@ export default function createSetupSessionManager(options = {}) {
       endedAt: timestamp,
       updatedAt: timestamp
     });
-    return repository.write(session);
+    return repository.create(session);
+  }
+
+  function update(sessionId, changes = {}) {
+    const current = get(sessionId);
+    const session = deepFreeze({
+      ...current,
+      ...changes,
+      id: current.id,
+      updatedAt: now()
+    });
+    return repository.create(session);
   }
 
   function list() {
     return repository.list();
   }
 
-  return { create, end, get, list, version: SETUP_SESSION_VERSION };
+  return { create, end, get, list, update, version: SETUP_SESSION_VERSION };
 }
