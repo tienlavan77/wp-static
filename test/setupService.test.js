@@ -44,3 +44,52 @@ test("validateSetupContext accepts all supported setup clients", () => {
     assert.equal(validateSetupContext({ client, siteId: "company-a" }).ok, true);
   }
 });
+
+test("Setup Service owns the runtime session lifecycle", () => {
+  const observedEvents = [];
+  const timestamps = [
+    "2026-07-27T01:00:00.000Z",
+    "2026-07-27T02:00:00.000Z"
+  ];
+  const service = createSetupService({
+    createSessionId: () => "setup-session-1",
+    now: () => timestamps.shift(),
+    onEvent: (event) => observedEvents.push(event)
+  });
+  const started = service.start({
+    client: SetupClient.CLI,
+    siteId: "company-a"
+  });
+
+  assert.equal(started.ok, true);
+  assert.equal(started.session.id, "setup-session-1");
+  assert.equal(started.session.context, started.context);
+  assert.equal(Object.hasOwn(started.context, "session"), false);
+  assert.equal(Object.isFrozen(started.session), true);
+  assert.deepEqual(started.events.map((event) => event.type), [
+    SetupEvent.STARTED,
+    SetupEvent.CONTEXT_CREATED,
+    SetupEvent.SESSION_CREATED
+  ]);
+  assert.deepEqual(observedEvents, started.events);
+  assert.equal(service.getSession("setup-session-1").session, started.session);
+
+  const ended = service.endSession("setup-session-1");
+  assert.equal(ended.ok, true);
+  assert.equal(ended.session.endedAt, "2026-07-27T02:00:00.000Z");
+  assert.deepEqual(ended.events.map((event) => event.type), [SetupEvent.SESSION_ENDED]);
+  assert.equal(service.endSession("setup-session-1").diagnostics.errors[0].code, "setup.session.ended");
+});
+
+test("Setup Service does not create a session for rejected context", () => {
+  const service = createSetupService();
+  const result = service.start({ client: "browser" });
+
+  assert.equal(result.ok, false);
+  assert.equal(Object.hasOwn(result, "session"), false);
+  assert.deepEqual(result.events.map((event) => event.type), [
+    SetupEvent.STARTED,
+    SetupEvent.CONTEXT_REJECTED
+  ]);
+  assert.equal(service.getSession("missing").diagnostics.errors[0].code, "setup.session.not_found");
+});
