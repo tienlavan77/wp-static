@@ -90,11 +90,15 @@ export {
   planCreateSite
 } from "./provision/createProvisioningService.js";
 export {
+  PROVISIONING_SECRET_ALGORITHM,
   PROVISIONING_SECRET_BYTES,
+  PROVISIONING_SECRET_METADATA_VERSION,
   PROVISIONING_SECRET_VERSION,
-  ProvisioningSecretName,
+  ProvisioningSecretType,
+  createRandomSecretProvider,
   createSecret,
   default as createProvisioningSecrets,
+  unwrapProvisioningSecrets,
   validateProvisioningSecrets
 } from "./provision/createProvisioningSecrets.js";
 export { default as collectAssetUrls } from "./assets/collectAssetUrls.js";
