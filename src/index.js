@@ -67,6 +67,7 @@ export {
   default as createSiteStateManager
 } from "./site/createSiteStateManager.js";
 export { default as createSiteRepository } from "./site/createSiteRepository.js";
+export { default as createSitePathPolicy } from "./site/createSitePathPolicy.js";
 export { default as collectAssetUrls } from "./assets/collectAssetUrls.js";
 export { default as processAssetPipeline } from "./assets/processAssetPipeline.js";
 export { default as generateRobotsTxt } from "./seo/generateRobotsTxt.js";
