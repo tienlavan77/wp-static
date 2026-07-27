@@ -112,6 +112,13 @@ export {
   ProvisioningEnvironmentSeverity,
   default as validateProvisioningEnvironment
 } from "./provision/validateProvisioningEnvironment.js";
+export {
+  SETUP_SERVICE_VERSION,
+  SetupClient,
+  SetupEvent,
+  default as createSetupService,
+  validateSetupContext
+} from "./setup/createSetupService.js";
 
 export { default as collectAssetUrls } from "./assets/collectAssetUrls.js";
 export { default as processAssetPipeline } from "./assets/processAssetPipeline.js";
