@@ -83,9 +83,11 @@ export {
 } from "./site/createSiteRegistry.js";
 export {
   ProvisioningEvent,
+  ProvisioningStep,
   PROVISIONING_SERVICE_VERSION,
   SITE_PROVISIONING_DIRECTORIES,
-  default as createProvisioningService
+  default as createProvisioningService,
+  planCreateSite
 } from "./provision/createProvisioningService.js";
 export { default as collectAssetUrls } from "./assets/collectAssetUrls.js";
 export { default as processAssetPipeline } from "./assets/processAssetPipeline.js";

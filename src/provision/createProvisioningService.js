@@ -1,4 +1,4 @@
-import { mkdir } from "node:fs/promises";
+import { mkdir, rm } from "node:fs/promises";
 import createSiteMetadata, {
   SiteState,
   validateSiteMetadata
@@ -16,7 +16,15 @@ export const ProvisioningEvent = Object.freeze({
   METADATA_GENERATED: "provision.metadata.generated",
   METADATA_VALIDATED: "provision.metadata.validated",
   METADATA_WRITTEN: "provision.metadata.written",
+  ROLLED_BACK: "provision.rolled_back",
   STARTED: "provision.started"
+});
+
+export const ProvisioningStep = Object.freeze({
+  CREATE_DIRECTORIES: "create_directories",
+  GENERATE_METADATA: "generate_metadata",
+  VALIDATE_METADATA: "validate_metadata",
+  WRITE_METADATA: "write_metadata"
 });
 
 export const SITE_PROVISIONING_DIRECTORIES = Object.freeze([
@@ -38,6 +46,27 @@ function normalizeSiteId(input) {
     .toLowerCase()
     .replace(/[^a-z0-9_-]+/g, "-")
     .replace(/^-+|-+$/g, "");
+}
+
+export function planCreateSite(siteId) {
+  return [
+    {
+      siteId,
+      step: ProvisioningStep.CREATE_DIRECTORIES
+    },
+    {
+      siteId,
+      step: ProvisioningStep.GENERATE_METADATA
+    },
+    {
+      siteId,
+      step: ProvisioningStep.VALIDATE_METADATA
+    },
+    {
+      siteId,
+      step: ProvisioningStep.WRITE_METADATA
+    }
+  ];
 }
 
 export default function createProvisioningService(options = {}) {
@@ -95,79 +124,114 @@ export default function createProvisioningService(options = {}) {
     const pathPolicy = createSitePathPolicy({
       siteRoot
     });
+    const transaction = {
+      plan: planCreateSite(siteId),
+      rollback: []
+    };
 
-    for (const directory of SITE_PROVISIONING_DIRECTORIES) {
-      await mkdir(pathPolicy.resolve(directory), {
-        recursive: true
+    try {
+      for (const directory of SITE_PROVISIONING_DIRECTORIES) {
+        await mkdir(pathPolicy.resolve(directory), {
+          recursive: true
+        });
+        eventRecorder.emit(ProvisioningEvent.DIRECTORY_CREATED, {
+          directory,
+          siteId
+        });
+      }
+      transaction.rollback.push({
+        path: siteRoot,
+        step: "remove_site_root"
       });
-      eventRecorder.emit(ProvisioningEvent.DIRECTORY_CREATED, {
-        directory,
+
+      const metadata = createSiteMetadata({
+        createdAt: input.createdAt,
+        frameworkVersion: input.frameworkVersion,
+        name: input.name || siteId,
+        now: input.now,
+        status: SiteState.SETUP_REQUIRED,
+        updatedAt: input.updatedAt,
+        uuid: createSiteUuid({
+          uuid: input.uuid
+        })
+      });
+      eventRecorder.emit(ProvisioningEvent.METADATA_GENERATED, {
+        siteId,
+        uuid: metadata.uuid
+      });
+
+      const validation = validateSiteMetadata(metadata);
+
+      if (!validation.ok) {
+        eventRecorder.emit(ProvisioningEvent.FAILED, {
+          errors: validation.errors,
+          reason: "metadata-validation-failed",
+          siteId
+        });
+        await rollback(transaction, eventRecorder, siteId);
+        return {
+          diagnostics: {
+            errors: validation.errors,
+            warnings: []
+          },
+          events: eventRecorder.events,
+          ok: false,
+          transaction
+        };
+      }
+
+      eventRecorder.emit(ProvisioningEvent.METADATA_VALIDATED, {
         siteId
       });
-    }
 
-    const metadata = createSiteMetadata({
-      createdAt: input.createdAt,
-      frameworkVersion: input.frameworkVersion,
-      name: input.name || siteId,
-      now: input.now,
-      status: SiteState.SETUP_REQUIRED,
-      updatedAt: input.updatedAt,
-      uuid: createSiteUuid({
-        uuid: input.uuid
-      })
-    });
-    eventRecorder.emit(ProvisioningEvent.METADATA_GENERATED, {
-      siteId,
-      uuid: metadata.uuid
-    });
-
-    const validation = validateSiteMetadata(metadata);
-
-    if (!validation.ok) {
-      eventRecorder.emit(ProvisioningEvent.FAILED, {
-        errors: validation.errors,
-        reason: "metadata-validation-failed",
+      const write = await repository.writeMetadata(siteId, metadata);
+      eventRecorder.emit(ProvisioningEvent.METADATA_WRITTEN, {
+        path: write.path,
         siteId
       });
+
+      eventRecorder.emit(ProvisioningEvent.COMPLETED, {
+        siteId
+      });
+
       return {
         diagnostics: {
-          errors: validation.errors,
+          errors: [],
           warnings: []
         },
         events: eventRecorder.events,
-        ok: false
+        metadata,
+        ok: true,
+        paths: {
+          metadata: write.path,
+          root: siteRoot
+        },
+        siteId,
+        transaction
+      };
+    } catch (error) {
+      eventRecorder.emit(ProvisioningEvent.FAILED, {
+        message: error.message,
+        reason: "transaction-failed",
+        siteId
+      });
+      await rollback(transaction, eventRecorder, siteId);
+
+      return {
+        diagnostics: {
+          errors: [
+            {
+              code: "provision.transaction.failed",
+              message: error.message
+            }
+          ],
+          warnings: []
+        },
+        events: eventRecorder.events,
+        ok: false,
+        transaction
       };
     }
-
-    eventRecorder.emit(ProvisioningEvent.METADATA_VALIDATED, {
-      siteId
-    });
-
-    const write = await repository.writeMetadata(siteId, metadata);
-    eventRecorder.emit(ProvisioningEvent.METADATA_WRITTEN, {
-      path: write.path,
-      siteId
-    });
-
-    eventRecorder.emit(ProvisioningEvent.COMPLETED, {
-      siteId
-    });
-
-    return {
-      diagnostics: {
-        errors: [],
-        warnings: []
-      },
-      events: eventRecorder.events,
-      metadata,
-      ok: true,
-      paths: {
-        metadata: write.path,
-        root: siteRoot
-      },
-      siteId
-    };
   }
 
   return {
@@ -175,4 +239,19 @@ export default function createProvisioningService(options = {}) {
     repository,
     version: PROVISIONING_SERVICE_VERSION
   };
+}
+
+async function rollback(transaction, eventRecorder, siteId) {
+  for (const action of transaction.rollback.slice().reverse()) {
+    if (action.step === "remove_site_root") {
+      await rm(action.path, {
+        force: true,
+        recursive: true
+      });
+      eventRecorder.emit(ProvisioningEvent.ROLLED_BACK, {
+        action: action.step,
+        siteId
+      });
+    }
+  }
 }
