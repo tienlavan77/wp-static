@@ -116,7 +116,6 @@ export {
   SETUP_SERVICE_VERSION,
   SetupClient,
   SetupEvent,
-  SetupState,
   default as createSetupService,
   validateSetupContext
 } from "./setup/createSetupService.js";
@@ -147,6 +146,11 @@ export {
   V1_ADAPTER_REQUIRED_METHODS
 } from "./api/v1AdapterApi.js";
 export { V1_PLUGIN_API, V1_PLUGIN_HOOKS } from "./api/v1PluginApi.js";
+export {
+  SETUP_API_VERSION,
+  SetupApiRoute,
+  default as createSetupApi
+} from "./api/createSetupApi.js";
 export {
   V1_THEME_API,
   V1_THEME_CONFIG_FIELDS,

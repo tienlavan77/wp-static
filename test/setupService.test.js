@@ -4,9 +4,9 @@ import createSetupService, {
   SETUP_SERVICE_VERSION,
   SetupClient,
   SetupEvent,
-  SetupState,
   validateSetupContext
 } from "../src/setup/createSetupService.js";
+import { SetupState } from "../src/setup/createSetupStateMachine.js";
 
 test("createSetupService creates an immutable shared setup context", () => {
   const observedEvents = [];
@@ -84,18 +84,18 @@ test("Setup Service owns the runtime session lifecycle", () => {
   assert.equal(service.endSession("setup-session-1").diagnostics.errors[0].code, "setup.session.ended");
 });
 
-test("Setup Service delegates workflow transitions to the state machine", () => {
+test("Setup Service delegates workflow advancement to the state machine", () => {
   const service = createSetupService({
     createSessionId: () => "setup-state-session",
     now: () => "2026-07-27T03:00:00.000Z"
   });
   const started = service.start({ client: SetupClient.BROWSER, siteId: "company-a" });
-  const transitioned = service.transition(started.session.id, SetupState.VALIDATING);
+  const transitioned = service.advance(started.session.id);
 
   assert.equal(transitioned.ok, true);
   assert.equal(transitioned.session.currentStateId, SetupState.VALIDATING);
   assert.deepEqual(transitioned.events.map((event) => event.type), [SetupEvent.STATE_CHANGED]);
-  assert.equal(service.transition(started.session.id, SetupState.READY).ok, false);
+  assert.equal(service.advance(started.session.id).session.currentStateId, SetupState.CONFIGURING);
 });
 
 test("Setup Service does not create a session for rejected context", () => {

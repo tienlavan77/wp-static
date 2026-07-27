@@ -16,6 +16,15 @@ const TRANSITIONS = Object.freeze({
   [SetupState.VALIDATING]: Object.freeze([SetupState.CONFIGURING, SetupState.FAILED])
 });
 
+const PRIMARY_TRANSITIONS = Object.freeze({
+  [SetupState.CONFIGURING]: SetupState.REGISTERING_SOURCE,
+  [SetupState.FAILED]: null,
+  [SetupState.NOT_STARTED]: SetupState.VALIDATING,
+  [SetupState.READY]: null,
+  [SetupState.REGISTERING_SOURCE]: SetupState.READY,
+  [SetupState.VALIDATING]: SetupState.CONFIGURING
+});
+
 function assertState(state) {
   if (!Object.values(SetupState).includes(state)) {
     throw new TypeError(`Unknown setup state: ${state}`);
@@ -48,6 +57,10 @@ export default function createSetupStateMachine(options = {}) {
 
     getState() {
       return snapshot();
+    },
+
+    nextState() {
+      return PRIMARY_TRANSITIONS[current];
     },
 
     transition(nextState) {

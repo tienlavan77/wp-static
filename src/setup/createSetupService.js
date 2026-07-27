@@ -57,6 +57,7 @@ export default function createSetupService(options = {}) {
     validateContext: validateSetupContext
   });
   const stateMachines = new Map();
+  const stateSnapshots = new Map();
 
   function emit(events, type, payload = {}) {
     const event = deepFreeze({
@@ -123,6 +124,7 @@ export default function createSetupService(options = {}) {
     try {
       session = sessionManager.create(contextResult.context);
       stateMachines.set(session.id, createSetupStateMachine());
+      stateSnapshots.delete(session.id);
     } catch (error) {
       return {
         ...contextResult,
@@ -145,13 +147,21 @@ export default function createSetupService(options = {}) {
     return {
       ...contextResult,
       events,
-      session
+      session,
+      state: stateMachines.get(session.id).getState()
     };
   }
 
   function getSession(sessionId) {
     try {
-      return { diagnostics: { errors: [], warnings: [] }, ok: true, session: sessionManager.get(sessionId) };
+      const session = sessionManager.get(sessionId);
+      const state = stateMachines.get(session.id)?.getState() || stateSnapshots.get(session.id) || null;
+      return {
+        diagnostics: { errors: [], warnings: [] },
+        ok: true,
+        session,
+        state
+      };
     } catch (error) {
       return {
         diagnostics: {
@@ -172,12 +182,16 @@ export default function createSetupService(options = {}) {
 
     try {
       const session = sessionManager.end(sessionId);
+      const state = stateMachines.get(session.id)?.getState() || null;
+      if (state) {
+        stateSnapshots.set(session.id, state);
+      }
       stateMachines.delete(session.id);
       emit(events, SetupEvent.SESSION_ENDED, {
         sessionId: session.id,
         siteId: session.context.siteId
       });
-      return { diagnostics: { errors: [], warnings: [] }, events, ok: true, session };
+      return { diagnostics: { errors: [], warnings: [] }, events, ok: true, session, state };
     } catch (error) {
       return {
         diagnostics: {
@@ -250,12 +264,37 @@ export default function createSetupService(options = {}) {
     }
   }
 
+  function advance(sessionId) {
+    const sessionResult = getSession(sessionId);
+    if (!sessionResult.ok) {
+      return sessionResult;
+    }
+
+    const nextState = stateMachines.get(sessionId)?.nextState();
+    if (!nextState) {
+      return {
+        diagnostics: {
+          errors: [{
+            code: "setup.state.advance.unavailable",
+            message: "Setup workflow cannot advance from its current state.",
+            severity: "error"
+          }],
+          warnings: []
+        },
+        events: [],
+        ok: false
+      };
+    }
+
+    return transition(sessionId, nextState);
+  }
+
   return {
+    advance,
     createContext,
     endSession,
     getSession,
     start,
-    transition,
     version: SETUP_SERVICE_VERSION
   };
 }
