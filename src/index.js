@@ -81,6 +81,11 @@ export {
   createSiteRelativePath,
   default as createSiteRegistry
 } from "./site/createSiteRegistry.js";
+export {
+  PROVISIONING_SERVICE_VERSION,
+  SITE_PROVISIONING_DIRECTORIES,
+  default as createProvisioningService
+} from "./provision/createProvisioningService.js";
 export { default as collectAssetUrls } from "./assets/collectAssetUrls.js";
 export { default as processAssetPipeline } from "./assets/processAssetPipeline.js";
 export { default as generateRobotsTxt } from "./seo/generateRobotsTxt.js";
