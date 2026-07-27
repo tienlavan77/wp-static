@@ -68,6 +68,13 @@ export {
 } from "./site/createSiteStateManager.js";
 export { default as createSiteRepository } from "./site/createSiteRepository.js";
 export { default as createSitePathPolicy } from "./site/createSitePathPolicy.js";
+export {
+  SITE_UUID_VERSION,
+  default as createSiteUuid,
+  isSiteUuid
+} from "./site/createSiteUuid.js";
+export { default as createSiteLoader } from "./site/createSiteLoader.js";
+export { default as createSiteRegistry } from "./site/createSiteRegistry.js";
 export { default as collectAssetUrls } from "./assets/collectAssetUrls.js";
 export { default as processAssetPipeline } from "./assets/processAssetPipeline.js";
 export { default as generateRobotsTxt } from "./seo/generateRobotsTxt.js";
