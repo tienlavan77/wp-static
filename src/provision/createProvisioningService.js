@@ -6,12 +6,14 @@ import createSiteMetadata, {
 import createSiteRepository from "../site/createSiteRepository.js";
 import createSitePathPolicy from "../site/createSitePathPolicy.js";
 import createSiteUuid from "../site/createSiteUuid.js";
+import validateProvisioningEnvironment from "./validateProvisioningEnvironment.js";
 
 export const PROVISIONING_SERVICE_VERSION = "1.0";
 
 export const ProvisioningEvent = Object.freeze({
   COMPLETED: "provision.completed",
   DIRECTORY_CREATED: "provision.directory.created",
+  ENVIRONMENT_VALIDATED: "provision.environment.validated",
   FAILED: "provision.failed",
   METADATA_GENERATED: "provision.metadata.generated",
   METADATA_VALIDATED: "provision.metadata.validated",
@@ -23,6 +25,7 @@ export const ProvisioningEvent = Object.freeze({
 export const ProvisioningStep = Object.freeze({
   CREATE_DIRECTORIES: "create_directories",
   GENERATE_METADATA: "generate_metadata",
+  VALIDATE_ENVIRONMENT: "validate_environment",
   VALIDATE_METADATA: "validate_metadata",
   WRITE_METADATA: "write_metadata"
 });
@@ -50,6 +53,10 @@ function normalizeSiteId(input) {
 
 export function planCreateSite(siteId) {
   return [
+    {
+      siteId,
+      step: ProvisioningStep.VALIDATE_ENVIRONMENT
+    },
     {
       siteId,
       step: ProvisioningStep.CREATE_DIRECTORIES
@@ -117,6 +124,33 @@ export default function createProvisioningService(options = {}) {
     }
 
     eventRecorder.emit(ProvisioningEvent.STARTED, {
+      siteId
+    });
+
+    const environmentValidator = options.validateEnvironment
+      || validateProvisioningEnvironment;
+    const environment = await environmentValidator({
+      checks: options.environmentChecks,
+      node: input.environment?.node,
+      sitesDir: repository.sitesDir
+    });
+
+    if (!environment.ok) {
+      eventRecorder.emit(ProvisioningEvent.FAILED, {
+        errors: environment.diagnostics.errors,
+        reason: "environment-check-failed",
+        siteId
+      });
+      return {
+        diagnostics: environment.diagnostics,
+        environment,
+        events: eventRecorder.events,
+        ok: false,
+        siteId
+      };
+    }
+
+    eventRecorder.emit(ProvisioningEvent.ENVIRONMENT_VALIDATED, {
       siteId
     });
 
@@ -199,6 +233,7 @@ export default function createProvisioningService(options = {}) {
           errors: [],
           warnings: []
         },
+        environment,
         events: eventRecorder.events,
         metadata,
         ok: true,

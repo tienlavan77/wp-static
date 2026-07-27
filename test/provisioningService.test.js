@@ -40,6 +40,7 @@ test("createProvisioningService creates an isolated site skeleton", async () => 
     assert.deepEqual(
       result.transaction.plan.map((item) => item.step),
       [
+        ProvisioningStep.VALIDATE_ENVIRONMENT,
         ProvisioningStep.CREATE_DIRECTORIES,
         ProvisioningStep.GENERATE_METADATA,
         ProvisioningStep.VALIDATE_METADATA,
@@ -50,6 +51,7 @@ test("createProvisioningService creates an isolated site skeleton", async () => 
       result.events.map((event) => event.type),
       [
         ProvisioningEvent.STARTED,
+        ProvisioningEvent.ENVIRONMENT_VALIDATED,
         ...SITE_PROVISIONING_DIRECTORIES.map(() => ProvisioningEvent.DIRECTORY_CREATED),
         ProvisioningEvent.METADATA_GENERATED,
         ProvisioningEvent.METADATA_VALIDATED,
@@ -79,6 +81,10 @@ test("createProvisioningService creates an isolated site skeleton", async () => 
 
 test("planCreateSite creates a stable provisioning transaction plan", () => {
   assert.deepEqual(planCreateSite("company-a"), [
+    {
+      siteId: "company-a",
+      step: ProvisioningStep.VALIDATE_ENVIRONMENT
+    },
     {
       siteId: "company-a",
       step: ProvisioningStep.CREATE_DIRECTORIES
