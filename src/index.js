@@ -1,5 +1,9 @@
 export { default as buildSite } from "./builder/buildSite.js";
 export {
+  SITE_SETUP_COMMAND_VERSION,
+  default as createSiteSetupCommand
+} from "./cli/createSiteSetupCommand.js";
+export {
   BROWSER_SETUP_WIZARD_VERSION,
   default as createSetupWizard
 } from "./browser/createSetupWizard.js";

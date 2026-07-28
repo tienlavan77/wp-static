@@ -4,6 +4,8 @@ import path from "node:path";
 import cleanOutput from "../builder/cleanOutput.js";
 import createInstallConfiguration from "../core/createInstallConfiguration.js";
 import createProjectScaffold, { STARTER_TEMPLATES } from "../core/createProjectScaffold.js";
+import createSiteSetupCommand from "./createSiteSetupCommand.js";
+import createSetupService from "../setup/createSetupService.js";
 import doctorProject from "../core/doctorProject.js";
 import loadConfig from "../core/loadConfig.js";
 import buildProjectOnce from "../dev-server/buildProjectOnce.js";
@@ -139,6 +141,13 @@ async function main(cliArgs) {
     return;
   }
 
+  if (cliArgs[0] === "site:setup") {
+    await setupSite(readRequiredArg(cliArgs, "--site"), {
+      advance: cliArgs.includes("--advance")
+    });
+    return;
+  }
+
   if (cliArgs[0] === "validate") {
     await validateProject(readProjectArg(cliArgs), {
       format: cliArgs.includes("--json") ? "json" : "text"
@@ -203,6 +212,16 @@ function readOptionalArg(cliArgs, flagName) {
 
   if (!value || value.startsWith("--")) {
     throw new Error(`CLI option "${flagName}" requires a value.`);
+  }
+
+  return value;
+}
+
+function readRequiredArg(cliArgs, flagName) {
+  const value = readOptionalArg(cliArgs, flagName);
+
+  if (!value) {
+    throw new Error(`CLI option "${flagName}" is required.`);
   }
 
   return value;
@@ -347,6 +366,21 @@ async function serveProject(projectArg, port) {
   const close = () => server.close(() => process.exit(0));
   process.on("SIGINT", close);
   process.on("SIGTERM", close);
+}
+
+async function setupSite(siteId, options = {}) {
+  const command = createSiteSetupCommand({
+    setupService: createSetupService(),
+    write: (line) => logger.info(line)
+  });
+  const result = command.run({
+    advance: options.advance,
+    siteId
+  });
+
+  if (!result.ok) {
+    process.exitCode = 1;
+  }
 }
 
 async function deployRsync(projectArg, options = {}) {
@@ -497,6 +531,7 @@ function printHelp() {
   wpsc release recover [--release-dir <release-dir>] [--reason <text>] --confirm [--json]
   wpsc release validate [--release-dir <release-dir>] [--json]
   wpsc serve [--project <project-dir>] [--port <port>]
+  wpsc site:setup --site <site-id> [--advance]
   wpsc validate [--project <project-dir>] [--json]
   wpsc webhook [--project <project-dir>] [--port <port>] [--secret <secret>]
   wpsc --help
