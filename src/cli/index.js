@@ -5,7 +5,14 @@ import cleanOutput from "../builder/cleanOutput.js";
 import createInstallConfiguration from "../core/createInstallConfiguration.js";
 import createProjectScaffold, { STARTER_TEMPLATES } from "../core/createProjectScaffold.js";
 import createSiteSetupCommand from "./createSiteSetupCommand.js";
+import createSiteCreateCommand from "./createSiteCreateCommand.js";
+import createRuntimeServeCommand from "./createRuntimeServeCommand.js";
 import createSetupService from "../setup/createSetupService.js";
+import createProvisioningService from "../provision/createProvisioningService.js";
+import createSiteRepository from "../site/createSiteRepository.js";
+import createSiteRuntimeInstance from "../runtime/createSiteRuntimeInstance.js";
+import createRuntimeHttpServer from "../runtime/createRuntimeHttpServer.js";
+import loadSiteRuntimeConfig from "../runtime/loadSiteRuntimeConfig.js";
 import doctorProject from "../core/doctorProject.js";
 import loadConfig from "../core/loadConfig.js";
 import buildProjectOnce from "../dev-server/buildProjectOnce.js";
@@ -150,6 +157,24 @@ async function main(cliArgs) {
         type: sourceType
       },
       webhookUrl: readOptionalArg(cliArgs, "--webhook-url")
+    });
+    return;
+  }
+
+  if (cliArgs[0] === "site:create") {
+    await createSite(readRequiredArg(cliArgs, "--site"), {
+      domain: readOptionalArg(cliArgs, "--domain"),
+      workspaceDir: readProjectArg(cliArgs)
+    });
+    return;
+  }
+
+  if (cliArgs[0] === "runtime:serve") {
+    await serveSiteRuntime({
+      configPath: readOptionalArg(cliArgs, "--config"),
+      host: readOptionalArg(cliArgs, "--host") || "127.0.0.1",
+      port: readPortArg(cliArgs),
+      workspaceDir: readProjectArg(cliArgs)
     });
     return;
   }
@@ -391,6 +416,39 @@ async function setupSite(siteId, options = {}) {
   }
 }
 
+async function createSite(siteId, options = {}) {
+  const workspaceDir = path.resolve(options.workspaceDir || process.cwd());
+  const repository = createSiteRepository({ workspaceDir });
+  const command = createSiteCreateCommand({
+    provisioningService: createProvisioningService({ repository }),
+    workspaceDir,
+    write: (line) => logger.info(line)
+  });
+  const result = await command.run({ domain: options.domain, siteId });
+  if (!result.ok) {
+    for (const item of result.diagnostics.errors || []) logger.error?.(`[${item.severity || "error"}] ${item.code}: ${item.message}`);
+    process.exitCode = 1;
+  }
+}
+
+async function serveSiteRuntime(options = {}) {
+  const command = createRuntimeServeCommand({
+    createHttpServer: createRuntimeHttpServer,
+    createRuntimeInstance: createSiteRuntimeInstance,
+    loadRuntimeConfig: loadSiteRuntimeConfig,
+    write: (line) => logger.info(line)
+  });
+  const result = await command.run(options);
+  if (!result.ok) {
+    for (const item of result.diagnostics.errors || []) logger.error?.(`[${item.severity}] ${item.code}: ${item.message}`);
+    process.exitCode = 1;
+    return;
+  }
+  const close = () => result.server.close(() => process.exit(0));
+  process.on("SIGINT", close);
+  process.on("SIGTERM", close);
+}
+
 async function deployRsync(projectArg, options = {}) {
   if (!options.target) {
     throw new Error('CLI option "--target" is required for deploy rsync.');
@@ -539,7 +597,9 @@ function printHelp() {
   wpsc release recover [--release-dir <release-dir>] [--reason <text>] --confirm [--json]
   wpsc release validate [--release-dir <release-dir>] [--json]
   wpsc serve [--project <project-dir>] [--port <port>]
+  wpsc site:create --site <site-id> [--domain <domain>] [--project <workspace>]
   wpsc site:setup --site <site-id> [--advance] [--source <type> --endpoint <url> --webhook-url <url>]
+  wpsc runtime:serve [--config <runtime.config.js>] [--project <workspace>] [--host <host>] [--port <port>]
   wpsc validate [--project <project-dir>] [--json]
   wpsc webhook [--project <project-dir>] [--port <port>] [--secret <secret>]
   wpsc --help
