@@ -22,6 +22,12 @@ test("Setup API is a browser gateway over Setup Service and returns revision", (
   assert.equal(started.ok, true);
   assert.equal(started.session.currentStateId, SetupState.NOT_STARTED);
   assert.equal(started.session.revision, 0);
+  assert.deepEqual(started.presentation, {
+    canAdvance: true,
+    progress: 0,
+    revision: 0,
+    title: "Setup is ready to begin"
+  });
   assert.equal(service.getSession(started.session.id).session.context.client, SetupClient.BROWSER);
   assert.equal(Object.hasOwn(api, "transition"), false);
   assert.equal(SetupApiRoute.ADVANCE, "POST /setup/sessions/:sessionId/advance");
@@ -33,6 +39,7 @@ test("Setup API is a browser gateway over Setup Service and returns revision", (
   assert.equal(advanced.ok, true);
   assert.equal(advanced.session.currentStateId, SetupState.VALIDATING);
   assert.equal(advanced.session.revision, 1);
+  assert.equal(advanced.presentation.revision, 1);
 
   const state = api.state({ sessionId: started.session.id });
   assert.equal(state.session.currentStateId, SetupState.VALIDATING);

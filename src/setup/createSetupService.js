@@ -1,6 +1,9 @@
 import deepFreeze from "../shared/deepFreeze.js";
 import createSetupSessionManager from "./createSetupSessionManager.js";
-import createSetupStateMachine, { SetupState } from "./createSetupStateMachine.js";
+import createSetupStateMachine, {
+  createSetupStatePresentation,
+  SetupState
+} from "./createSetupStateMachine.js";
 
 export { SetupState };
 
@@ -147,6 +150,7 @@ export default function createSetupService(options = {}) {
     return {
       ...contextResult,
       events,
+      presentation: stateMachines.get(session.id).getPresentation(),
       session,
       state: stateMachines.get(session.id).getState()
     };
@@ -159,6 +163,7 @@ export default function createSetupService(options = {}) {
       return {
         diagnostics: { errors: [], warnings: [] },
         ok: true,
+        presentation: state ? createSetupStatePresentation(state) : null,
         session,
         state
       };
@@ -191,7 +196,14 @@ export default function createSetupService(options = {}) {
         sessionId: session.id,
         siteId: session.context.siteId
       });
-      return { diagnostics: { errors: [], warnings: [] }, events, ok: true, session, state };
+      return {
+        diagnostics: { errors: [], warnings: [] },
+        events,
+        ok: true,
+        presentation: state ? createSetupStatePresentation(state) : null,
+        session,
+        state
+      };
     } catch (error) {
       return {
         diagnostics: {
@@ -245,6 +257,7 @@ export default function createSetupService(options = {}) {
         diagnostics: { errors: [], warnings: [] },
         events,
         ok: true,
+        presentation: createSetupStatePresentation(state),
         session,
         state
       };

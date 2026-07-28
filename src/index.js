@@ -1,4 +1,8 @@
 export { default as buildSite } from "./builder/buildSite.js";
+export {
+  BROWSER_SETUP_WIZARD_VERSION,
+  default as createSetupWizard
+} from "./browser/createSetupWizard.js";
 export { default as addRelatedProducts } from "./commerce/addRelatedProducts.js";
 export { default as applyAdvancedCommerceData } from "./commerce/applyAdvancedCommerceData.js";
 export { default as cleanOutput } from "./builder/cleanOutput.js";

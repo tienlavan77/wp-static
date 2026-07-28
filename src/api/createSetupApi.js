@@ -73,6 +73,7 @@ export default function createSetupApi(options = {}) {
         diagnostics: result.diagnostics,
         events: result.events,
         ok: true,
+        presentation: result.presentation,
         session: publicSession(result.session, result.state)
       };
     },
@@ -92,6 +93,7 @@ export default function createSetupApi(options = {}) {
         diagnostics: result.diagnostics,
         events: result.events,
         ok: true,
+        presentation: result.presentation,
         session: publicSession(result.session, result.state)
       };
     },
@@ -117,6 +119,7 @@ export default function createSetupApi(options = {}) {
         diagnostics: result.diagnostics,
         events: result.events,
         ok: true,
+        presentation: result.presentation,
         session: publicSession(result.session, result.state)
       };
     },
@@ -135,6 +138,7 @@ export default function createSetupApi(options = {}) {
       return {
         diagnostics: result.diagnostics,
         ok: true,
+        presentation: result.presentation,
         session: publicSession(result.session, result.state)
       };
     }

@@ -25,6 +25,39 @@ const PRIMARY_TRANSITIONS = Object.freeze({
   [SetupState.VALIDATING]: SetupState.CONFIGURING
 });
 
+const PRESENTATIONS = Object.freeze({
+  [SetupState.CONFIGURING]: Object.freeze({
+    canAdvance: true,
+    progress: 50,
+    title: "Configuring site"
+  }),
+  [SetupState.FAILED]: Object.freeze({
+    canAdvance: false,
+    progress: 100,
+    title: "Setup needs attention"
+  }),
+  [SetupState.NOT_STARTED]: Object.freeze({
+    canAdvance: true,
+    progress: 0,
+    title: "Setup is ready to begin"
+  }),
+  [SetupState.READY]: Object.freeze({
+    canAdvance: false,
+    progress: 100,
+    title: "Setup is ready for first build"
+  }),
+  [SetupState.REGISTERING_SOURCE]: Object.freeze({
+    canAdvance: true,
+    progress: 75,
+    title: "Registering source"
+  }),
+  [SetupState.VALIDATING]: Object.freeze({
+    canAdvance: true,
+    progress: 25,
+    title: "Validating environment"
+  })
+});
+
 function assertState(state) {
   if (!Object.values(SetupState).includes(state)) {
     throw new TypeError(`Unknown setup state: ${state}`);
@@ -35,6 +68,18 @@ export function canTransition(from, to) {
   assertState(from);
   assertState(to);
   return TRANSITIONS[from].includes(to);
+}
+
+export function createSetupStatePresentation(state) {
+  assertState(state.currentStateId);
+  const presentation = PRESENTATIONS[state.currentStateId];
+
+  return Object.freeze({
+    canAdvance: presentation.canAdvance,
+    progress: presentation.progress,
+    revision: state.revision,
+    title: presentation.title
+  });
 }
 
 export default function createSetupStateMachine(options = {}) {
@@ -57,6 +102,10 @@ export default function createSetupStateMachine(options = {}) {
 
     getState() {
       return snapshot();
+    },
+
+    getPresentation() {
+      return createSetupStatePresentation(snapshot());
     },
 
     nextState() {
