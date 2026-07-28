@@ -2,7 +2,8 @@ export const SetupState = Object.freeze({
   CONFIGURING: "CONFIGURING",
   FAILED: "FAILED",
   NOT_STARTED: "NOT_STARTED",
-  READY: "READY",
+  READY: "READY_FOR_FIRST_BUILD",
+  READY_FOR_FIRST_BUILD: "READY_FOR_FIRST_BUILD",
   REGISTERING_SOURCE: "REGISTERING_SOURCE",
   VALIDATING: "VALIDATING"
 });
@@ -11,8 +12,8 @@ const TRANSITIONS = Object.freeze({
   [SetupState.CONFIGURING]: Object.freeze([SetupState.REGISTERING_SOURCE, SetupState.FAILED]),
   [SetupState.FAILED]: Object.freeze([]),
   [SetupState.NOT_STARTED]: Object.freeze([SetupState.VALIDATING, SetupState.FAILED]),
-  [SetupState.READY]: Object.freeze([]),
-  [SetupState.REGISTERING_SOURCE]: Object.freeze([SetupState.READY, SetupState.FAILED]),
+  [SetupState.READY_FOR_FIRST_BUILD]: Object.freeze([]),
+  [SetupState.REGISTERING_SOURCE]: Object.freeze([SetupState.READY_FOR_FIRST_BUILD, SetupState.FAILED]),
   [SetupState.VALIDATING]: Object.freeze([SetupState.CONFIGURING, SetupState.FAILED])
 });
 
@@ -20,8 +21,8 @@ const PRIMARY_TRANSITIONS = Object.freeze({
   [SetupState.CONFIGURING]: SetupState.REGISTERING_SOURCE,
   [SetupState.FAILED]: null,
   [SetupState.NOT_STARTED]: SetupState.VALIDATING,
-  [SetupState.READY]: null,
-  [SetupState.REGISTERING_SOURCE]: SetupState.READY,
+  [SetupState.READY_FOR_FIRST_BUILD]: null,
+  [SetupState.REGISTERING_SOURCE]: null,
   [SetupState.VALIDATING]: SetupState.CONFIGURING
 });
 
@@ -41,7 +42,7 @@ const PRESENTATIONS = Object.freeze({
     progress: 0,
     title: "Setup is ready to begin"
   }),
-  [SetupState.READY]: Object.freeze({
+  [SetupState.READY_FOR_FIRST_BUILD]: Object.freeze({
     canAdvance: false,
     progress: 100,
     title: "Setup is ready for first build"
@@ -76,8 +77,10 @@ export function createSetupStatePresentation(state) {
 
   return Object.freeze({
     canAdvance: presentation.canAdvance,
+    canFinalize: state.currentStateId === SetupState.REGISTERING_SOURCE,
     progress: presentation.progress,
     revision: state.revision,
+    sourceRegistrationAvailable: state.currentStateId === SetupState.REGISTERING_SOURCE,
     title: presentation.title
   });
 }

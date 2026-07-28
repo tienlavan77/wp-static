@@ -35,17 +35,30 @@ export default function createSiteSetupCommand(options = {}) {
   }
 
   return {
-    run(input = {}) {
+    async run(input = {}) {
       const started = setupService.start({
         client: SetupClient.CLI,
         siteId: input.siteId
       });
 
-      if (!started.ok || !input.advance) {
+      if (!started.ok) {
         return report(started);
       }
 
-      return report(setupService.advance(started.session.id));
+      let result = started;
+      if (input.advance) {
+        result = setupService.advance(started.session.id);
+      }
+      if (!result.ok || !input.source) {
+        return report(result);
+      }
+
+      return report(await setupService.registerSource(result.session.id, {
+        adapterOptions: input.adapterOptions,
+        credentials: input.credentials,
+        source: input.source,
+        webhookUrl: input.webhookUrl
+      }));
     },
     version: SITE_SETUP_COMMAND_VERSION
   };

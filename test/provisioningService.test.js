@@ -44,7 +44,8 @@ test("createProvisioningService creates an isolated site skeleton", async () => 
         ProvisioningStep.CREATE_DIRECTORIES,
         ProvisioningStep.GENERATE_METADATA,
         ProvisioningStep.VALIDATE_METADATA,
-        ProvisioningStep.WRITE_METADATA
+        ProvisioningStep.WRITE_METADATA,
+        ProvisioningStep.WRITE_RUNTIME_ENTRY
       ]
     );
     assert.deepEqual(
@@ -56,6 +57,7 @@ test("createProvisioningService creates an isolated site skeleton", async () => 
         ProvisioningEvent.METADATA_GENERATED,
         ProvisioningEvent.METADATA_VALIDATED,
         ProvisioningEvent.METADATA_WRITTEN,
+        ProvisioningEvent.RUNTIME_ENTRY_CREATED,
         ProvisioningEvent.COMPLETED
       ]
     );
@@ -64,6 +66,7 @@ test("createProvisioningService creates an isolated site skeleton", async () => 
     for (const directory of SITE_PROVISIONING_DIRECTORIES) {
       await access(path.join(workspaceDir, "sites", "tin-sinh-phat", directory));
     }
+    await access(result.paths.runtimeEntry);
 
     const loader = createSiteLoader({
       repository
@@ -100,6 +103,10 @@ test("planCreateSite creates a stable provisioning transaction plan", () => {
     {
       siteId: "company-a",
       step: ProvisioningStep.WRITE_METADATA
+    },
+    {
+      siteId: "company-a",
+      step: ProvisioningStep.WRITE_RUNTIME_ENTRY
     }
   ]);
 });

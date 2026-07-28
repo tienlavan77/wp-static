@@ -24,8 +24,10 @@ test("Setup API is a browser gateway over Setup Service and returns revision", (
   assert.equal(started.session.revision, 0);
   assert.deepEqual(started.presentation, {
     canAdvance: true,
+    canFinalize: false,
     progress: 0,
     revision: 0,
+    sourceRegistrationAvailable: false,
     title: "Setup is ready to begin"
   });
   assert.equal(service.getSession(started.session.id).session.context.client, SetupClient.BROWSER);

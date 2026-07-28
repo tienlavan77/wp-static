@@ -6,7 +6,7 @@ import createSiteSetupCommand, {
 import createSetupService, { SetupClient } from "../src/setup/createSetupService.js";
 import { SetupState } from "../src/setup/createSetupStateMachine.js";
 
-test("site setup command calls Setup Service directly and writes service progress", () => {
+test("site setup command calls Setup Service directly and writes service progress", async () => {
   const output = [];
   const service = createSetupService({
     createSessionId: () => "cli-setup-session",
@@ -16,7 +16,7 @@ test("site setup command calls Setup Service directly and writes service progres
     setupService: service,
     write: (line) => output.push(line)
   });
-  const result = command.run({ siteId: "company-a" });
+  const result = await command.run({ siteId: "company-a" });
 
   assert.equal(command.version, SITE_SETUP_COMMAND_VERSION);
   assert.equal(result.ok, true);
@@ -25,7 +25,7 @@ test("site setup command calls Setup Service directly and writes service progres
   assert.match(output[0], /Setup company-a: Setup is ready to begin \(0%, revision 0\)/);
 });
 
-test("site setup command advances only through the Setup Service", () => {
+test("site setup command advances only through the Setup Service", async () => {
   const output = [];
   const command = createSiteSetupCommand({
     setupService: createSetupService({
@@ -34,16 +34,16 @@ test("site setup command advances only through the Setup Service", () => {
     }),
     write: (line) => output.push(line)
   });
-  const result = command.run({ advance: true, siteId: "company-a" });
+  const result = await command.run({ advance: true, siteId: "company-a" });
 
   assert.equal(result.ok, true);
   assert.equal(result.session.currentStateId, SetupState.VALIDATING);
   assert.match(output[0], /Validating environment/);
 });
 
-test("site setup command renders Setup Service diagnostics without translating them", () => {
+test("site setup command renders Setup Service diagnostics without translating them", async () => {
   const output = [];
-  const result = createSiteSetupCommand({
+  const result = await createSiteSetupCommand({
     setupService: createSetupService(),
     write: (line) => output.push(line)
   }).run({});

@@ -142,8 +142,14 @@ async function main(cliArgs) {
   }
 
   if (cliArgs[0] === "site:setup") {
+    const sourceType = readOptionalArg(cliArgs, "--source");
     await setupSite(readRequiredArg(cliArgs, "--site"), {
-      advance: cliArgs.includes("--advance")
+      advance: cliArgs.includes("--advance"),
+      source: sourceType && {
+        endpoint: readOptionalArg(cliArgs, "--endpoint"),
+        type: sourceType
+      },
+      webhookUrl: readOptionalArg(cliArgs, "--webhook-url")
     });
     return;
   }
@@ -373,9 +379,11 @@ async function setupSite(siteId, options = {}) {
     setupService: createSetupService(),
     write: (line) => logger.info(line)
   });
-  const result = command.run({
+  const result = await command.run({
     advance: options.advance,
-    siteId
+    siteId,
+    source: options.source,
+    webhookUrl: options.webhookUrl
   });
 
   if (!result.ok) {
@@ -531,7 +539,7 @@ function printHelp() {
   wpsc release recover [--release-dir <release-dir>] [--reason <text>] --confirm [--json]
   wpsc release validate [--release-dir <release-dir>] [--json]
   wpsc serve [--project <project-dir>] [--port <port>]
-  wpsc site:setup --site <site-id> [--advance]
+  wpsc site:setup --site <site-id> [--advance] [--source <type> --endpoint <url> --webhook-url <url>]
   wpsc validate [--project <project-dir>] [--json]
   wpsc webhook [--project <project-dir>] [--port <port>] [--secret <secret>]
   wpsc --help

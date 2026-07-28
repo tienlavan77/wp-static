@@ -54,6 +54,9 @@ export function validateSetupContext(context = {}) {
 
 export default function createSetupService(options = {}) {
   const onEvent = typeof options.onEvent === "function" ? options.onEvent : null;
+  const sourceRegistrationService = options.sourceRegistrationService || null;
+  const webhookActivationService = options.webhookActivationService || null;
+  const firstBuildReadinessService = options.firstBuildReadinessService || null;
   const sessionManager = createSetupSessionManager({
     createId: options.createSessionId,
     now: options.now,
@@ -302,11 +305,114 @@ export default function createSetupService(options = {}) {
     return transition(sessionId, nextState);
   }
 
+  async function registerSource(sessionId, input = {}) {
+    let sessionResult = getSession(sessionId);
+    if (!sessionResult.ok) {
+      return sessionResult;
+    }
+
+    // Only Setup Service advances the workflow needed before source registration.
+    while (sessionResult.state?.currentStateId !== SetupState.REGISTERING_SOURCE) {
+      const advanced = advance(sessionId);
+      if (!advanced.ok) {
+        return advanced;
+      }
+      sessionResult = getSession(sessionId);
+    }
+
+    if (sessionResult.state?.currentStateId !== SetupState.REGISTERING_SOURCE) {
+      return {
+        diagnostics: {
+          errors: [createDiagnostic(
+            "setup.source.registration.unavailable",
+            "A source can only be registered while setup is registering a source."
+          )],
+          warnings: []
+        },
+        events: [],
+        ok: false
+      };
+    }
+
+    if (!sourceRegistrationService || typeof sourceRegistrationService.register !== "function") {
+      return {
+        diagnostics: {
+          errors: [createDiagnostic(
+            "setup.source.registration.unavailable",
+            "Source registration is not configured for this Setup Service."
+          )],
+          warnings: []
+        },
+        events: [],
+        ok: false
+      };
+    }
+
+    const registration = await sourceRegistrationService.register({
+      ...input,
+      siteId: sessionResult.session.context.siteId
+    });
+    if (!registration.ok) {
+      return { ...registration, presentation: sessionResult.presentation, session: sessionResult.session, state: sessionResult.state };
+    }
+
+    if (typeof input.webhookUrl !== "string" || input.webhookUrl.trim() === "") {
+      return { ...registration, presentation: sessionResult.presentation, session: sessionResult.session, state: sessionResult.state };
+    }
+
+    if (!webhookActivationService || typeof webhookActivationService.activate !== "function") {
+      return {
+        diagnostics: {
+          errors: [createDiagnostic(
+            "setup.webhook.activation.unavailable",
+            "Webhook activation is not configured for this Setup Service."
+          )],
+          warnings: []
+        },
+        events: registration.events,
+        ok: false,
+        presentation: sessionResult.presentation,
+        session: sessionResult.session,
+        state: sessionResult.state
+      };
+    }
+
+    const activation = await webhookActivationService.activate({
+      adapterOptions: input.adapterOptions,
+      siteId: sessionResult.session.context.siteId,
+      webhookUrl: input.webhookUrl
+    });
+    return {
+      ...activation,
+      events: [...registration.events, ...(activation.events || [])],
+      presentation: sessionResult.presentation,
+      registration,
+      session: sessionResult.session,
+      state: sessionResult.state
+    };
+  }
+
+  async function readyForFirstBuild(sessionId) {
+    const sessionResult = getSession(sessionId);
+    if (!sessionResult.ok) return sessionResult;
+    if (sessionResult.state?.currentStateId !== SetupState.REGISTERING_SOURCE || !firstBuildReadinessService) {
+      return { diagnostics: { errors: [createDiagnostic("setup.ready.unavailable", "First build readiness is not available for this setup session.")], warnings: [] }, events: [], ok: false };
+    }
+    const validation = await firstBuildReadinessService.validate(sessionResult.session.context.siteId);
+    if (!validation.ok) return { ...validation, events: [], presentation: sessionResult.presentation, session: sessionResult.session, state: sessionResult.state };
+    const transitioned = transition(sessionId, SetupState.READY_FOR_FIRST_BUILD);
+    const events = [...transitioned.events];
+    emit(events, "setup.readyForFirstBuild", { siteId: sessionResult.session.context.siteId });
+    return { ...transitioned, events, metadata: validation.metadata };
+  }
+
   return {
     advance,
     createContext,
     endSession,
     getSession,
+    registerSource,
+    readyForFirstBuild,
     start,
     version: SETUP_SERVICE_VERSION
   };

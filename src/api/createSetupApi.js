@@ -5,6 +5,8 @@ export const SETUP_API_VERSION = "1.0";
 export const SetupApiRoute = Object.freeze({
   ADVANCE: "POST /setup/sessions/:sessionId/advance",
   END: "POST /setup/sessions/:sessionId/end",
+  READY: "POST /setup/sessions/:sessionId/ready",
+  SOURCE: "POST /setup/sessions/:sessionId/source",
   START: "POST /setup/sessions",
   STATE: "GET /setup/sessions/:sessionId"
 });
@@ -122,6 +124,39 @@ export default function createSetupApi(options = {}) {
         presentation: result.presentation,
         session: publicSession(result.session, result.state)
       };
+    },
+
+    async source(request = {}) {
+      const invalidSession = sessionFailure(request.sessionId);
+      if (invalidSession) {
+        return invalidSession;
+      }
+
+      const result = await setupService.registerSource(request.sessionId.trim(), {
+        adapterOptions: request.adapterOptions,
+        credentials: request.credentials,
+        source: request.source,
+        webhookUrl: request.webhookUrl
+      });
+      if (!result.ok) {
+        return failure(result.diagnostics);
+      }
+
+      return {
+        diagnostics: result.diagnostics,
+        events: result.events,
+        ok: true,
+        presentation: result.presentation,
+        session: publicSession(result.session, result.state)
+      };
+    },
+
+    async ready(request = {}) {
+      const invalidSession = sessionFailure(request.sessionId);
+      if (invalidSession) return invalidSession;
+      const result = await setupService.readyForFirstBuild(request.sessionId.trim());
+      if (!result.ok) return failure(result.diagnostics);
+      return { diagnostics: result.diagnostics, events: result.events, ok: true, presentation: result.presentation, session: publicSession(result.session, result.state) };
     },
 
     state(request = {}) {

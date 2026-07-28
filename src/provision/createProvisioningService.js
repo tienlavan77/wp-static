@@ -6,6 +6,7 @@ import createSiteMetadata, {
 import createSiteRepository from "../site/createSiteRepository.js";
 import createSitePathPolicy from "../site/createSitePathPolicy.js";
 import createSiteUuid from "../site/createSiteUuid.js";
+import { createSiteRuntimeEntryPoint } from "../runtime/createSiteRuntime.js";
 import validateProvisioningEnvironment from "./validateProvisioningEnvironment.js";
 
 export const PROVISIONING_SERVICE_VERSION = "1.0";
@@ -18,6 +19,7 @@ export const ProvisioningEvent = Object.freeze({
   METADATA_GENERATED: "provision.metadata.generated",
   METADATA_VALIDATED: "provision.metadata.validated",
   METADATA_WRITTEN: "provision.metadata.written",
+  RUNTIME_ENTRY_CREATED: "provision.runtime.entry.created",
   ROLLED_BACK: "provision.rolled_back",
   STARTED: "provision.started"
 });
@@ -27,7 +29,8 @@ export const ProvisioningStep = Object.freeze({
   GENERATE_METADATA: "generate_metadata",
   VALIDATE_ENVIRONMENT: "validate_environment",
   VALIDATE_METADATA: "validate_metadata",
-  WRITE_METADATA: "write_metadata"
+  WRITE_METADATA: "write_metadata",
+  WRITE_RUNTIME_ENTRY: "write_runtime_entry"
 });
 
 export const SITE_PROVISIONING_DIRECTORIES = Object.freeze([
@@ -72,6 +75,10 @@ export function planCreateSite(siteId) {
     {
       siteId,
       step: ProvisioningStep.WRITE_METADATA
+    },
+    {
+      siteId,
+      step: ProvisioningStep.WRITE_RUNTIME_ENTRY
     }
   ];
 }
@@ -224,6 +231,12 @@ export default function createProvisioningService(options = {}) {
         siteId
       });
 
+      const runtimeEntry = await createSiteRuntimeEntryPoint(repository, siteId);
+      eventRecorder.emit(ProvisioningEvent.RUNTIME_ENTRY_CREATED, {
+        path: runtimeEntry.indexPath,
+        siteId
+      });
+
       eventRecorder.emit(ProvisioningEvent.COMPLETED, {
         siteId
       });
@@ -239,6 +252,7 @@ export default function createProvisioningService(options = {}) {
         ok: true,
         paths: {
           metadata: write.path,
+          runtimeEntry: runtimeEntry.indexPath,
           root: siteRoot
         },
         siteId,

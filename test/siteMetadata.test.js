@@ -68,12 +68,11 @@ test("createSiteMetadata exposes the architecture v2 state list", () => {
   assert.deepEqual(SITE_STATUSES, [
     SiteState.CREATED,
     SiteState.SETUP_REQUIRED,
-    SiteState.READY,
+    SiteState.READY_FOR_FIRST_BUILD,
     SiteState.BUILDING,
     SiteState.RUNNING,
     SiteState.ERROR,
-    SiteState.DISABLED,
-    SiteState.REGISTERING_SOURCE
+    SiteState.MAINTENANCE
   ]);
 });
 

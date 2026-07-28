@@ -15,7 +15,17 @@ function createHtml(options) {
       <input id="setup-site-id" name="siteId" required autocomplete="off">
       <button type="submit">Start setup</button>
     </form>
+    <form data-setup-source-form hidden>
+      <label for="setup-source-type">Source type</label>
+      <input id="setup-source-type" name="sourceType" required autocomplete="off">
+      <label for="setup-source-endpoint">Source endpoint</label>
+      <input id="setup-source-endpoint" name="endpoint" required type="url">
+      <label for="setup-webhook-url">Webhook URL (optional)</label>
+      <input id="setup-webhook-url" name="webhookUrl" type="url">
+      <button type="submit">Register source</button>
+    </form>
     <button type="button" data-setup-advance hidden>Continue</button>
+    <button type="button" data-setup-finalize hidden>Ready for first build</button>
     <button type="button" data-setup-refresh hidden>Refresh status</button>
     <section data-setup-errors aria-live="polite"></section>
   </section>
@@ -35,7 +45,9 @@ if(root){
   const progress=root.querySelector('[data-setup-progress]');
   const errors=root.querySelector('[data-setup-errors]');
   const startForm=root.querySelector('[data-setup-start-form]');
+  const sourceForm=root.querySelector('[data-setup-source-form]');
   const advance=root.querySelector('[data-setup-advance]');
+  const finalize=root.querySelector('[data-setup-finalize]');
   const refresh=root.querySelector('[data-setup-refresh]');
 
   function renderDiagnostics(diagnostics){
@@ -55,6 +67,8 @@ if(root){
     title.textContent=presentation.title||'';
     progress.textContent=(presentation.progress??0)+'%';
     advance.hidden=!presentation.canAdvance;
+    finalize.hidden=!presentation.canFinalize;
+    sourceForm.hidden=!model.sessionId||!presentation.sourceRegistrationAvailable;
     refresh.hidden=!model.sessionId;
     renderDiagnostics(snapshot.diagnostics);
   }
@@ -80,6 +94,20 @@ if(root){
     if(!model.sessionId)return;
     await request('/sessions/'+encodeURIComponent(model.sessionId)+'/advance','POST');
     await refreshState();
+  });
+  finalize.addEventListener('click',async()=>{
+    if(!model.sessionId)return;
+    render(await request('/sessions/'+encodeURIComponent(model.sessionId)+'/ready','POST'));
+  });
+  sourceForm.addEventListener('submit',async(event)=>{
+    event.preventDefault();
+    if(!model.sessionId)return;
+    const form=new FormData(sourceForm);
+    const snapshot=await request('/sessions/'+encodeURIComponent(model.sessionId)+'/source','POST',{
+      source:{endpoint:form.get('endpoint'),type:form.get('sourceType')},
+      webhookUrl:form.get('webhookUrl')
+    });
+    render(snapshot);
   });
   refresh.addEventListener('click',refreshState);
 }`;

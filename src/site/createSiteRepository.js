@@ -38,6 +38,10 @@ export default function createSiteRepository(options = {}) {
     return path.join(resolveSiteRoot(siteId), "config", "site.json");
   }
 
+  function resolveSourceMetadataPath(siteId) {
+    return path.join(resolveSiteRoot(siteId), "config", "source.json");
+  }
+
   async function readMetadata(siteId) {
     const metadataPath = resolveMetadataPath(siteId);
     const raw = await readFile(metadataPath, "utf8");
@@ -60,12 +64,37 @@ export default function createSiteRepository(options = {}) {
     };
   }
 
+  async function readSourceMetadata(siteId) {
+    const metadataPath = resolveSourceMetadataPath(siteId);
+    const raw = await readFile(metadataPath, "utf8");
+    return JSON.parse(raw);
+  }
+
+  async function writeSourceMetadata(siteId, metadata) {
+    const metadataPath = resolveSourceMetadataPath(siteId);
+    await mkdir(path.dirname(metadataPath), {
+      recursive: true
+    });
+
+    const tempPath = `${metadataPath}.tmp`;
+    await writeFile(tempPath, `${JSON.stringify(metadata, null, 2)}\n`, "utf8");
+    await rename(tempPath, metadataPath);
+
+    return {
+      metadata,
+      path: metadataPath
+    };
+  }
+
   return {
     readMetadata,
+    readSourceMetadata,
     resolveMetadataPath,
+    resolveSourceMetadataPath,
     resolveSiteRoot,
     sitesDir,
     workspaceDir,
-    writeMetadata
+    writeMetadata,
+    writeSourceMetadata
   };
 }

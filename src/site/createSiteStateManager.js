@@ -1,14 +1,13 @@
 import { SITE_STATUSES, SiteState } from "./createSiteMetadata.js";
 
 export const SITE_STATE_TRANSITIONS = {
-  [SiteState.BUILDING]: [SiteState.RUNNING, SiteState.READY, SiteState.ERROR, SiteState.DISABLED],
-  [SiteState.CREATED]: [SiteState.SETUP_REQUIRED, SiteState.DISABLED],
-  [SiteState.DISABLED]: [SiteState.SETUP_REQUIRED],
-  [SiteState.ERROR]: [SiteState.SETUP_REQUIRED, SiteState.READY, SiteState.DISABLED],
-  [SiteState.READY]: [SiteState.BUILDING, SiteState.RUNNING, SiteState.ERROR, SiteState.DISABLED],
-  [SiteState.REGISTERING_SOURCE]: [SiteState.READY, SiteState.ERROR, SiteState.DISABLED],
-  [SiteState.RUNNING]: [SiteState.BUILDING, SiteState.ERROR, SiteState.DISABLED],
-  [SiteState.SETUP_REQUIRED]: [SiteState.REGISTERING_SOURCE, SiteState.ERROR, SiteState.DISABLED]
+  [SiteState.BUILDING]: [SiteState.RUNNING, SiteState.ERROR],
+  [SiteState.CREATED]: [SiteState.SETUP_REQUIRED],
+  [SiteState.ERROR]: [SiteState.SETUP_REQUIRED, SiteState.READY_FOR_FIRST_BUILD],
+  [SiteState.MAINTENANCE]: [SiteState.RUNNING, SiteState.ERROR],
+  [SiteState.READY_FOR_FIRST_BUILD]: [SiteState.BUILDING, SiteState.ERROR],
+  [SiteState.RUNNING]: [SiteState.BUILDING, SiteState.MAINTENANCE, SiteState.ERROR],
+  [SiteState.SETUP_REQUIRED]: [SiteState.READY_FOR_FIRST_BUILD, SiteState.ERROR]
 };
 
 function assertKnownStatus(status) {
