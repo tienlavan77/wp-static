@@ -1,6 +1,6 @@
 export const RUNTIME_ROUTER_VERSION = "1.0";
 
-function response(status, body) { return { body, status }; }
+function response(status, body, headers = null) { return { body, headers, status }; }
 function failure(code, message, status = 400) { return response(status, { diagnostics: { errors: [{ code, message, severity: "error" }], warnings: [] }, ok: false }); }
 
 export default function createRuntimeRouter(options = {}) {
@@ -20,10 +20,25 @@ export default function createRuntimeRouter(options = {}) {
     const body = request.body || {};
     const siteId = resolved.siteId;
 
+    if (path.startsWith("/api/")) {
+      const commerceGateway = service("commerceGateway");
+      if (!commerceGateway) return failure("runtime.account.unavailable", "Account service is not configured.", 503);
+      return commerceGateway.handle(siteId, request);
+    }
+
+    const webhookMatch = path.match(/^\/webhook\/([a-z0-9-]+)$/i);
+    if (webhookMatch) {
+      const receiver = service("webhookReceiver");
+      if (!receiver) return failure("runtime.webhook.receiver.unavailable", "Webhook receiver is not configured.", 503);
+      const result = await receiver.handle(siteId, webhookMatch[1], request);
+      return response(result.status, result.body);
+    }
+
     if (method === "GET" && path === "/") {
-      if (resolved.route === "installer") return response(200, { ok: true, route: "installer", siteId });
+      const browserViews = service("browserViews");
+      if (resolved.route === "installer") return browserViews ? response(200, browserViews.installer(siteId), { "content-type": "text/html; charset=utf-8" }) : response(200, { ok: true, route: "installer", siteId });
       const dashboard = await service("dashboard").show(siteId);
-      return response(dashboard.ok ? 200 : 500, { ...dashboard, route: "dashboard" });
+      return browserViews ? response(dashboard.ok ? 200 : 500, browserViews.dashboard(dashboard), { "content-type": "text/html; charset=utf-8" }) : response(dashboard.ok ? 200 : 500, { ...dashboard, route: "dashboard" });
     }
     if (method === "POST" && path === "/installer/start") return response(200, service("installer").begin(siteId));
     if (method === "POST" && path === "/installer/complete") {

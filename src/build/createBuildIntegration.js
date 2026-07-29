@@ -8,12 +8,11 @@ function diagnostic(code, message) {
 
 export default function createBuildIntegration(options = {}) {
   const buildEngine = options.buildEngine;
-  const contentPipeline = options.contentPipeline;
   const contentReader = options.contentReader;
   const outputPipeline = options.outputPipeline;
-  const themeRenderer = options.themeRenderer;
-  if (!buildEngine || !contentPipeline || !contentReader || !outputPipeline || !themeRenderer) {
-    throw new TypeError("Build Integration requires engine, reader, content, theme, and output components.");
+  const runtimeV1Builder = options.runtimeV1Builder;
+  if (!buildEngine || !contentReader || !outputPipeline || !runtimeV1Builder) {
+    throw new TypeError("Build Integration requires engine, Runtime Content Reader, Runtime V1 Builder, and Output Pipeline.");
   }
 
   async function build(input = {}) {
@@ -25,11 +24,8 @@ export default function createBuildIntegration(options = {}) {
       if (!source || !Array.isArray(source.items)) {
         return buildEngine.fail(started.buildId, { diagnostics: { errors: [diagnostic("build.source.content.invalid", "Content Reader must return an items array.")], warnings: [] } });
       }
-      const content = contentPipeline.run(source.items);
-      if (!content.ok) return buildEngine.fail(started.buildId, { diagnostics: content.diagnostics });
-      const rendered = themeRenderer.render(content.model);
-      if (!rendered.ok) return buildEngine.fail(started.buildId, { diagnostics: rendered.diagnostics });
-      const output = await outputPipeline.write({ assets: source.assets || [], pages: rendered.pages, siteId: started.context.siteId });
+      const built = await runtimeV1Builder.build({ buildId: started.buildId, changed: input.changed || [], collections: source.collections, contents: source.items, siteId: started.context.siteId });
+      const output = await outputPipeline.write({ assets: built.assets, pages: [], siteId: started.context.siteId });
       if (!output.ok) return buildEngine.fail(started.buildId, { diagnostics: output.diagnostics });
       return buildEngine.finish(started.buildId, { generatedFiles: output.generatedFiles });
     } catch (error) {

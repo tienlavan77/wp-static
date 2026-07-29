@@ -13,8 +13,11 @@ export function normalizeContent(raw = {}) {
   if (!id || !type || !slug) return null;
   return deepFreeze({
     data: deepFreeze({ ...(raw.data || {}) }),
+    domain: typeof raw.domain === "string" ? raw.domain : null,
     id,
+    seo: deepFreeze({ ...(raw.seo || {}) }),
     slug,
+    status: typeof raw.status === "string" ? raw.status : null,
     title: typeof raw.title === "string" ? raw.title : "",
     type
   });

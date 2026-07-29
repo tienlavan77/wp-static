@@ -6,7 +6,6 @@ import path from "node:path";
 import { spawn } from "node:child_process";
 import test from "node:test";
 import createProvisioningService from "../src/provision/createProvisioningService.js";
-import createThemeRenderer from "../src/renderer/createThemeRenderer.js";
 import createRuntimeHttpServer from "../src/runtime/createRuntimeHttpServer.js";
 import createSiteRuntimeInstance from "../src/runtime/createSiteRuntimeInstance.js";
 import createSiteRepository from "../src/site/createSiteRepository.js";
@@ -71,7 +70,6 @@ test("Runtime E2E provisions, proxies a domain, configures, builds, and serves a
     contentReader: { read: async () => ({ assets: [], items: [{ id: "welcome-1", slug: "welcome", title: "Welcome to Company A", type: "page" }] }) },
     domains: { "example.test": created.siteId },
     repository,
-    themeRenderer: createThemeRenderer({ defaultLayout: ({ content, html }) => html`<main>${content.title}</main>` }),
     webhookBaseUrl: "https://example.test/webhook"
   });
   const nodeServer = createRuntimeHttpServer({ router: instance.router });
@@ -89,7 +87,8 @@ test("Runtime E2E provisions, proxies a domain, configures, builds, and serves a
   try {
     const installer = await waitForServer(phpPort);
     assert.equal(installer.status, 200);
-    assert.equal(JSON.parse(installer.body).route, "installer");
+    assert.match(installer.headers["content-type"], /text\/html/);
+    assert.match(installer.body, /Set up company-a/);
 
     const started = await request(phpPort, { method: "POST", path: "/installer/start" });
     const sessionId = JSON.parse(started.body).session.id;

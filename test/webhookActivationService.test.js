@@ -81,6 +81,24 @@ test("Webhook Activation registers, verifies, and persists webhook metadata", as
   }
 });
 
+test("Webhook Activation loads saved source credentials instead of receiving them from Browser", async () => {
+  const { repository, workspaceDir } = await createFixture();
+  const calls = { register: 0, unregister: 0, verify: 0 };
+  let adapterOptions;
+  const service = createWebhookActivationService({
+    adapterLoader: { load: (_type, options) => { adapterOptions = options; return createAdapter(calls); } },
+    credentialStore: { read: async () => ({ applicationPassword: "stored-password", wordpressUsername: "admin" }) },
+    repository
+  });
+  try {
+    const result = await service.activate({ siteId: "company-a", webhookUrl: "https://wpsc.example.test/webhook/company-a" });
+    assert.equal(result.ok, true);
+    assert.deepEqual(adapterOptions.credentials, { applicationPassword: "stored-password", wordpressUsername: "admin" });
+  } finally {
+    await rm(workspaceDir, { force: true, recursive: true });
+  }
+});
+
 test("Webhook Activation removes only an existing webhook and persists removal metadata", async () => {
   const { repository, workspaceDir } = await createFixture();
   const calls = { register: 0, unregister: 0, verify: 0 };

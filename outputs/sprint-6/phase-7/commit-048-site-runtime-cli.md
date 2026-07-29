@@ -3,7 +3,8 @@
 ## Delivered
 
 - `wpsc site:create --site <id> [--domain <domain>]` provisions a real Site
-  Skeleton through Provisioning Service and records the optional domain mapping.
+  Skeleton through Provisioning Service, records the optional domain mapping,
+  and scaffolds a non-overwriting runnable `runtime.config.js` on first use.
 - `wpsc runtime:serve --config runtime.config.js [--port 8787]` loads injected
   runtime dependencies, creates Site Runtime composition, and exposes its HTTP
   transport.

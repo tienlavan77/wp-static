@@ -59,17 +59,17 @@ export default {
     enabled: false
   },
   theme: {
-    layout: "./theme/layout.js",
-    blocks: "./theme/blocks.js",
+    layout: "./themes/layout.js",
+    blocks: "./themes/blocks.js",
     layouts: {
-      "archive:product_cat": "./theme/layouts/archive.js",
-      account: "./theme/layouts/account.js",
-      page: "./theme/layouts/page.js",
-      search: "./theme/layouts/search.js",
-      product: "./theme/layouts/product.js"
+      "archive:product_cat": "./themes/layouts/archive.js",
+      account: "./themes/layouts/account.js",
+      page: "./themes/layouts/page.js",
+      search: "./themes/layouts/search.js",
+      product: "./themes/layouts/product.js"
     },
-    components: "./theme/components/index.js",
-    assets: "./theme/assets",
+    components: "./themes/components/index.js",
+    assets: "./themes/assets",
     meta: {
       name: "Basic Commerce Theme",
       version: "1.0.0",

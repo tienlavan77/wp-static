@@ -15,6 +15,8 @@ final class WPSC_Webhook_Bridge {
     private const CRON_HOOK = 'wpsc_webhook_bridge_flush_queue';
     private const OPTION_QUEUE = 'wpsc_webhook_bridge_queue';
     private const OPTION_LAST_RESULT = 'wpsc_webhook_bridge_last_result';
+    private const OPTION_TARGET_URL = 'wpsc_webhook_bridge_target_url';
+    private const OPTION_SECRET = 'wpsc_webhook_bridge_secret';
     private const REST_NAMESPACE = 'wpsc/v1';
 
     public static function init(): void {
@@ -118,6 +120,18 @@ final class WPSC_Webhook_Bridge {
             'callback' => [$this, 'rest_test'],
             'permission_callback' => [$this, 'rest_authorized'],
         ]);
+
+        register_rest_route(self::REST_NAMESPACE, '/webhook/config', [
+            'methods' => WP_REST_Server::CREATABLE,
+            'callback' => [$this, 'rest_configure'],
+            'permission_callback' => [$this, 'rest_can_configure'],
+        ]);
+
+        register_rest_route(self::REST_NAMESPACE, '/webhook/config', [
+            'methods' => WP_REST_Server::DELETABLE,
+            'callback' => [$this, 'rest_remove_configuration'],
+            'permission_callback' => [$this, 'rest_can_configure'],
+        ]);
     }
 
     public function rest_status(): WP_REST_Response {
@@ -146,6 +160,38 @@ final class WPSC_Webhook_Bridge {
         $result = $this->send_payload($payload);
 
         return new WP_REST_Response($result, !empty($result['ok']) ? 200 : 500);
+    }
+
+    public function rest_can_configure(): bool {
+        return current_user_can('manage_options');
+    }
+
+    public function rest_configure(WP_REST_Request $request): WP_REST_Response {
+        $target_url = esc_url_raw((string) $request->get_param('targetUrl'));
+        $secret = trim((string) $request->get_param('secret'));
+
+        if (!$this->is_allowed_target_url($target_url)) {
+            return new WP_REST_Response(['code' => 'wpsc_webhook_target_invalid', 'message' => 'targetUrl must be a valid HTTP(S) URL.'], 400);
+        }
+
+        if (strlen($secret) < 32) {
+            return new WP_REST_Response(['code' => 'wpsc_webhook_secret_invalid', 'message' => 'secret must contain at least 32 characters.'], 400);
+        }
+
+        update_option(self::OPTION_TARGET_URL, $target_url, false);
+        update_option(self::OPTION_SECRET, $secret, false);
+
+        return new WP_REST_Response([
+            'ok' => true,
+            'targetUrl' => $target_url,
+            'webhookId' => 'wpsc-webhook-bridge',
+        ], 200);
+    }
+
+    public function rest_remove_configuration(): WP_REST_Response {
+        delete_option(self::OPTION_TARGET_URL);
+        delete_option(self::OPTION_SECRET);
+        return new WP_REST_Response(['ok' => true], 200);
     }
 
     public function rest_authorized(WP_REST_Request $request): bool {
@@ -379,12 +425,43 @@ final class WPSC_Webhook_Bridge {
         return $default;
     }
 
+    private function is_allowed_target_url(string $target_url): bool {
+        $scheme = (string) wp_parse_url($target_url, PHP_URL_SCHEME);
+        $host = strtolower((string) wp_parse_url($target_url, PHP_URL_HOST));
+
+        if (!in_array($scheme, ['http', 'https'], true) || $host === '') {
+            return false;
+        }
+
+        if (wp_http_validate_url($target_url)) {
+            return true;
+        }
+
+        // A workstation-only Runtime commonly uses a hosts-file .local name.
+        // Permit HTTP local development without weakening public URL validation.
+        return $scheme === 'http' && ($host === 'localhost' || str_ends_with($host, '.local'));
+    }
+
     private function target_url(): string {
-        return defined('WPSC_WEBHOOK_TARGET_URL') ? esc_url_raw((string) WPSC_WEBHOOK_TARGET_URL) : '';
+        if (defined('WPSC_WEBHOOK_TARGET_URL')) {
+            return esc_url_raw((string) WPSC_WEBHOOK_TARGET_URL);
+        }
+
+        return esc_url_raw((string) get_option(self::OPTION_TARGET_URL, ''));
     }
 
     private function secret(): string {
-        return defined('WPSC_WEBHOOK_SECRET') ? (string) WPSC_WEBHOOK_SECRET : '';
+        $stored_secret = trim((string) get_option(self::OPTION_SECRET, ''));
+
+        if ($stored_secret !== '') {
+            return $stored_secret;
+        }
+
+        if (defined('WPSC_WEBHOOK_SECRET')) {
+            return (string) WPSC_WEBHOOK_SECRET;
+        }
+
+        return '';
     }
 
     private function enabled(): bool {

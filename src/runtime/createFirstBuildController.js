@@ -15,7 +15,13 @@ export default function createFirstBuildController(options = {}) {
 
   async function build(siteId) {
     try {
-      const metadata = await repository.readMetadata(siteId);
+      let metadata = await repository.readMetadata(siteId);
+      if (metadata.status === SiteState.ERROR) {
+        const recovered = stateManager.transition(metadata, SiteState.READY_FOR_FIRST_BUILD, { reason: "dashboard.first_build.recovered" });
+        if (!recovered.ok) return { diagnostics: { errors: [recovered.error], warnings: [] }, ok: false };
+        await repository.writeMetadata(siteId, recovered.metadata);
+        metadata = recovered.metadata;
+      }
       const started = stateManager.transition(metadata, SiteState.BUILDING, { reason: "dashboard.first_build" });
       if (!started.ok) return { diagnostics: { errors: [started.error], warnings: [] }, ok: false };
       await repository.writeMetadata(siteId, started.metadata);

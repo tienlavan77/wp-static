@@ -1,5 +1,6 @@
 import { copyFile, mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { SITE_RUNTIME_INDEX_PHP } from "../runtime/createSiteRuntime.js";
 
 export const OUTPUT_PIPELINE_VERSION = "1.0";
 
@@ -36,6 +37,8 @@ export default function createOutputPipeline(options = {}) {
     try {
       publicDir = path.join(repository.resolveSiteRoot(input.siteId), "public", "dist");
       await mkdir(publicDir, { recursive: true });
+      // Keep the Site entrypoint in sync so a completed build takes over from Setup.
+      await writeFile(path.join(path.dirname(publicDir), "index.php"), SITE_RUNTIME_INDEX_PHP, "utf8");
       const generatedFiles = [];
       for (const page of pages) {
         const target = resolveInside(publicDir, pageFilePath(page.path));

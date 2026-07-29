@@ -7,12 +7,14 @@ import createProjectScaffold, { STARTER_TEMPLATES } from "../core/createProjectS
 import createSiteSetupCommand from "./createSiteSetupCommand.js";
 import createSiteCreateCommand from "./createSiteCreateCommand.js";
 import createRuntimeServeCommand from "./createRuntimeServeCommand.js";
+import createRuntimeConfigureWordPressCommand, { LEGACY_WORDPRESS_RUNTIME_ENV_FILE, WORDPRESS_RUNTIME_ENV_FILE } from "./createRuntimeConfigureWordPressCommand.js";
 import createSetupService from "../setup/createSetupService.js";
 import createProvisioningService from "../provision/createProvisioningService.js";
 import createSiteRepository from "../site/createSiteRepository.js";
 import createSiteRuntimeInstance from "../runtime/createSiteRuntimeInstance.js";
 import createRuntimeHttpServer from "../runtime/createRuntimeHttpServer.js";
 import loadSiteRuntimeConfig from "../runtime/loadSiteRuntimeConfig.js";
+import loadRuntimeEnvironment from "../runtime/loadRuntimeEnvironment.js";
 import doctorProject from "../core/doctorProject.js";
 import loadConfig from "../core/loadConfig.js";
 import buildProjectOnce from "../dev-server/buildProjectOnce.js";
@@ -174,6 +176,23 @@ async function main(cliArgs) {
       configPath: readOptionalArg(cliArgs, "--config"),
       host: readOptionalArg(cliArgs, "--host") || "127.0.0.1",
       port: readPortArg(cliArgs),
+      workspaceDir: readProjectArg(cliArgs)
+    });
+    return;
+  }
+
+  if (cliArgs[0] === "runtime:build") {
+    await buildRuntimeSite(readRequiredArg(cliArgs, "--site"), {
+      changed: readRepeatedArg(cliArgs, "--changed"),
+      configPath: readOptionalArg(cliArgs, "--config"),
+      workspaceDir: readProjectArg(cliArgs)
+    });
+    return;
+  }
+
+  if (cliArgs[0] === "runtime:configure-wordpress") {
+    await configureRuntimeWordPress({
+      webhookBaseUrl: readOptionalArg(cliArgs, "--webhook-base-url"),
       workspaceDir: readProjectArg(cliArgs)
     });
     return;
@@ -432,6 +451,12 @@ async function createSite(siteId, options = {}) {
 }
 
 async function serveSiteRuntime(options = {}) {
+  const workspaceDir = path.resolve(options.workspaceDir || process.cwd());
+  // Load the retired file first so config/runtime.env always wins when both exist.
+  const legacyEnvironment = await loadRuntimeEnvironment(path.join(workspaceDir, LEGACY_WORDPRESS_RUNTIME_ENV_FILE));
+  if (!legacyEnvironment.ok) throw legacyEnvironment.error;
+  const environment = await loadRuntimeEnvironment(path.join(workspaceDir, WORDPRESS_RUNTIME_ENV_FILE));
+  if (!environment.ok) throw environment.error;
   const command = createRuntimeServeCommand({
     createHttpServer: createRuntimeHttpServer,
     createRuntimeInstance: createSiteRuntimeInstance,
@@ -444,9 +469,34 @@ async function serveSiteRuntime(options = {}) {
     process.exitCode = 1;
     return;
   }
-  const close = () => result.server.close(() => process.exit(0));
+  const close = () => { result.stop(); process.exit(0); };
   process.on("SIGINT", close);
   process.on("SIGTERM", close);
+}
+
+async function buildRuntimeSite(siteId, options = {}) {
+  const workspaceDir = path.resolve(options.workspaceDir || process.cwd());
+  const legacyEnvironment = await loadRuntimeEnvironment(path.join(workspaceDir, LEGACY_WORDPRESS_RUNTIME_ENV_FILE));
+  if (!legacyEnvironment.ok) throw legacyEnvironment.error;
+  const environment = await loadRuntimeEnvironment(path.resolve(workspaceDir, WORDPRESS_RUNTIME_ENV_FILE));
+  if (!environment.ok) throw environment.error;
+  const loaded = await loadSiteRuntimeConfig({ configPath: options.configPath, workspaceDir });
+  if (!loaded.ok) throw new Error(loaded.diagnostics.errors.map((item) => item.message).join(" "));
+  const instance = createSiteRuntimeInstance({ ...loaded.config, workspaceDir: loaded.workspaceDir });
+  const queued = instance.services.scheduler.trigger({ changed: options.changed || [], siteId, triggerType: "cli" });
+  if (!queued.ok) throw new Error(queued.diagnostics.errors.map((item) => item.message).join(" "));
+  const tick = await instance.services.scheduler.tick();
+  const build = tick.dispatched?.build;
+  if (!tick.ok || build?.status !== "SUCCESS") throw new Error(build?.diagnostics?.errors?.[0]?.message || "Runtime build failed.");
+  logger.info(`Runtime Site: ${siteId}`);
+  logger.info(`Mode: ${(options.changed || []).length > 0 ? "incremental" : "full"}`);
+  logger.info(`Changed: ${(options.changed || []).join(", ") || "all routes"}`);
+  logger.info(`Files published: ${build.generatedFiles.length}`);
+}
+
+async function configureRuntimeWordPress(options = {}) {
+  const command = createRuntimeConfigureWordPressCommand({ workspaceDir: options.workspaceDir, write: (line) => logger.info(line) });
+  await command.run({ webhookBaseUrl: options.webhookBaseUrl });
 }
 
 async function deployRsync(projectArg, options = {}) {
@@ -600,6 +650,8 @@ function printHelp() {
   wpsc site:create --site <site-id> [--domain <domain>] [--project <workspace>]
   wpsc site:setup --site <site-id> [--advance] [--source <type> --endpoint <url> --webhook-url <url>]
   wpsc runtime:serve [--config <runtime.config.js>] [--project <workspace>] [--host <host>] [--port <port>]
+  wpsc runtime:build --site <site-id> [--config <runtime.config.js>] [--project <workspace>] [--changed <type:id>]
+  wpsc runtime:configure-wordpress [--project <workspace>] [--webhook-base-url <url>]
   wpsc validate [--project <project-dir>] [--json]
   wpsc webhook [--project <project-dir>] [--port <port>] [--secret <secret>]
   wpsc --help

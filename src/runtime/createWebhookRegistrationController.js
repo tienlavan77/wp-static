@@ -30,7 +30,21 @@ export default function createWebhookRegistrationController(options = {}) {
       const secretValue = typeof secret === "string" ? secret : secret.value;
       const secretMetadata = typeof secret === "string" ? null : secret.metadata;
       const webhookUrl = `${webhookBaseUrl}/${metadata.uuid}`;
-      const activation = await webhookActivationService.activate({ adapterOptions: input.adapterOptions, siteId, webhookUrl });
+      const pendingConfiguration = {
+        schema: WEBHOOK_RUNTIME_SCHEMA,
+        schemaVersion: WEBHOOK_RUNTIME_SCHEMA_VERSION,
+        secret: secretValue,
+        secretMetadata,
+        siteId,
+        uuid: metadata.uuid,
+        webhookId: null,
+        webhookStatus: "pending",
+        webhookUrl
+      };
+      // The callback verification needs the secret before WordPress can finish registration.
+      await mkdir(path.dirname(configPath), { recursive: true });
+      await writeFile(configPath, `${JSON.stringify(pendingConfiguration, null, 2)}\n`, "utf8");
+      const activation = await webhookActivationService.activate({ adapterOptions: { ...(input.adapterOptions || {}), webhookSecret: secretValue }, siteId, webhookUrl });
       if (!activation.ok) return activation;
       const configuration = {
         schema: WEBHOOK_RUNTIME_SCHEMA,

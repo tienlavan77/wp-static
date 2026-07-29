@@ -27,7 +27,7 @@ export default function createJobDispatcher(options = {}) {
     const events = [];
     emit(events, JobEvent.STARTED, { jobId: job.id, siteId: job.siteId, triggerType: job.triggerType });
     try {
-      const build = await buildEngine.build({ siteId: job.siteId, triggerType: job.triggerType });
+      const build = await buildEngine.build({ changed: job.changed, siteId: job.siteId, triggerType: job.triggerType });
       const status = build?.status === "SUCCESS" ? JobStatus.SUCCESS : JobStatus.FAILED;
       const completed = queue.complete(job.id, { diagnostics: build?.diagnostics, status });
       if (!completed.ok) return { ...completed, events, job };

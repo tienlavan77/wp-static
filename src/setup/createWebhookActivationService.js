@@ -26,6 +26,7 @@ function normalizeResult(result, fallbackCode, fallbackMessage) {
 export default function createWebhookActivationService(options = {}) {
   const adapterLoader = options.adapterLoader;
   const repository = options.repository;
+  const credentialStore = options.credentialStore || null;
   const onEvent = typeof options.onEvent === "function" ? options.onEvent : null;
 
   if (!adapterLoader || typeof adapterLoader.load !== "function") {
@@ -46,7 +47,11 @@ export default function createWebhookActivationService(options = {}) {
   async function load(siteId, adapterOptions) {
     try {
       const metadata = await repository.readSourceMetadata(siteId);
-      const adapter = adapterLoader.load(metadata.sourceType, adapterOptions || {});
+      let credentials = {};
+      if (credentialStore) {
+        try { credentials = await credentialStore.read(siteId); } catch { /* Source may not need credentials. */ }
+      }
+      const adapter = adapterLoader.load(metadata.sourceType, { ...(adapterOptions || {}), credentials, endpoint: metadata.endpoint });
       return { adapter, metadata, ok: true };
     } catch (error) {
       return {

@@ -5,14 +5,59 @@ import createSiteMetadata, { SiteState } from "../site/createSiteMetadata.js";
 export const SITE_RUNTIME_VERSION = "1.0";
 
 export const SITE_RUNTIME_INDEX_PHP = `<?php
-// WPSC Site Runtime front controller proxies this Domain request to Node Runtime.
-$runtimeOrigin = rtrim((string) getenv('WPSC_RUNTIME_ORIGIN'), '/');
+// WPSC Site Runtime front controller: prefer generated static pages, then proxy Runtime routes.
+$publicDir = __DIR__;
+$distDir = $publicDir . '/dist';
+$requestUri = $_SERVER['REQUEST_URI'] ?? '/';
+$requestPath = parse_url($requestUri, PHP_URL_PATH) ?: '/';
+$method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+if (($method === 'GET' || $method === 'HEAD') && is_dir($distDir)) {
+    $relativePath = trim($requestPath, '/');
+    $candidates = $relativePath === ''
+        ? [$distDir . '/index.html']
+        : [$distDir . '/' . $relativePath, $distDir . '/' . $relativePath . '/index.html'];
+    $realDistDir = realpath($distDir);
+    foreach ($candidates as $candidate) {
+        $realCandidate = realpath($candidate);
+        if ($realDistDir !== false && $realCandidate !== false && str_starts_with($realCandidate, $realDistDir . DIRECTORY_SEPARATOR) && is_file($realCandidate)) {
+            $extension = strtolower(pathinfo($realCandidate, PATHINFO_EXTENSION));
+            $mimeTypes = [
+                'avif' => 'image/avif',
+                'css' => 'text/css; charset=utf-8',
+                'gif' => 'image/gif',
+                'html' => 'text/html; charset=utf-8',
+                'ico' => 'image/x-icon',
+                'jpeg' => 'image/jpeg',
+                'jpg' => 'image/jpeg',
+                'js' => 'text/javascript; charset=utf-8',
+                'json' => 'application/json; charset=utf-8',
+                'png' => 'image/png',
+                'svg' => 'image/svg+xml',
+                'webp' => 'image/webp',
+                'xml' => 'application/xml; charset=utf-8'
+            ];
+            if (isset($mimeTypes[$extension])) header('Content-Type: ' . $mimeTypes[$extension]);
+            if ($method === 'GET') readfile($realCandidate);
+            exit;
+        }
+    }
+
+    // Keep Runtime APIs dynamic, but serve Builder V1's branded static 404 for unknown public URLs.
+    $isRuntimeEndpoint = preg_match('#^/(api/|dashboard(?:/|$)|installer(?:/|$)|webhook/)#', $requestPath) === 1;
+    $notFoundPath = realpath($distDir . '/404.html');
+    if (!$isRuntimeEndpoint && $realDistDir !== false && $notFoundPath !== false && str_starts_with($notFoundPath, $realDistDir . DIRECTORY_SEPARATOR) && is_file($notFoundPath)) {
+        http_response_code(404);
+        header('Content-Type: text/html; charset=utf-8');
+        if ($method === 'GET') readfile($notFoundPath);
+        exit;
+    }
+}
+
+$runtimeOrigin = rtrim((string) ($_SERVER['WPSC_RUNTIME_ORIGIN'] ?? getenv('WPSC_RUNTIME_ORIGIN')), '/');
 if ($runtimeOrigin === '') {
     http_response_code(503);
     exit('WPSC Runtime origin is not configured.');
 }
-$requestUri = $_SERVER['REQUEST_URI'] ?? '/';
-$method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 $body = file_get_contents('php://input');
 $headers = [];
 if (isset($_SERVER['HTTP_HOST'])) {
@@ -20,6 +65,9 @@ if (isset($_SERVER['HTTP_HOST'])) {
 }
 if (isset($_SERVER['CONTENT_TYPE'])) {
     $headers[] = 'Content-Type: ' . $_SERVER['CONTENT_TYPE'];
+}
+if (isset($_SERVER['HTTP_COOKIE'])) {
+    $headers[] = 'Cookie: ' . $_SERVER['HTTP_COOKIE'];
 }
 $context = stream_context_create(['http' => [
     'method' => $method,
@@ -40,6 +88,9 @@ foreach ($http_response_header ?? [] as $index => $header) {
     }
     if (stripos($header, 'Content-Type:') === 0) {
         header($header, true);
+    }
+    if (stripos($header, 'Set-Cookie:') === 0) {
+        header($header, false);
     }
 }
 echo $response;

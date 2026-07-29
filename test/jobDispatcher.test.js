@@ -16,7 +16,7 @@ test("Job Dispatcher claims a queued job, calls injected Build Engine, and compl
   const result = await dispatcher.dispatch();
   assert.equal(result.ok, true);
   assert.equal(result.job.status, JobStatus.SUCCESS);
-  assert.deepEqual(calls, [{ siteId: "company-a", triggerType: JobTrigger.WEBHOOK }]);
+  assert.deepEqual(calls, [{ changed: [], siteId: "company-a", triggerType: JobTrigger.WEBHOOK }]);
   assert.deepEqual(result.events.map((event) => event.type), [JobEvent.STARTED, JobEvent.COMPLETED]);
 });
 

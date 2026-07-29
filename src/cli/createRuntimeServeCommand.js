@@ -11,12 +11,18 @@ export default function createRuntimeServeCommand(options = {}) {
       const loaded = await loadRuntimeConfig({ configPath: input.configPath, workspaceDir: input.workspaceDir });
       if (!loaded.ok) return loaded;
       const instance = createRuntimeInstance({ ...loaded.config, workspaceDir: loaded.workspaceDir });
+      const scheduler = instance.services.scheduler;
+      scheduler?.start?.();
       const server = createHttpServer({ router: instance.router });
       const port = Number(input.port || 8787);
       const host = input.host || "127.0.0.1";
       await new Promise((resolve, reject) => { server.once("error", reject); server.listen(port, host, resolve); });
+      const tickIntervalMs = Number(loaded.config.schedulerTickIntervalMs || 1000);
+      const tickTimer = scheduler?.tick && Number.isFinite(tickIntervalMs) && tickIntervalMs > 0
+        ? setInterval(() => { void scheduler.tick(); }, tickIntervalMs)
+        : null;
       write(`WPSC Site Runtime listening at http://${host}:${port}`);
-      return { configPath: loaded.configPath, instance, ok: true, server, url: `http://${host}:${port}` };
+      return { configPath: loaded.configPath, instance, ok: true, server, stop: () => { if (tickTimer) clearInterval(tickTimer); server.close(); }, url: `http://${host}:${port}` };
     },
     version: RUNTIME_SERVE_COMMAND_VERSION
   });

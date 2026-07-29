@@ -16,6 +16,7 @@ test("Output Pipeline is the sole writer for HTML and copied assets under site p
     assert.equal(result.ok, true);
     assert.equal(await readFile(path.join(result.publicDir, "welcome", "index.html"), "utf8"), "<h1>Welcome</h1>");
     assert.equal(await readFile(path.join(result.publicDir, "assets", "style.css"), "utf8"), "body{}");
+    assert.match(await readFile(path.join(workspaceDir, "sites", "company-a", "public", "index.php"), "utf8"), /prefer generated static pages/);
   } finally { await rm(workspaceDir, { force: true, recursive: true }); }
 });
 

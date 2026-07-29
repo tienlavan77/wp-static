@@ -7,26 +7,28 @@ function diagnostic(code, message) { return { code, message, severity: "error" }
 async function readSourceStatus(repository, siteId) {
   try {
     const metadata = await repository.readSourceMetadata(siteId);
-    return { connected: true, sourceType: metadata.sourceType, webhookStatus: metadata.webhookStatus || null };
+    return { connected: true, endpoint: metadata.endpoint || "", sourceType: metadata.sourceType, webhookStatus: metadata.webhookStatus || null };
   } catch {
-    return { connected: false, sourceType: null, webhookStatus: null };
+    return { connected: false, endpoint: "", sourceType: null, webhookStatus: null };
   }
 }
 
 export default function createDashboardController(options = {}) {
   const repository = options.repository;
+  const credentialStore = options.credentialStore || null;
   const buildStatusProvider = options.buildStatusProvider || { get: async () => null };
   if (!repository || typeof repository.readMetadata !== "function" || typeof repository.readSourceMetadata !== "function") throw new TypeError("Dashboard Controller requires a Site Repository.");
   if (typeof buildStatusProvider.get !== "function") throw new TypeError("Dashboard build status provider must implement get().");
 
   async function show(siteId) {
     try {
-      const [metadata, source, build] = await Promise.all([
+      const [metadata, source, build, credentials] = await Promise.all([
         repository.readMetadata(siteId),
         readSourceStatus(repository, siteId),
-        buildStatusProvider.get(siteId)
+        buildStatusProvider.get(siteId),
+        credentialStore ? credentialStore.summary(siteId) : {}
       ]);
-      return { build, diagnostics: { errors: [], warnings: [] }, metadata, ok: true, source };
+      return { build, credentials, diagnostics: { errors: [], warnings: [] }, metadata, ok: true, source };
     } catch (error) {
       return { diagnostics: { errors: [diagnostic("runtime.dashboard.load.failed", error.message)], warnings: [] }, ok: false };
     }

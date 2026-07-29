@@ -23,12 +23,14 @@ export default function createRuntimeHttpServer(options = {}) {
       for await (const chunk of request) chunks.push(chunk);
       const result = await router.handle({
         body: parseBody(Buffer.concat(chunks).toString("utf8"), request.headers["content-type"]),
+        headers: request.headers,
         host: request.headers.host,
         method: request.method,
         path: new URL(request.url || "/", "http://runtime.local").pathname
       });
-      response.writeHead(result.status, { "content-type": "application/json; charset=utf-8" });
-      response.end(`${JSON.stringify(result.body)}\n`);
+      const isHtml = typeof result.body === "string";
+      response.writeHead(result.status, result.headers || { "content-type": isHtml ? "text/html; charset=utf-8" : "application/json; charset=utf-8" });
+      response.end(isHtml ? result.body : `${JSON.stringify(result.body)}\n`);
     } catch (error) {
       response.writeHead(500, { "content-type": "application/json; charset=utf-8" });
       response.end(`${JSON.stringify({ diagnostics: { errors: [{ code: "runtime.http.request.failed", message: error.message, severity: "error" }], warnings: [] }, ok: false })}\n`);

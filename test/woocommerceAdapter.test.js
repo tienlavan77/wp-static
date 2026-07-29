@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 import normalizeWooCommerceProduct from "../src/adapters/woocommerce/normalizeWooCommerceProduct.js";
+import createContent from "../src/core/createContent.js";
 import createWooCommerceClient from "../src/adapters/woocommerce/woocommerceClient.js";
 import createWooCommerceRepository from "../src/adapters/woocommerce/woocommerceRepository.js";
 import createWooCommerceAdapter from "../src/adapters/woocommerce/woocommerceAdapter.js";
@@ -65,6 +66,19 @@ test("normalizeWooCommerceProduct maps variations into variants", () => {
   assert.equal(content.data.variants[0].slug, "box-10-20");
   assert.equal(content.data.variants[0].price, 120000);
   assert.equal(content.data.variants[0].featuredImage.sourceUrl, "https://example.com/variant.jpg");
+});
+
+test("normalizeWooCommerceProduct converts missing optional API fields into JSON-safe data", () => {
+  const content = normalizeWooCommerceProduct({
+    categories: [{}],
+    id: 42,
+    images: [{}],
+    name: "Optional fields",
+    slug: "optional-fields",
+    tags: [],
+    variations: [{ attributes: [{}], image: {} }]
+  });
+  assert.doesNotThrow(() => createContent(content));
 });
 
 test("WooCommerce client fetches paginated collections with credentials", async () => {

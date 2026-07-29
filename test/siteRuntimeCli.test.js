@@ -17,6 +17,7 @@ test("site:create provisions a Site Skeleton and persists its domain mapping", a
     assert.equal(result.domain, "example.test");
     assert.equal(JSON.parse(await readFile(result.domainRegistryPath, "utf8")).domains["example.test"], "company-a");
     assert.match(await readFile(result.paths.runtimeEntry, "utf8"), /WPSC Site Runtime front controller/);
+    assert.match(await readFile(result.runtimeConfigPath, "utf8"), /demoAdapter/);
   } finally { await rm(workspaceDir, { force: true, recursive: true }); }
 });
 
@@ -28,7 +29,7 @@ test("runtime:serve loads configuration and opens only the injected HTTP transpo
   };
   const command = createRuntimeServeCommand({
     createHttpServer: ({ router }) => { calls.push(`server:${router.name}`); return server; },
-    createRuntimeInstance: (config) => { calls.push(`instance:${config.domains["example.test"]}`); return { router: { name: "runtime-router" } }; },
+    createRuntimeInstance: (config) => { calls.push(`instance:${config.domains["example.test"]}`); return { router: { name: "runtime-router" }, services: {} }; },
     loadRuntimeConfig: async () => ({ config: { domains: { "example.test": "company-a" } }, configPath: "/workspace/runtime.config.js", ok: true, workspaceDir: "/workspace" })
   });
   const result = await command.run({ host: "127.0.0.1", port: 8787 });

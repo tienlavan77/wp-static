@@ -56,9 +56,23 @@ function normalizeSourceMetadata(metadata) {
   return { adapterVersion, capabilities, sourceType };
 }
 
+async function mergeCredentials(store, siteId, incoming) {
+  if (!store) return incoming || {};
+  let current = {};
+  try { current = await store.read(siteId); } catch { /* First connection has no vault yet. */ }
+  return Object.fromEntries(Object.entries({ ...current, ...(incoming || {}) }).filter(([, value]) => typeof value === "string" && value.trim() !== ""));
+}
+
+function connectionConfiguration(credentials = {}) {
+  return {
+    woocommerce: Boolean(credentials.woocommerceConsumerKey && credentials.woocommerceConsumerSecret)
+  };
+}
+
 export default function createSourceRegistrationService(options = {}) {
   const adapterLoader = options.adapterLoader;
   const repository = options.repository;
+  const credentialStore = options.credentialStore || null;
   const onEvent = typeof options.onEvent === "function" ? options.onEvent : null;
 
   if (!adapterLoader || typeof adapterLoader.load !== "function") {
@@ -81,6 +95,7 @@ export default function createSourceRegistrationService(options = {}) {
     const siteId = String(input.siteId || "").trim();
     const sourceType = String(input.source?.type || "").trim().toLowerCase();
     const endpoint = typeof input.source?.endpoint === "string" ? input.source.endpoint.trim() : "";
+    const credentials = await mergeCredentials(credentialStore, siteId, input.credentials);
 
     if (!siteId || !sourceType || !endpoint) {
       const diagnostics = {
@@ -96,7 +111,7 @@ export default function createSourceRegistrationService(options = {}) {
 
     let adapter;
     try {
-      adapter = adapterLoader.load(sourceType, input.adapterOptions || {});
+      adapter = adapterLoader.load(sourceType, { ...(input.adapterOptions || {}), credentials });
     } catch (error) {
       const diagnostics = {
         errors: [createDiagnostic(error.code || "source.registration.adapter.failed", error.message)],
@@ -121,7 +136,7 @@ export default function createSourceRegistrationService(options = {}) {
     const validated = await runAdapterStep(
       adapter,
       "validate",
-      { credentials: input.credentials, endpoint },
+      { credentials, endpoint },
       "source.registration.validation.failed",
       "Source validation failed."
     );
@@ -177,6 +192,7 @@ export default function createSourceRegistrationService(options = {}) {
     let write;
     try {
       write = await repository.writeSourceMetadata(siteId, metadata);
+      if (credentialStore && credentials) await credentialStore.write(siteId, credentials);
     } catch (error) {
       const diagnostics = {
         errors: [createDiagnostic("source.registration.persistence.failed", error.message)],
@@ -200,6 +216,7 @@ export default function createSourceRegistrationService(options = {}) {
     const siteId = String(input.siteId || "").trim();
     const sourceType = String(input.source?.type || "").trim().toLowerCase();
     const endpoint = typeof input.source?.endpoint === "string" ? input.source.endpoint.trim() : "";
+    const credentials = await mergeCredentials(credentialStore, siteId, input.credentials);
     if (!siteId || !sourceType || !endpoint) {
       const diagnostics = { errors: [createDiagnostic("source.connection.input.invalid", "Site id, source type, and endpoint are required.")], warnings: [] };
       emit(events, SourceRegistrationEvent.FAILED, { diagnostics, siteId, sourceType });
@@ -207,7 +224,7 @@ export default function createSourceRegistrationService(options = {}) {
     }
     let adapter;
     try {
-      adapter = adapterLoader.load(sourceType, input.adapterOptions || {});
+      adapter = adapterLoader.load(sourceType, { ...(input.adapterOptions || {}), credentials });
     } catch (error) {
       const diagnostics = { errors: [createDiagnostic(error.code || "source.connection.adapter.failed", error.message)], warnings: [] };
       emit(events, SourceRegistrationEvent.FAILED, { diagnostics, siteId, sourceType });
@@ -215,11 +232,16 @@ export default function createSourceRegistrationService(options = {}) {
     }
     const initialized = await runAdapterStep(adapter, "initialize", { endpoint, siteId }, "source.connection.initialize.failed", "Source adapter initialization failed.");
     if (!initialized.ok) return { diagnostics: initialized.diagnostics, events, ok: false };
-    const validated = await runAdapterStep(adapter, "validate", { credentials: input.credentials, endpoint }, "source.connection.validation.failed", "Source validation failed.");
+    const validated = await runAdapterStep(adapter, "validate", { credentials, endpoint }, "source.connection.validation.failed", "Source validation failed.");
     if (!validated.ok) return { diagnostics: validated.diagnostics, events, ok: false };
     const health = await runAdapterStep(adapter, "healthCheck", { endpoint }, "source.connection.health.failed", "Source health check failed.");
     if (!health.ok) return { diagnostics: health.diagnostics, events, ok: false };
-    return { diagnostics: { errors: [], warnings: [] }, events, ok: true };
+    return {
+      configuration: connectionConfiguration(credentials),
+      diagnostics: validated.diagnostics,
+      events,
+      ok: true
+    };
   }
 
   return { register, testConnection };

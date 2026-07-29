@@ -137,6 +137,32 @@ test("Source Registration Service tests connection without persisting metadata",
   assert.deepEqual(calls, { healthCheck: 1, initialize: 1, registerWebhook: 0, validate: 1 });
 });
 
+test("Source Registration Service checks stored credentials when the Dashboard sends no credential changes", async () => {
+  let receivedCredentials;
+  const credentialStore = {
+    read: async () => ({ applicationPassword: "stored-app-password", wordpressUsername: "saved-admin" })
+  };
+  const registry = createSourceRegistry({
+    adapters: [{
+      create: (options) => createAdapter({ healthCheck: 0, initialize: 0, registerWebhook: 0, validate: 0 }, {
+        validate: async ({ credentials }) => {
+          receivedCredentials = credentials;
+          return ok();
+        }
+      }),
+      type: "rest"
+    }]
+  });
+  const result = await createSourceRegistrationService({
+    adapterLoader: createSourceAdapterLoader({ registry }),
+    credentialStore,
+    repository: { writeSourceMetadata: async () => { throw new Error("must not persist"); } }
+  }).testConnection({ siteId: "company-a", source: { endpoint: "https://source.example.test", type: "rest" } });
+
+  assert.equal(result.ok, true);
+  assert.deepEqual(receivedCredentials, { applicationPassword: "stored-app-password", wordpressUsername: "saved-admin" });
+});
+
 test("Source Registration Service converts adapter exceptions into workflow diagnostics", async () => {
   const registry = createSourceRegistry({
     adapters: [{

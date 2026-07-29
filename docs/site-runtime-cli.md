@@ -17,36 +17,31 @@ sites/company-a/
 
 It also persists the domain mapping in `config/runtime-sites.json`. This mapping
 is read by `runtime:serve`; it is operational configuration, not Setup workflow.
+On the first Site, it also creates a runnable `runtime.config.js` using the
+local `demo` adapter. The command never overwrites an existing Runtime config.
 
 ## Configure the Runtime Service
 
-Create `runtime.config.js` in the workspace. The file is executable JavaScript
-because adapters, readers, and themes are injected dependencies:
+`site:create` creates `runtime.config.js` for the first Site. The file is
+executable JavaScript because source adapters are injected dependencies. Theme
+selection belongs to the Runtime Builder V1 configuration, not this file.
+Replace its local demo adapter when connecting a real provider:
 
 ```js
-import { createThemeRenderer } from "wpsc";
-
 export default {
   adapterLoader: {
     load(sourceType, options) {
       // Return a contract-valid adapter for sourceType.
     }
   },
-  contentReader: {
-    async read({ siteId }) {
-      return { assets: [], items: [] };
-    }
-  },
-  themeRenderer: createThemeRenderer({
-    defaultLayout: ({ content, html }) => html`<main>${content.title}</main>`
-  }),
   webhookBaseUrl: "https://example.test/webhook"
 };
 ```
 
-`adapterLoader`, `contentReader`, `themeRenderer`, and `webhookBaseUrl` are
-required. Domain mappings may optionally be supplied as `domains` in this file;
-they override same-name entries in `config/runtime-sites.json`.
+`adapterLoader` and `webhookBaseUrl` are required. Domain
+mappings may optionally be supplied as `domains` in this file; they override
+same-name entries in `config/runtime-sites.json`. Customer Source credentials
+are entered only through Browser Setup and persisted privately per Site.
 
 ## Start Node Runtime
 

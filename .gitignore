@@ -16,3 +16,12 @@ examples/*/.wpsc/
 sites/*/dist/
 sites/*/.wpsc/
 *.swp
+config/runtime-wordpress.env
+config/runtime.env
+config/._runtime.env
+config/runtime-sites.json
+runtime.config.js.backup-*
+sites/*/config/*.json
+sites/*/public/index.php
+sites/*/public/dist/
+sites/*/storage/

@@ -11,7 +11,10 @@ test("Site Runtime Skeleton creates public index.php and setup-required metadata
   const repository = createSiteRepository({ workspaceDir });
   try {
     const skeleton = await createSiteRuntimeSkeleton({ repository, siteId: "company-a" });
-    assert.match(await readFile(skeleton.indexPath, "utf8"), /WPSC Site Runtime front controller/);
+    const entryPoint = await readFile(skeleton.indexPath, "utf8");
+    assert.match(entryPoint, /WPSC Site Runtime front controller/);
+    assert.match(entryPoint, /\$_SERVER\['WPSC_RUNTIME_ORIGIN'\]/);
+    assert.match(entryPoint, /'css' => 'text\/css; charset=utf-8'/);
     assert.equal((await repository.readMetadata("company-a")).status, "SETUP_REQUIRED");
   } finally { await rm(workspaceDir, { force: true, recursive: true }); }
 });

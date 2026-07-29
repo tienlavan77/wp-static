@@ -33,3 +33,24 @@ test("Runtime Router dispatches source, webhook, and first build only to injecte
   await router.handle({ method: "POST", path: "/dashboard/build" });
   assert.deepEqual(calls, ["source:company-a", "webhook:company-a", "build:company-a"]);
 });
+
+test("Runtime Router serves Browser views while retaining REST actions as JSON", async () => {
+  const router = createRuntimeRouter({ composition: composition({
+    browserViews: { dashboard: () => "<main>dashboard</main>", installer: (siteId) => `<main>installer:${siteId}</main>` },
+    dashboard: { show: async () => ({ diagnostics: { errors: [], warnings: [] }, metadata: { name: "Company A" }, ok: true, source: {} }) },
+    runtime: { handle: async () => ({ diagnostics: { errors: [], warnings: [] }, ok: true, route: "installer", siteId: "company-a" }) }
+  }) });
+  const page = await router.handle({ method: "GET", path: "/" });
+  assert.equal(page.headers["content-type"], "text/html; charset=utf-8");
+  assert.equal(page.body, "<main>installer:company-a</main>");
+});
+
+test("Runtime Router delegates Account API requests to the Site Commerce Gateway", async () => {
+  const router = createRuntimeRouter({ composition: composition({
+    commerceGateway: { handle: async (siteId, request) => ({ body: { authenticated: false, ok: true, siteId }, status: 200 }) },
+    runtime: { handle: async () => ({ diagnostics: { errors: [], warnings: [] }, ok: true, route: "dashboard", siteId: "company-a" }) }
+  }) });
+  const session = await router.handle({ method: "GET", path: "/api/account/me" });
+  assert.equal(session.status, 200);
+  assert.deepEqual(session.body, { authenticated: false, ok: true, siteId: "company-a" });
+});

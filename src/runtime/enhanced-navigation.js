@@ -34,6 +34,7 @@ import { escapeHtml, normalizeText, stripHtml } from "./frontend/shared/text.js"
   var accountSessionPromise = null;
   var accountSessionRequestId = 0;
   var searchIndexPromise = null;
+  var routeManifestPromise = null;
   var routePrefetchCache = new Map();
   var routePrefetchLimit = 24;
   var transitionMs = 80;
@@ -2277,6 +2278,8 @@ import { escapeHtml, normalizeText, stripHtml } from "./frontend/shared/text.js"
     if (link.hasAttribute("data-no-enhanced-navigation")) return false;
     if (link.pathname.startsWith("/admin")) return false;
     if (link.pathname.startsWith("/api")) return false;
+    // Account owns an HTTP-only session and renders from live API state.
+    if (link.pathname === "/account") return false;
     if (link.pathname.startsWith("/cart") || link.pathname.startsWith("/checkout") || link.pathname.startsWith("/thank-you") || link.pathname.startsWith("/track-order")) return false;
     return true;
   }
@@ -2289,6 +2292,35 @@ import { escapeHtml, normalizeText, stripHtml } from "./frontend/shared/text.js"
     }
   }
 
+  function loadRouteManifest() {
+    if (!routeManifestPromise) {
+      routeManifestPromise = fetch("/data/manifest.json", { headers: { accept: "application/json" } })
+        .then(function (response) {
+          if (!response.ok) throw new Error("Route manifest not found");
+          return response.json();
+        })
+        .then(function (manifest) {
+          return new Set((manifest.routes || []).map(function (route) {
+            return normalizeNavigationPath(route.path);
+          }));
+        })
+        .catch(function (error) {
+          routeManifestPromise = null;
+          throw error;
+        });
+    }
+
+    return routeManifestPromise;
+  }
+
+  function assertKnownRoute(pathname) {
+    return loadRouteManifest().then(function (routes) {
+      if (!routes.has(pathname)) {
+        throw new Error("Route is not part of this static build");
+      }
+    });
+  }
+
   async function loadRouteFragment(pathname) {
     pathname = normalizeNavigationPath(pathname);
 
@@ -2296,7 +2328,10 @@ import { escapeHtml, normalizeText, stripHtml } from "./frontend/shared/text.js"
       return routePrefetchCache.get(pathname);
     }
 
-    var promise = fetch(routeDataUrl(pathname), { headers: { accept: "application/json" } })
+    // Only request route data that this build actually published.
+    var promise = assertKnownRoute(pathname).then(function () {
+      return fetch(routeDataUrl(pathname), { headers: { accept: "application/json" } });
+    })
       .then(function (dataResponse) {
         if (!dataResponse.ok) throw new Error("Route data not found");
         return dataResponse.json();

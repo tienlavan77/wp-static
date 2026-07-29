@@ -1,5 +1,6 @@
 import normalizeRankMathSeo from "./normalizeRankMathSeo.js";
 import normalizeWordPressMedia from "./normalizeWordPressMedia.js";
+import toJsonData from "../../shared/toJsonData.js";
 
 export default function normalizeWordPressContent(rawItem, type = "page") {
   const slug = rawItem.slug ?? String(rawItem.id);
@@ -13,7 +14,7 @@ export default function normalizeWordPressContent(rawItem, type = "page") {
     slug,
     status: rawItem.status ?? null,
     domain: "wordpress",
-    data: {
+    data: toJsonData({
       acf: rawItem.acf ?? {},
       author: rawItem.author ?? null,
       excerpt: stripTags(rawItem.excerpt?.rendered ?? ""),
@@ -24,7 +25,7 @@ export default function normalizeWordPressContent(rawItem, type = "page") {
       link: rawItem.link ?? null,
       modified: rawItem.modified ?? null,
       rawType: rawItem.type ?? type
-    },
+    }),
     seo: normalizeRankMathSeo(rawItem)
   };
 }

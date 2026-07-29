@@ -1,4 +1,5 @@
 import normalizeRankMathSeo from "../wordpress/normalizeRankMathSeo.js";
+import toJsonData from "../../shared/toJsonData.js";
 
 export default function normalizeWooCommerceProduct(rawProduct = {}) {
   const slug = rawProduct.slug ?? String(rawProduct.id);
@@ -10,7 +11,7 @@ export default function normalizeWooCommerceProduct(rawProduct = {}) {
     slug,
     status: rawProduct.status ?? null,
     domain: "woocommerce",
-    data: {
+    data: toJsonData({
       acf: rawProduct.acf ?? {},
       averageRating: rawProduct.average_rating ?? null,
       categories: normalizeTaxonomy(rawProduct.categories),
@@ -33,7 +34,7 @@ export default function normalizeWooCommerceProduct(rawProduct = {}) {
       ],
       variants: normalizeVariations(rawProduct.variations, slug),
       variations: rawProduct.variations ?? []
-    },
+    }),
     seo: normalizeRankMathSeo(rawProduct)
   };
 }

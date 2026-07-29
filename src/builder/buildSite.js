@@ -100,7 +100,7 @@ export default async function buildSite(sitePlan, options = {}) {
   progress("seo:write", "Writing SEO outputs");
   const seoOutputs = await writeSeoOutputs(sitePlan, outputDir, options);
   progress("runtime:copy", "Copying runtime assets");
-  await copyRuntimeAssets(outputDir);
+  await copyBuilderRuntimeAssets(outputDir);
   progress("admin:write", "Writing admin app");
   const adminApp = await writeAdminApp(outputDir, {
     config: options.config
@@ -165,7 +165,7 @@ async function writeRouteServeAlias(page, html, options = {}) {
   return aliasPath;
 }
 
-async function copyRuntimeAssets(outputDir) {
+export async function copyBuilderRuntimeAssets(outputDir) {
   const source = new URL("../runtime/enhanced-navigation.js", import.meta.url);
   const frontendSource = new URL("../runtime/frontend", import.meta.url);
   await copyFile(source, path.join(outputDir, "wpsc-enhanced-navigation.js"));
