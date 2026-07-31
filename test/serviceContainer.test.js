@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import createServiceContainer, {
   SERVICE_CONTAINER_VERSION
-} from "../src/runtime/createServiceContainer.js";
+} from "../framework/src/runtime/bootstrap/createServiceContainer.js";
 
 test("createServiceContainer registers and resolves value services", () => {
   const logger = {

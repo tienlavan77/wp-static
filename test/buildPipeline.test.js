@@ -3,13 +3,13 @@ import { mkdtemp, readFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import buildSite from "../src/builder/buildSite.js";
-import compile from "../src/core/compile.js";
-import loadConfig from "../src/core/loadConfig.js";
+import buildSite from "../framework/src/builder/buildSite.js";
+import compile from "../framework/src/core/compile.js";
+import loadConfig from "../framework/src/core/loadConfig.js";
 
 test("build pipeline writes html files and manifest", async () => {
   const outputDir = await mkdtemp(path.join(os.tmpdir(), "wpsc-build-"));
-  const config = await loadConfig("examples/basic-shop");
+  const config = await loadConfig("fixtures/basic-shop");
   const testConfig = {
     ...config,
     outputDir,
@@ -62,6 +62,8 @@ test("build pipeline writes html files and manifest", async () => {
   assert.match(productFragment, /^<main\b/);
   assert.match(productServeAlias, /data-template-scope="contentType:product"/);
   assert.match(enhancedNavigation, /wpsc:navigation/);
+  assert.match(enhancedNavigation, /synchronizeRuntimeCart/);
+  assert.match(enhancedNavigation, /fetch\("\/api\/cart\/items"/);
   assert.equal(result.adminApp.outputPath, "admin.html");
   assert.match(adminHtml, /data-login-form/);
   assert.match(adminHtml, /data-logout/);

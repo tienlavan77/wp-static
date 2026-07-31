@@ -1,9 +1,11 @@
 {
-  "created_at": "2026-07-27T00:00:00.000Z",
+  "created_at": "2026-07-28T11:21:40.990Z",
   "framework_version": "1.0.0",
   "metadata_version": "1.0",
   "name": "tinsinhphat",
-  "status": "SETUP_REQUIRED",
-  "updated_at": "2026-07-27T00:00:00.000Z",
-  "uuid": "8d20de63-68f1-43cf-a28f-f62a347695a1"
+  "status": "RUNNING",
+  "updated_at": "2026-07-28T17:52:40.306Z",
+  "uuid": "b20ed26a-4cdc-443f-9dee-87108ed291a0",
+  "previous_status": "BUILDING",
+  "status_reason": "dashboard.first_build.completed"
 }

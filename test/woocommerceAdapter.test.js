@@ -1,17 +1,18 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
-import normalizeWooCommerceProduct from "../src/adapters/woocommerce/normalizeWooCommerceProduct.js";
-import createContent from "../src/core/createContent.js";
-import createWooCommerceClient from "../src/adapters/woocommerce/woocommerceClient.js";
-import createWooCommerceRepository from "../src/adapters/woocommerce/woocommerceRepository.js";
-import createWooCommerceAdapter from "../src/adapters/woocommerce/woocommerceAdapter.js";
+import normalizeWooCommerceProduct from "../framework/src/adapters/woocommerce/normalizeWooCommerceProduct.js";
+import createContent from "../framework/src/core/createContent.js";
+import createWooCommerceClient from "../framework/src/adapters/woocommerce/woocommerceClient.js";
+import createWooCommerceRepository from "../framework/src/adapters/woocommerce/woocommerceRepository.js";
+import createWooCommerceAdapter from "../framework/src/adapters/woocommerce/woocommerceAdapter.js";
 
 test("normalizeWooCommerceProduct maps product data into Content input", async () => {
   const rawProduct = JSON.parse(await readFile("test/fixtures/woocommerce/product-with-rankmath.json", "utf8"));
   const content = normalizeWooCommerceProduct(rawProduct);
 
   assert.equal(content.id, "product-44");
+  assert.equal(content.data.woocommerceProductId, "44");
   assert.equal(content.type, "product");
   assert.equal(content.title, "Áo thun basic");
   assert.equal(content.data.price, 249000);
@@ -158,6 +159,25 @@ test("WooCommerce client tolerates PHP warnings before JSON", async () => {
   const items = await client.getCollection("/wp-json/wc/v3/products/categories");
 
   assert.deepEqual(items, [{ id: 5, name: "Cat" }]);
+});
+
+test("WooCommerce client preserves provider diagnostics for failed requests", async () => {
+  const client = createWooCommerceClient({
+    baseUrl: "https://shop.example.test",
+    consumerKey: "ck_test",
+    consumerSecret: "cs_test",
+    fetchImpl: async () => new Response(JSON.stringify({
+      code: "woocommerce_rest_invalid_product_id",
+      message: "Product is invalid."
+    }), { status: 400, statusText: "Bad Request" })
+  });
+
+  await assert.rejects(
+    () => client.createResource("/wp-json/wc/v3/orders", { line_items: [] }),
+    (error) => error.status === 400
+      && error.providerCode === "woocommerce_rest_invalid_product_id"
+      && error.message.includes("Product is invalid.")
+  );
 });
 
 test("WooCommerce repository fetches products and variations", async () => {

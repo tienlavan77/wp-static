@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import createRuntimeBrowserViews from "../src/browser/createRuntimeBrowserViews.js";
+import createRuntimeBrowserViews from "../framework/src/runtime/browser/createRuntimeBrowserViews.js";
 
 test("Runtime Browser views render HTML clients that call only Runtime REST endpoints", () => {
   const views = createRuntimeBrowserViews();

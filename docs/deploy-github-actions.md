@@ -24,7 +24,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: basic-shop-dist
-          path: examples/basic-shop/dist
+          path: fixtures/basic-shop/dist
 ```
 
 For real sources, add WordPress/WooCommerce credentials as repository secrets and map them to environment variables in the build step.

@@ -3,16 +3,19 @@ import { mkdtemp, readFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import buildSite from "../src/builder/buildSite.js";
-import compile from "../src/core/compile.js";
-import loadConfig from "../src/core/loadConfig.js";
+import buildSite from "../framework/src/builder/buildSite.js";
+import compile from "../framework/src/core/compile.js";
+import loadConfig from "../framework/src/core/loadConfig.js";
 
 test("theme resolver supports content type layouts, components, metadata, and assets", async () => {
   const outputDir = await mkdtemp(path.join(os.tmpdir(), "wpsc-theme-"));
-  const config = await loadConfig("examples/basic-shop");
+  const config = await loadConfig("fixtures/basic-shop");
   const testConfig = {
     ...config,
     outputDir,
+    templates: {
+      enabled: false
+    },
     _paths: {
       ...config._paths,
       outputDir
@@ -43,7 +46,7 @@ test("theme resolver supports content type layouts, components, metadata, and as
 });
 
 test("theme resolver falls back to theme.layout when content type layout is missing", async () => {
-  const config = await loadConfig("examples/basic-shop");
+  const config = await loadConfig("fixtures/basic-shop");
   const testConfig = {
     ...config,
     templates: {

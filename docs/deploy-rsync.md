@@ -3,17 +3,17 @@
 Use rsync when you deploy to a VPS that serves the built `dist` directory with Nginx.
 
 ```bash
-node src/cli/index.js deploy rsync \
-  --project examples/basic-shop \
-  --target tienlavan@192.168.1.181:/home/data/sites/wp-static/examples/basic-shop/dist/
+node framework/src/cli/index.js deploy rsync \
+  --project fixtures/basic-shop \
+  --target tienlavan@192.168.1.181:/home/data/sites/wp-static/fixtures/basic-shop/dist/
 ```
 
 Dry run first:
 
 ```bash
-node src/cli/index.js deploy rsync \
-  --project examples/basic-shop \
-  --target tienlavan@192.168.1.181:/home/data/sites/wp-static/examples/basic-shop/dist/ \
+node framework/src/cli/index.js deploy rsync \
+  --project fixtures/basic-shop \
+  --target tienlavan@192.168.1.181:/home/data/sites/wp-static/fixtures/basic-shop/dist/ \
   --dry-run
 ```
 

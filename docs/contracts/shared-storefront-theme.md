@@ -3,7 +3,7 @@
 ## Ownership
 
 `themes/storefront/` is the canonical shared Storefront Theme. The copy in
-`examples/basic-shop/themes/` remains a demo fixture during the compatibility
+`fixtures/basic-shop/themes/` remains a demo fixture during the compatibility
 migration and is not the Runtime import path.
 
 ## Builder V1 Integration

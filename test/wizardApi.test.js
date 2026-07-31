@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import createWizardApi, {
   WIZARD_API_VERSION
-} from "../src/installer/createWizardApi.js";
+} from "../framework/src/installer/createWizardApi.js";
 
 test("createWizardApi creates and exposes installation sessions", () => {
   const api = createWizardApi();

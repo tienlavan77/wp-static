@@ -1,1 +1,1 @@
-export { default as createRoutes } from "../../../src/router/createRoutes.js";
+export { default as createRoutes } from "../../../framework/src/builder/router/createRoutes.js";

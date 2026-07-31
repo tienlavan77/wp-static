@@ -3,8 +3,8 @@ import { mkdtemp, readFile, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import createSiteMetadata from "../src/site/createSiteMetadata.js";
-import createSiteRepository from "../src/site/createSiteRepository.js";
+import createSiteMetadata from "../framework/src/site/createSiteMetadata.js";
+import createSiteRepository from "../framework/src/site/createSiteRepository.js";
 
 test("createSiteRepository resolves site metadata inside workspace sites", () => {
   const repository = createSiteRepository({

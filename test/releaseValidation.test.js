@@ -3,11 +3,11 @@ import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
-import buildReleasePackage from "../src/release/buildReleasePackage.js";
-import createInstallationLock from "../src/release/createInstallationLock.js";
+import buildReleasePackage from "../framework/src/release/buildReleasePackage.js";
+import createInstallationLock from "../framework/src/release/createInstallationLock.js";
 import validateReleasePackage, {
   RELEASE_VALIDATION_VERSION
-} from "../src/release/validateReleasePackage.js";
+} from "../framework/src/release/validateReleasePackage.js";
 
 async function fixtureDir() {
   return mkdtemp(path.join(tmpdir(), "wpsc-release-validation-"));

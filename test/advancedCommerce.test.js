@@ -3,13 +3,13 @@ import { mkdtemp } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import addRelatedProducts from "../src/commerce/addRelatedProducts.js";
-import applyAdvancedCommerceData from "../src/commerce/applyAdvancedCommerceData.js";
-import createCommerceCollections from "../src/commerce/createCommerceCollections.js";
-import createProductVariantContents from "../src/commerce/createProductVariantContents.js";
-import createContent from "../src/core/createContent.js";
-import compile from "../src/core/compile.js";
-import loadConfig from "../src/core/loadConfig.js";
+import addRelatedProducts from "../framework/src/commerce/addRelatedProducts.js";
+import applyAdvancedCommerceData from "../framework/src/commerce/applyAdvancedCommerceData.js";
+import createCommerceCollections from "../framework/src/commerce/createCommerceCollections.js";
+import createProductVariantContents from "../framework/src/commerce/createProductVariantContents.js";
+import createContent from "../framework/src/core/createContent.js";
+import compile from "../framework/src/core/compile.js";
+import loadConfig from "../framework/src/core/loadConfig.js";
 
 test("createProductVariantContents creates slug-only variant pages", () => {
   const variants = createProductVariantContents([product("product-phone", "phone", {
@@ -121,7 +121,7 @@ test("applyAdvancedCommerceData keeps variants on parent products", () => {
 
 test("compile keeps product variants on parent product data", async () => {
   const outputDir = await mkdtemp(path.join(os.tmpdir(), "wpsc-advanced-commerce-"));
-  const config = await loadConfig("examples/basic-shop");
+  const config = await loadConfig("fixtures/basic-shop");
   const testConfig = {
     ...config,
     _paths: {

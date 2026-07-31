@@ -6,7 +6,7 @@ import createSiteMetadata, {
   SITE_STATUSES,
   SiteState,
   validateSiteMetadata
-} from "../src/site/createSiteMetadata.js";
+} from "../framework/src/site/createSiteMetadata.js";
 
 test("createSiteMetadata creates architecture v2 site metadata", () => {
   const metadata = createSiteMetadata({

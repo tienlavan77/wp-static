@@ -5,7 +5,7 @@ import path from "node:path";
 import test from "node:test";
 import buildReleasePackage, {
   RELEASE_BUILDER_VERSION
-} from "../src/release/buildReleasePackage.js";
+} from "../framework/src/release/buildReleasePackage.js";
 
 async function fixtureDir() {
   return mkdtemp(path.join(tmpdir(), "wpsc-release-builder-"));

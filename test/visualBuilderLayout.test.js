@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import createContentTypeLayoutIndex from "../src/visual-builder/createContentTypeLayoutIndex.js";
-import createLayoutDocument, { validateLayoutDocument } from "../src/visual-builder/createLayoutDocument.js";
-import normalizeResponsiveSettings from "../src/visual-builder/normalizeResponsiveSettings.js";
+import createContentTypeLayoutIndex from "../framework/src/builder/visual-builder/createContentTypeLayoutIndex.js";
+import createLayoutDocument, { validateLayoutDocument } from "../framework/src/builder/visual-builder/createLayoutDocument.js";
+import normalizeResponsiveSettings from "../framework/src/builder/visual-builder/normalizeResponsiveSettings.js";
 
 test("createLayoutDocument normalizes layout JSON documents", () => {
   const layout = createLayoutDocument({

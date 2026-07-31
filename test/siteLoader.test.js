@@ -3,9 +3,9 @@ import { mkdir, mkdtemp, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import createSiteMetadata from "../src/site/createSiteMetadata.js";
-import createSiteLoader from "../src/site/createSiteLoader.js";
-import createSiteRepository from "../src/site/createSiteRepository.js";
+import createSiteMetadata from "../framework/src/site/createSiteMetadata.js";
+import createSiteLoader from "../framework/src/site/createSiteLoader.js";
+import createSiteRepository from "../framework/src/site/createSiteRepository.js";
 
 test("createSiteLoader loads metadata and site-local paths", async () => {
   const workspaceDir = await mkdtemp(path.join(os.tmpdir(), "wpsc-site-loader-"));

@@ -21,6 +21,8 @@ export default function productLayout({ components, content, graph, html, route 
   const shortDescription = data.shortDescriptionHtml ?? data.shortDescription ?? data.description ?? "";
   const images = normalizeImages(content);
   const variants = content.variants ?? data.variants ?? [];
+  const woocommerceProductId = normalizeWooCommerceProductId(data.woocommerceProductId);
+  const canAddToCart = Boolean(woocommerceProductId) && variants.length === 0;
   const price = formatProductPrice(data, variants, components);
   const relatedProducts = findRelatedProducts(content, graph).slice(0, 5);
   const viewedProduct = createViewedProductPayload(content, categories, images, price, route);
@@ -78,7 +80,7 @@ export default function productLayout({ components, content, graph, html, route 
           ${variants.length > 0 ? `<script type="application/json" data-product-variants>${safeJsonForScript(createVariantPayload(variants, data.currency))}</script>` : ""}
           <div class="storefront-product-actions">
             <input type="number" min="1" value="1" aria-label="Số lượng">
-            <button class="storefront-button" type="button" data-add-to-cart data-product-id="${escapeAttribute(content.id)}" data-product-title="${escapeAttribute(content.title)}" data-product-url="${escapeAttribute(route.path)}" data-product-image="${escapeAttribute(productImage)}"${variants.length > 0 ? " disabled" : ""}>Thêm vào giỏ</button>
+            <button class="storefront-button" type="button" data-add-to-cart${woocommerceProductId ? ` data-product-id="${escapeAttribute(woocommerceProductId)}"` : ""} data-product-title="${escapeAttribute(content.title)}" data-product-url="${escapeAttribute(route.path)}" data-product-image="${escapeAttribute(productImage)}"${canAddToCart ? "" : " disabled"}>Thêm vào giỏ</button>
             <a class="storefront-button-secondary${variants.length > 0 ? " is-disabled" : ""}" href="/lien-he" data-request-quote data-product-id="${escapeAttribute(content.id)}" data-product-title="${escapeAttribute(content.title)}" data-product-url="${escapeAttribute(route.path)}" data-product-image="${escapeAttribute(productImage)}"${variants.length > 0 ? ` aria-disabled="true"` : ""}>Nhận báo giá</a>
           </div>
           <dl class="storefront-product-meta">
@@ -150,6 +152,12 @@ export default function productLayout({ components, content, graph, html, route 
     navItems,
     siteTitle: "Tín Sinh Phát"
   });
+}
+
+function normalizeWooCommerceProductId(value) {
+  const productId = Number(value);
+
+  return Number.isInteger(productId) && productId > 0 ? String(productId) : "";
 }
 
 function createProductSchema(content, data, variants, categories, breadcrumbs, images, route) {

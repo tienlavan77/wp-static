@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import createContent from "../src/core/createContent.js";
-import createContentGraph from "../src/content/createContentGraph.js";
+import createContent from "../framework/src/core/createContent.js";
+import createContentGraph from "../framework/src/builder/content/createContentGraph.js";
 
 test("createContentGraph indexes content by id, slug, type, and term", () => {
   const product = createContent({
@@ -64,9 +64,9 @@ test("createContentGraph indexes content by id, slug, type, and term", () => {
 });
 
 test("compiled site plan includes a content graph", async () => {
-  const { default: compile } = await import("../src/core/compile.js");
-  const { default: loadConfig } = await import("../src/core/loadConfig.js");
-  const config = await loadConfig("examples/basic-shop");
+  const { default: compile } = await import("../framework/src/core/compile.js");
+  const { default: loadConfig } = await import("../framework/src/core/loadConfig.js");
+  const config = await loadConfig("fixtures/basic-shop");
   const sitePlan = await compile(config);
 
   assert.equal(sitePlan.graph.findContentBySlug("iphone-15").id, "product-iphone-15");

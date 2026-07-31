@@ -3,8 +3,8 @@ import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import createOutputPipeline from "../src/output/createOutputPipeline.js";
-import createSiteRepository from "../src/site/createSiteRepository.js";
+import createOutputPipeline from "../framework/src/output/createOutputPipeline.js";
+import createSiteRepository from "../framework/src/site/createSiteRepository.js";
 
 test("Output Pipeline is the sole writer for HTML and copied assets under site public", async () => {
   const workspaceDir = await mkdtemp(path.join(os.tmpdir(), "wpsc-output-"));

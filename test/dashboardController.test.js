@@ -3,9 +3,9 @@ import { mkdtemp, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import createDashboardController from "../src/runtime/createDashboardController.js";
-import createSiteMetadata from "../src/site/createSiteMetadata.js";
-import createSiteRepository from "../src/site/createSiteRepository.js";
+import createDashboardController from "../framework/src/runtime/dashboard/createDashboardController.js";
+import createSiteMetadata from "../framework/src/site/createSiteMetadata.js";
+import createSiteRepository from "../framework/src/site/createSiteRepository.js";
 
 test("Dashboard reads site metadata, runtime state, source status, and injected build status", async () => {
   const workspaceDir = await mkdtemp(path.join(os.tmpdir(), "wpsc-dashboard-"));

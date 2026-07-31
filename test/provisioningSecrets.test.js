@@ -11,7 +11,7 @@ import createProvisioningSecrets, {
   createSecret,
   unwrapProvisioningSecrets,
   validateProvisioningSecrets
-} from "../src/provision/createProvisioningSecrets.js";
+} from "../framework/src/provision/createProvisioningSecrets.js";
 
 test("createSecret creates URL-safe random secrets with CSPRNG", () => {
   const secret = createSecret(PROVISIONING_SECRET_BYTES);
@@ -80,7 +80,7 @@ test("createProvisioningSecrets validates provided secrets and metadata", () => 
 });
 
 test("secret module does not use Math.random", async () => {
-  const source = await readFile(new URL("../src/provision/createProvisioningSecrets.js", import.meta.url), "utf8");
+  const source = await readFile(new URL("../framework/src/provision/createProvisioningSecrets.js", import.meta.url), "utf8");
 
   assert.equal(source.includes("Math.random"), false);
   assert.equal(source.includes("randomBytes"), true);

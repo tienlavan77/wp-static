@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
 import path from "node:path";
-import buildSite from "../src/builder/buildSite.js";
-import compile from "../src/core/compile.js";
-import loadConfig from "../src/core/loadConfig.js";
+import buildSite from "../framework/src/builder/buildSite.js";
+import compile from "../framework/src/core/compile.js";
+import loadConfig from "../framework/src/core/loadConfig.js";
 
 const args = process.argv.slice(2);
 
@@ -15,7 +15,7 @@ try {
 }
 
 async function main(cliArgs) {
-  const projectDir = path.resolve(readOption(cliArgs, "--project") ?? "examples/basic-shop");
+  const projectDir = path.resolve(readOption(cliArgs, "--project") ?? "fixtures/basic-shop");
   const routePath = normalizeRoutePath(readOption(cliArgs, "--route") ?? cliArgs[0] ?? "/");
   const useMock = cliArgs.includes("--mock");
   const withRelated = cliArgs.includes("--with-related");

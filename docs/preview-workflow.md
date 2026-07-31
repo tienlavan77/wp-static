@@ -27,7 +27,7 @@ export default {
 ## Public Build
 
 ```bash
-node src/cli/index.js build --project examples/basic-shop
+node framework/src/cli/index.js build --project fixtures/basic-shop
 ```
 
 This excludes draft/private content.
@@ -36,7 +36,7 @@ This excludes draft/private content.
 
 ```bash
 WPSC_PREVIEW_TOKEN=secret \
-node src/cli/index.js build --project examples/basic-shop --preview --preview-token secret
+node framework/src/cli/index.js build --project fixtures/basic-shop --preview --preview-token secret
 ```
 
 Preview output should be deployed only to a protected preview location. Do not publish

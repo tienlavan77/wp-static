@@ -5,7 +5,7 @@ Phase 20 adds a small webhook receiver for editor workflows. WordPress or WooCom
 ## Start The Receiver
 
 ```sh
-WPSC_WEBHOOK_SECRET=change-me node src/cli/index.js webhook --project examples/basic-shop --port 8787
+WPSC_WEBHOOK_SECRET=change-me node framework/src/cli/index.js webhook --project fixtures/basic-shop --port 8787
 ```
 
 The endpoint is:

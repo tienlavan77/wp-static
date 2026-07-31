@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import createHttpInstaller, {
   HTTP_INSTALLER_VERSION
-} from "../src/release/createHttpInstaller.js";
+} from "../framework/src/release/createHttpInstaller.js";
 
 test("createHttpInstaller serves web installer html", async () => {
   const installer = createHttpInstaller();

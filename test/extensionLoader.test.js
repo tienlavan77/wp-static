@@ -2,9 +2,9 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import createExtensionLoader, {
   EXTENSION_LOADER_VERSION
-} from "../src/runtime/createExtensionLoader.js";
-import createHookSystem from "../src/runtime/createHookSystem.js";
-import createRuntimeContext from "../src/runtime/createRuntimeContext.js";
+} from "../framework/src/runtime/extensions/createExtensionLoader.js";
+import createHookSystem from "../framework/src/runtime/extensions/createHookSystem.js";
+import createRuntimeContext from "../framework/src/runtime/bootstrap/createRuntimeContext.js";
 
 test("createExtensionLoader loads plugin objects with Plugin SDK", async () => {
   const context = createRuntimeContext();

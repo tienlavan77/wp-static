@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import path from "node:path";
 import test from "node:test";
-import createSitePathPolicy from "../src/site/createSitePathPolicy.js";
+import createSitePathPolicy from "../framework/src/site/createSitePathPolicy.js";
 
 test("createSitePathPolicy resolves paths inside one site root", () => {
   const policy = createSitePathPolicy({

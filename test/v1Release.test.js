@@ -24,7 +24,7 @@ const v1Docs = [
 ];
 
 test("v1 release metadata is stable and versioned", async () => {
-  const api = await import("../src/index.js");
+  const api = await import("../framework/src/index.js");
   const rootPackage = JSON.parse(await readFile("package.json", "utf8"));
 
   assert.equal(rootPackage.version, "1.0.0");
@@ -42,7 +42,7 @@ test("v1 release metadata is stable and versioned", async () => {
 });
 
 test("v1 contracts and documentation are published", async () => {
-  const api = await import("../src/index.js");
+  const api = await import("../framework/src/index.js");
 
   assert.deepEqual(api.V1_PLUGIN_HOOKS, [
     "data",

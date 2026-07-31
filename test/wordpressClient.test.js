@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import createWordPressClient from "../src/adapters/wordpress/wordpressClient.js";
+import createWordPressClient from "../framework/src/adapters/wordpress/wordpressClient.js";
 
 test("WordPress client fetches paginated collections", async () => {
   const urls = [];

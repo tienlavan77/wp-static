@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import createBuildApi from "../src/api/createBuildApi.js";
-import createSiteBuildCommand from "../src/cli/createSiteBuildCommand.js";
-import createSchedulerWebhookReceiver from "../src/webhook/createSchedulerWebhookReceiver.js";
-import { JobTrigger } from "../src/scheduler/schedulerContracts.js";
+import createBuildApi from "../framework/src/api/createBuildApi.js";
+import createSiteBuildCommand from "../framework/src/cli/createSiteBuildCommand.js";
+import createSchedulerWebhookReceiver from "../framework/src/webhook/createSchedulerWebhookReceiver.js";
+import { JobTrigger } from "../framework/src/scheduler/contracts/schedulerContracts.js";
 
 function scheduler(calls) { return { trigger: (input) => { calls.push(input); return { diagnostics: { errors: [], warnings: [] }, job: { id: `job-${calls.length}` }, ok: true }; } }; }
 

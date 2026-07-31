@@ -3,11 +3,11 @@ import { mkdtemp, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import createContent from "../src/core/createContent.js";
-import compile from "../src/core/compile.js";
-import createArchiveRoutes from "../src/router/createArchiveRoutes.js";
-import createRoutes from "../src/router/createRoutes.js";
-import generateSitemap from "../src/seo/generateSitemap.js";
+import createContent from "../framework/src/core/createContent.js";
+import compile from "../framework/src/core/compile.js";
+import createArchiveRoutes from "../framework/src/builder/router/createArchiveRoutes.js";
+import createRoutes from "../framework/src/builder/router/createRoutes.js";
+import generateSitemap from "../framework/src/builder/seo/generateSitemap.js";
 
 test("createArchiveRoutes creates default taxonomy archive routes", () => {
   const routes = createArchiveRoutes([
@@ -104,8 +104,8 @@ test("compile includes taxonomy archive pages in the site plan and sitemap", asy
       url: "https://example.com"
     },
     theme: {
-      components: path.resolve(process.cwd(), "examples/basic-shop/theme/components/index.js"),
-      layout: path.resolve(process.cwd(), "examples/basic-shop/theme/layout.js")
+      components: path.resolve(process.cwd(), "fixtures/basic-shop/theme/components/index.js"),
+      layout: path.resolve(process.cwd(), "fixtures/basic-shop/theme/layout.js")
     },
     outputDir: "./dist"
   }, {

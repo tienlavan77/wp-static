@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import createRuntimeRouter from "../src/runtime/createRuntimeRouter.js";
+import createRuntimeRouter from "../framework/src/runtime/router/createRuntimeRouter.js";
 
 function composition(services) { return { get: (name) => { if (!services[name]) throw new Error("missing"); return services[name]; } }; }
 

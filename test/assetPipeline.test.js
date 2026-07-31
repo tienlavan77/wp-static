@@ -3,8 +3,8 @@ import { mkdtemp, readFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import buildSite from "../src/builder/buildSite.js";
-import processAssetPipeline from "../src/assets/processAssetPipeline.js";
+import buildSite from "../framework/src/builder/buildSite.js";
+import processAssetPipeline from "../framework/src/builder/assets/processAssetPipeline.js";
 
 test("asset pipeline downloads, caches, manifests, and rewrites remote images", async () => {
   const outputDir = await mkdtemp(path.join(os.tmpdir(), "wpsc-assets-"));

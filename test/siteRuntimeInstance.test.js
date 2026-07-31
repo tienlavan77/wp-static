@@ -3,10 +3,10 @@ import { mkdtemp, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import createSiteRuntimeInstance from "../src/runtime/createSiteRuntimeInstance.js";
-import { createSiteRuntimeSkeleton } from "../src/runtime/createSiteRuntime.js";
-import createSiteRepository from "../src/site/createSiteRepository.js";
-import { SchedulerState } from "../src/scheduler/schedulerContracts.js";
+import createSiteRuntimeInstance from "../framework/src/runtime/bootstrap/createSiteRuntimeInstance.js";
+import { createSiteRuntimeSkeleton } from "../framework/src/runtime/bootstrap/createSiteRuntime.js";
+import createSiteRepository from "../framework/src/site/createSiteRepository.js";
+import { SchedulerState } from "../framework/src/scheduler/contracts/schedulerContracts.js";
 
 function adapter() { return { getMetadata: async () => ({ adapterVersion: "1", capabilities: [], sourceType: "rest" }), healthCheck: async () => ({ ok: true }), initialize: async () => ({ ok: true }), registerWebhook: async () => ({ ok: true, webhookId: "hook-1" }), unregisterWebhook: async () => ({ ok: true }), validate: async () => ({ ok: true }), verifyWebhook: async () => ({ ok: true }) }; }
 

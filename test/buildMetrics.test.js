@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import createBuildMetrics from "../src/report/createBuildMetrics.js";
+import createBuildMetrics from "../framework/src/builder/report/createBuildMetrics.js";
 
 test("createBuildMetrics summarizes output assets pipeline and memory", () => {
   const metrics = createBuildMetrics({

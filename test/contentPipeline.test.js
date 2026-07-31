@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import createContentPipeline, { CONTENT_PIPELINE_VERSION } from "../src/content/createContentPipeline.js";
+import createContentPipeline, { CONTENT_PIPELINE_VERSION } from "../framework/src/builder/content/createContentPipeline.js";
 
 test("Content Pipeline normalizes, transforms, filters, and freezes its Content Model", () => {
   const pipeline = createContentPipeline({
@@ -13,7 +13,16 @@ test("Content Pipeline normalizes, transforms, filters, and freezes its Content 
   ]);
   assert.equal(pipeline.version, CONTENT_PIPELINE_VERSION);
   assert.equal(result.ok, true);
-  assert.deepEqual(result.model.items, [{ data: { visible: true }, id: "1", slug: "welcome", title: "WELCOME", type: "page" }]);
+  assert.deepEqual(result.model.items, [{
+    data: { visible: true },
+    domain: null,
+    id: "1",
+    seo: {},
+    slug: "welcome",
+    status: null,
+    title: "WELCOME",
+    type: "page"
+  }]);
   assert.equal(Object.isFrozen(result.model), true);
 });
 

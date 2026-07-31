@@ -3,10 +3,10 @@ import { mkdtemp } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import createRebuildQueue from "../src/queue/createRebuildQueue.js";
-import assertBuilderEditorAccess from "../src/visual-builder/production/assertBuilderEditorAccess.js";
-import createBuilderWorkflow from "../src/visual-builder/production/createBuilderWorkflow.js";
-import createLayoutRevisionStore from "../src/visual-builder/production/createLayoutRevisionStore.js";
+import createRebuildQueue from "../framework/src/scheduler/queue/createRebuildQueue.js";
+import assertBuilderEditorAccess from "../framework/src/builder/visual-builder/production/assertBuilderEditorAccess.js";
+import createBuilderWorkflow from "../framework/src/builder/visual-builder/production/createBuilderWorkflow.js";
+import createLayoutRevisionStore from "../framework/src/builder/visual-builder/production/createLayoutRevisionStore.js";
 
 const layout = {
   contentTypes: ["page"],

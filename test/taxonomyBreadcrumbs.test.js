@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import createContent from "../src/core/createContent.js";
-import createContentGraph from "../src/content/createContentGraph.js";
-import createRouteDataPayload from "../src/data/createRouteDataPayload.js";
-import createArchiveRoutes from "../src/router/createArchiveRoutes.js";
+import createContent from "../framework/src/core/createContent.js";
+import createContentGraph from "../framework/src/builder/content/createContentGraph.js";
+import createRouteDataPayload from "../framework/src/builder/data/createRouteDataPayload.js";
+import createArchiveRoutes from "../framework/src/builder/router/createArchiveRoutes.js";
 
 test("route data exposes hierarchical breadcrumbs while keeping flat archive URLs", () => {
   const parentTerm = term(10, "bao-bi", "Bao bì", "product_cat");

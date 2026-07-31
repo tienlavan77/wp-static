@@ -3,9 +3,9 @@ import { mkdtemp, readFile, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import createWebhookRegistrationController from "../src/runtime/createWebhookRegistrationController.js";
-import createSiteMetadata from "../src/site/createSiteMetadata.js";
-import createSiteRepository from "../src/site/createSiteRepository.js";
+import createWebhookRegistrationController from "../framework/src/runtime/webhook/createWebhookRegistrationController.js";
+import createSiteMetadata from "../framework/src/site/createSiteMetadata.js";
+import createSiteRepository from "../framework/src/site/createSiteRepository.js";
 
 test("Runtime registers webhook with provisioned UUID and managed secret", async () => {
   const workspaceDir = await mkdtemp(path.join(os.tmpdir(), "wpsc-webhook-runtime-"));

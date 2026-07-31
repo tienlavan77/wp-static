@@ -5,10 +5,10 @@ import os from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
 import test from "node:test";
-import buildProjectOnce from "../src/dev-server/buildProjectOnce.js";
-import createRouteDependencyGraph from "../src/graph/createRouteDependencyGraph.js";
-import parseChangedItem from "../src/planner/parseChangedItem.js";
-import planIncrementalBuild from "../src/planner/planIncrementalBuild.js";
+import buildProjectOnce from "../framework/src/dev-server/buildProjectOnce.js";
+import createRouteDependencyGraph from "../framework/src/builder/graph/createRouteDependencyGraph.js";
+import parseChangedItem from "../framework/src/builder/planner/parseChangedItem.js";
+import planIncrementalBuild from "../framework/src/builder/planner/planIncrementalBuild.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -36,6 +36,18 @@ test("route dependency graph maps changed products to product and archive routes
   assert.equal(affected.includes("/iphone-15"), true);
   assert.equal(affected.includes("/dien-thoai"), true);
   assert.equal(affected.includes("/thoi-trang"), false);
+});
+
+test("site SEO changes rebuild every route that carries site-wide canonical metadata", () => {
+  const sitePlan = {
+    routes: [
+      { content: { id: "page-1", slug: "about", type: "page" }, outputPath: "about.html", path: "/about" },
+      { content: { id: "product-1", slug: "card", type: "product" }, outputPath: "card.html", path: "/card" }
+    ]
+  };
+  const graph = createRouteDependencyGraph(sitePlan);
+
+  assert.deepEqual(graph.findAffectedRoutes([parseChangedItem("site:seo")]), ["/about", "/card"]);
 });
 
 test("incremental plan maps taxonomy changes to slug-only archive routes", async () => {
@@ -88,13 +100,13 @@ test("cli build accepts repeated changed item flags", async () => {
   });
 
   await execFileAsync("node", [
-    "src/cli/index.js",
+    "framework/src/cli/index.js",
     "build",
     "--project",
     projectDir
   ]);
   const result = await execFileAsync("node", [
-    "src/cli/index.js",
+    "framework/src/cli/index.js",
     "build",
     "--project",
     projectDir,

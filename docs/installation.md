@@ -16,11 +16,11 @@ This guide describes the Sprint 1 installation path for a new WPSC project.
 Run commands from the WPSC repository root:
 
 ```bash
-node src/cli/index.js doctor
-node src/cli/index.js create my-shop --template commerce
-node src/cli/index.js validate --project my-shop
-node src/cli/index.js build --project my-shop
-node src/cli/index.js serve --project my-shop --port 8080
+node framework/src/cli/index.js doctor
+node framework/src/cli/index.js create my-shop --template commerce
+node framework/src/cli/index.js validate --project my-shop
+node framework/src/cli/index.js build --project my-shop
+node framework/src/cli/index.js serve --project my-shop --port 8080
 ```
 
 Then open:
@@ -34,7 +34,7 @@ http://localhost:8080
 List available templates:
 
 ```bash
-node src/cli/index.js create --list-templates
+node framework/src/cli/index.js create --list-templates
 ```
 
 Available templates:
@@ -50,7 +50,7 @@ Available templates:
 Create a project:
 
 ```bash
-node src/cli/index.js create my-catalog --template catalog
+node framework/src/cli/index.js create my-catalog --template catalog
 ```
 
 The default template is:
@@ -64,7 +64,7 @@ commerce
 Use the install wizard when you want WPSC to generate project configuration files:
 
 ```bash
-node src/cli/index.js install \
+node framework/src/cli/index.js install \
   --project my-shop \
   --wordpress-url https://api.example.com \
   --woocommerce-url https://api.example.com \
@@ -89,7 +89,7 @@ install-report.md
 Use `--force` only when you intentionally want to overwrite generated install files:
 
 ```bash
-node src/cli/index.js install --project my-shop --force
+node framework/src/cli/index.js install --project my-shop --force
 ```
 
 ## Installation Report
@@ -103,7 +103,7 @@ install-report.md
 Choose another path:
 
 ```bash
-node src/cli/index.js install --project my-shop --report reports/install.md
+node framework/src/cli/index.js install --project my-shop --report reports/install.md
 ```
 
 The report includes:
@@ -147,13 +147,13 @@ Keep `.env` private.
 Run:
 
 ```bash
-node src/cli/index.js validate --project my-shop
+node framework/src/cli/index.js validate --project my-shop
 ```
 
 For machine-readable output:
 
 ```bash
-node src/cli/index.js validate --project my-shop --json
+node framework/src/cli/index.js validate --project my-shop --json
 ```
 
 Validation checks:
@@ -171,13 +171,13 @@ Validation checks:
 Run:
 
 ```bash
-node src/cli/index.js doctor --project my-shop
+node framework/src/cli/index.js doctor --project my-shop
 ```
 
 For JSON output:
 
 ```bash
-node src/cli/index.js doctor --project my-shop --json
+node framework/src/cli/index.js doctor --project my-shop --json
 ```
 
 Doctor is for environment diagnostics. Validate is for project configuration.
@@ -187,7 +187,7 @@ Doctor is for environment diagnostics. Validate is for project configuration.
 Run:
 
 ```bash
-node src/cli/index.js build --project my-shop
+node framework/src/cli/index.js build --project my-shop
 ```
 
 Output goes to the configured `outputDir`, usually:
@@ -201,7 +201,7 @@ my-shop/dist
 Run:
 
 ```bash
-node src/cli/index.js serve --project my-shop --port 8080
+node framework/src/cli/index.js serve --project my-shop --port 8080
 ```
 
 ## Current Packaging Note
@@ -213,5 +213,5 @@ package metadata is finalized.
 Until then, use:
 
 ```bash
-node src/cli/index.js create my-shop --template commerce
+node framework/src/cli/index.js create my-shop --template commerce
 ```

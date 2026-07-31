@@ -1694,69 +1694,163 @@ Trigger Build đầu tiên.
 
 ---
 
-# Sprint 7 — Dashboard
+# Sprint 7 — CMS Runtime
 
 ## Goal
 
-Hoàn thiện Dashboard.
+Chuyển Site Runtime hiện có thành CMS Runtime hoàn chỉnh. Sprint này xây dựng
+khả năng authoring và publishing Website trên Runtime Platform đã hoàn thành ở
+Sprint 6; không xây lại Framework, Build Engine hay Scheduler.
 
 ## Deliverables
 
-- Site Management
-- Build Monitor
-- Queue Monitor
-- Build History
-- Settings
-- User Interface
+- Pages
+- Posts
+- Menus
+- Media Library
+- Search
+- Routing
+- Theme Composition
+- Publishing Workflow
+- Site Configuration Management
+
+## Exit Outcome
+
+```text
+Create Site
+
+↓
+
+Open Browser
+
+↓
+
+CMS Runtime
+
+↓
+
+Create Website Content
+
+↓
+
+Publish Website
+```
+
+Sprint 7 phải giữ Site configuration isolated và không hardcode domain, source
+state hay service data cho một Site cụ thể. Multi-site operations đầy đủ vẫn
+thuộc Sprint 9.
 
 ---
 
-# Sprint 8 — Source Adapter
+# Sprint 8 — Advanced Website Experience
 
 ## Goal
 
-Chuẩn hóa Source Adapter.
+Mở rộng CMS Runtime thành trải nghiệm Website production thực tế.
 
 ## Deliverables
 
-- WordPress Adapter
-- REST Adapter
-- JSON Adapter
-- GraphQL Adapter
-
-Chuẩn hóa Interface.
-
----
-
-# Sprint 9 — Performance
-
-## Goal
-
-Tối ưu hiệu năng.
-
-## Deliverables
-
+- WooCommerce hoàn chỉnh
+- Customer Account
+- Shopping Cart
+- Checkout
+- Forms
+- Advanced SEO
 - Cache
-- Parallel Build
-- Incremental Sync
-- Queue Optimization
-- Memory Optimization
+- Performance Optimization
+- Extensions
+
+## Exit Outcome
+
+```text
+CMS Runtime
+
+↓
+
+Commerce
+
+↓
+
+Customer Experience
+
+↓
+
+High Performance Website
+```
+
+Các khả năng này phải mở rộng qua contract/provider phù hợp; Browser, Theme và
+client không được tự sở hữu business logic.
 
 ---
 
-# Sprint 10 — Production Ready
+# Sprint 9 — Production Operations
 
 ## Goal
 
-Chuẩn bị Release v1.
+Cung cấp năng lực vận hành production cho nhiều Site trên cùng Framework.
 
 ## Deliverables
 
+- Multi-site Management
+- Backup
+- Restore
+- Monitoring
+- Logs
+- Security
+- Deployment
+- Enterprise Runtime
+
+## Exit Outcome
+
+```text
+Website
+
+↓
+
+Production Operations
+
+↓
+
+Enterprise-ready Platform
+```
+
+Multi-site management phải giữ nguyên Shared Infrastructure, Site Isolation và
+Zero Cross-Site Coupling đã được freeze trong Architecture v2.01.
+
+---
+
+# Sprint 10 — Product Release
+
+## Goal
+
+Đóng gói WPSC thành sản phẩm ổn định và phát hành Version 1.0.
+
+## Deliverables
+
+- Installer hoàn chỉnh
+- Upgrade
+- Migration
 - Documentation
-- Testing
-- Benchmark
-- Security Audit
-- Release Candidate
+- SDK
+- Stable API
+- Version 1.0 Release
+
+## Exit Outcome
+
+```text
+Production Platform
+
+↓
+
+Stable Product
+
+↓
+
+WPSC v1.0
+```
+
+Sprint 10 không thay đổi core architecture; chỉ chuẩn hóa packaging, migration,
+compatibility, documentation và release quality.
 
 ---
 

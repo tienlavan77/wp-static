@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import createRuntimeContentReader from "../src/source/createRuntimeContentReader.js";
+import createRuntimeContentReader from "../framework/src/runtime/source/createRuntimeContentReader.js";
 
 test("Runtime Content Reader preserves source collections for Builder V1 archives and menus", async () => {
   const reader = createRuntimeContentReader({

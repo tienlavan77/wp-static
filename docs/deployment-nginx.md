@@ -14,7 +14,7 @@ npm run build:example
 The virtual host should point to the generated `dist` directory:
 
 ```nginx
-root /home/data/sites/wp-static/examples/basic-shop/dist;
+root /home/data/sites/wp-static/fixtures/basic-shop/dist;
 index index.html;
 
 location / {

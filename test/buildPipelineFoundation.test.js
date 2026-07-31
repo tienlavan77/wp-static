@@ -3,7 +3,7 @@ import test from "node:test";
 import createBuildPipeline, {
   BUILD_PIPELINE_STAGE_ORDER,
   createStandardBuildPipelineStages
-} from "../src/builder/createBuildPipeline.js";
+} from "../framework/src/builder/createBuildPipeline.js";
 
 test("createStandardBuildPipelineStages uses the Sprint 2 stage order", () => {
   assert.deepEqual(BUILD_PIPELINE_STAGE_ORDER, [

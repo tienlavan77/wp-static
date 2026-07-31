@@ -3,9 +3,9 @@ import test from "node:test";
 import createSetupApi, {
   SETUP_API_VERSION,
   SetupApiRoute
-} from "../src/api/createSetupApi.js";
-import createSetupService, { SetupClient } from "../src/setup/createSetupService.js";
-import { SetupState } from "../src/setup/createSetupStateMachine.js";
+} from "../framework/src/api/createSetupApi.js";
+import createSetupService, { SetupClient } from "../framework/src/setup/createSetupService.js";
+import { SetupState } from "../framework/src/setup/createSetupStateMachine.js";
 
 test("Setup API is a browser gateway over Setup Service and returns revision", () => {
   const service = createSetupService({

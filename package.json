@@ -11,17 +11,17 @@
     "node": ">=20"
   },
   "scripts": {
-    "build": "node src/cli/index.js build",
-    "build:css:example": "tailwindcss -i examples/basic-shop/theme/storefront.css -o examples/basic-shop/public/storefront.css --minify",
+    "build": "node framework/src/cli/index.js build",
+    "build:css:example": "tailwindcss -i fixtures/basic-shop/theme/storefront.css -o fixtures/basic-shop/public/storefront.css --minify",
     "prebuild:example": "npm run build:css:example",
-    "build:example": "node src/cli/index.js build --project examples/basic-shop",
+    "build:example": "node framework/src/cli/index.js build --project fixtures/basic-shop",
     "build:route": "node scripts/build-route.js",
-    "serve:runtime:example": "node examples/basic-shop/runtime/server.js",
-    "wpsc": "node src/cli/index.js",
+    "serve:runtime:example": "node fixtures/basic-shop/runtime/server.js",
+    "wpsc": "node framework/src/cli/index.js",
     "test": "node --test"
   },
   "exports": {
-    ".": "./src/index.js",
+    ".": "./framework/src/index.js",
     "./adapters": "./packages/adapters/src/index.js",
     "./builder": "./packages/builder/src/index.js",
     "./cli": "./packages/cli/src/index.js",
@@ -31,7 +31,7 @@
     "./shared": "./packages/shared/src/index.js"
   },
   "bin": {
-    "wpsc": "./src/cli/index.js"
+    "wpsc": "./framework/src/cli/index.js"
   },
   "license": "UNLICENSED",
   "devDependencies": {

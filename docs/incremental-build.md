@@ -5,16 +5,16 @@ Phase 21 adds the first incremental build engine. WPSC can parse changed source 
 ## CLI
 
 ```sh
-node src/cli/index.js build --project examples/basic-shop --changed product:iphone-15
-node src/cli/index.js build --project examples/basic-shop --changed term:product_cat:dien-thoai
-node src/cli/index.js build --project examples/basic-shop --changed menu:primary
+node framework/src/cli/index.js build --project fixtures/basic-shop --changed product:iphone-15
+node framework/src/cli/index.js build --project fixtures/basic-shop --changed term:product_cat:dien-thoai
+node framework/src/cli/index.js build --project fixtures/basic-shop --changed menu:primary
 ```
 
 The `--changed` flag can be repeated:
 
 ```sh
-node src/cli/index.js build \
-  --project examples/basic-shop \
+node framework/src/cli/index.js build \
+  --project fixtures/basic-shop \
   --changed product:iphone-15 \
   --changed term:product_cat:thoi-trang
 ```

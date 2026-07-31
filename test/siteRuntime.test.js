@@ -3,8 +3,8 @@ import { mkdtemp, readFile, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import createSiteRepository from "../src/site/createSiteRepository.js";
-import createSiteRuntime, { createInstallationCheck, createSiteResolver, createSiteRuntimeSkeleton } from "../src/runtime/createSiteRuntime.js";
+import createSiteRepository from "../framework/src/site/createSiteRepository.js";
+import createSiteRuntime, { createInstallationCheck, createSiteResolver, createSiteRuntimeSkeleton } from "../framework/src/runtime/bootstrap/createSiteRuntime.js";
 
 test("Site Runtime Skeleton creates public index.php and setup-required metadata", async () => {
   const workspaceDir = await mkdtemp(path.join(os.tmpdir(), "wpsc-runtime-"));

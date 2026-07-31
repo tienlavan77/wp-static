@@ -340,7 +340,7 @@ the example build.
 The mini core prototype is complete when:
 
 - `npm run build:example` succeeds.
-- `examples/basic-shop/dist/index.html` exists.
+- `fixtures/basic-shop/dist/index.html` exists.
 - At least three static HTML routes are generated.
 - Duplicate slugs fail the build.
 - Content models are immutable.

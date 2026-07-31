@@ -2,13 +2,13 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   checkNodeVersion
-} from "../src/validation/checkEnvironment.js";
+} from "../framework/src/validation/checkEnvironment.js";
 import {
   createError,
   createOk,
   createWarning,
   summarizeValidationResults
-} from "../src/validation/createValidationResult.js";
+} from "../framework/src/validation/createValidationResult.js";
 
 test("validation result model preserves status and legacy ok field", () => {
   const ok = createOk("Node", "v26.0.0");

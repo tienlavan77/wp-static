@@ -3,10 +3,10 @@ import { mkdtemp, readFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import createInstallationConfigGenerator from "../src/installer/createInstallationConfigGenerator.js";
+import createInstallationConfigGenerator from "../framework/src/installer/createInstallationConfigGenerator.js";
 import persistInstallationConfiguration, {
   PERSISTENT_CONFIGURATION_VERSION
-} from "../src/release/persistInstallationConfiguration.js";
+} from "../framework/src/release/persistInstallationConfiguration.js";
 
 async function readJson(filePath) {
   return JSON.parse(await readFile(filePath, "utf8"));

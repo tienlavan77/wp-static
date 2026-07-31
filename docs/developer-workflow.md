@@ -5,7 +5,7 @@ This guide summarizes the Sprint 2 development workflow.
 ## Build Once
 
 ```bash
-node src/cli/index.js build --project my-shop
+node framework/src/cli/index.js build --project my-shop
 ```
 
 The build flow is standardized as:
@@ -20,7 +20,7 @@ Validate
 ## Watch Build
 
 ```bash
-node src/cli/index.js build --project my-shop --watch
+node framework/src/cli/index.js build --project my-shop --watch
 ```
 
 Use watch mode when editing source files and wanting static output to rebuild automatically.
@@ -37,7 +37,7 @@ Watch mode:
 Use `--changed` to rebuild only affected routes:
 
 ```bash
-node src/cli/index.js build \
+node framework/src/cli/index.js build \
   --project my-shop \
   --changed product:demo-product
 ```
@@ -58,7 +58,7 @@ The planner maps changed items to affected routes through the route dependency g
 ## Production Build
 
 ```bash
-node src/cli/index.js build --project my-shop --production
+node framework/src/cli/index.js build --project my-shop --production
 ```
 
 Production build currently:

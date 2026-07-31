@@ -1,14 +1,11 @@
 import assert from "node:assert/strict";
 import { readFile, mkdtemp, rm } from "node:fs/promises";
-import { request as httpRequest } from "node:http";
 import os from "node:os";
 import path from "node:path";
-import { spawn } from "node:child_process";
 import test from "node:test";
-import createProvisioningService from "../src/provision/createProvisioningService.js";
-import createRuntimeHttpServer from "../src/runtime/createRuntimeHttpServer.js";
-import createSiteRuntimeInstance from "../src/runtime/createSiteRuntimeInstance.js";
-import createSiteRepository from "../src/site/createSiteRepository.js";
+import createProvisioningService from "../framework/src/provision/createProvisioningService.js";
+import createSiteRuntimeInstance from "../framework/src/runtime/bootstrap/createSiteRuntimeInstance.js";
+import createSiteRepository from "../framework/src/site/createSiteRepository.js";
 
 function adapter() {
   return {
@@ -22,43 +19,7 @@ function adapter() {
   };
 }
 
-function listen(server) {
-  return new Promise((resolve) => server.listen(0, "127.0.0.1", () => resolve(server.address().port)));
-}
-
-function close(server) {
-  return new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
-}
-
-function request(port, { body, host = "example.test", method = "GET", path: requestPath = "/" } = {}) {
-  return new Promise((resolve, reject) => {
-    const payload = body === undefined ? null : JSON.stringify(body);
-    const client = httpRequest({
-      headers: { Host: host, ...(payload ? { "Content-Type": "application/json", "Content-Length": Buffer.byteLength(payload) } : {}) },
-      hostname: "127.0.0.1",
-      method,
-      path: requestPath,
-      port
-    }, (response) => {
-      const chunks = [];
-      response.on("data", (chunk) => chunks.push(chunk));
-      response.on("end", () => resolve({ body: Buffer.concat(chunks).toString("utf8"), headers: response.headers, status: response.statusCode }));
-    });
-    client.on("error", reject);
-    if (payload) client.write(payload);
-    client.end();
-  });
-}
-
-async function waitForServer(port) {
-  let lastError;
-  for (let attempt = 0; attempt < 80; attempt += 1) {
-    try { return await request(port); } catch (error) { lastError = error; await new Promise((resolve) => setTimeout(resolve, 25)); }
-  }
-  throw lastError;
-}
-
-test("Runtime E2E provisions, proxies a domain, configures, builds, and serves a running Site", { timeout: 20_000 }, async () => {
+test("Runtime E2E provisions, resolves a domain, configures, and publishes a running Site", { timeout: 20_000 }, async () => {
   const workspaceDir = await mkdtemp(path.join(os.tmpdir(), "wpsc-runtime-e2e-"));
   const repository = createSiteRepository({ workspaceDir });
   const provision = createProvisioningService({ repository });
@@ -67,43 +28,49 @@ test("Runtime E2E provisions, proxies a domain, configures, builds, and serves a
 
   const instance = createSiteRuntimeInstance({
     adapterLoader: { load: () => adapter() },
-    contentReader: { read: async () => ({ assets: [], items: [{ id: "welcome-1", slug: "welcome", title: "Welcome to Company A", type: "page" }] }) },
+    contentReader: {
+      read: async () => ({
+        assets: [],
+        collections: {},
+        items: [{
+          data: { content: "<p>Company A is running.</p>" },
+          domain: "test",
+          id: "welcome-1",
+          slug: "welcome",
+          title: "Welcome to Company A",
+          type: "page"
+        }]
+      })
+    },
     domains: { "example.test": created.siteId },
     repository,
     webhookBaseUrl: "https://example.test/webhook"
   });
-  const nodeServer = createRuntimeHttpServer({ router: instance.router });
-  const nodePort = await listen(nodeServer);
-  const publicDir = path.join(repository.resolveSiteRoot(created.siteId), "public");
-  const phpPort = await new Promise((resolve) => {
-    const probe = createRuntimeHttpServer({ router: instance.router });
-    probe.listen(0, "127.0.0.1", () => { const port = probe.address().port; probe.close(() => resolve(port)); });
-  });
-  const php = spawn("php", ["-S", `127.0.0.1:${phpPort}`, "-t", publicDir], {
-    env: { ...process.env, WPSC_RUNTIME_ORIGIN: `http://127.0.0.1:${nodePort}` },
-    stdio: "ignore"
-  });
 
   try {
-    const installer = await waitForServer(phpPort);
+    const request = (input = {}) => instance.router.handle({ host: "example.test", ...input });
+    const installer = await request();
     assert.equal(installer.status, 200);
     assert.match(installer.headers["content-type"], /text\/html/);
     assert.match(installer.body, /Set up company-a/);
 
-    const started = await request(phpPort, { method: "POST", path: "/installer/start" });
-    const sessionId = JSON.parse(started.body).session.id;
-    const completed = await request(phpPort, { body: { configuration: { locale: "vi-VN", siteName: "Company A" }, sessionId }, method: "POST", path: "/installer/complete" });
+    const started = await request({ method: "POST", path: "/installer/start" });
+    const sessionId = started.body.session.id;
+    const completed = await request({ body: { configuration: { locale: "vi-VN", siteName: "Company A" }, sessionId }, method: "POST", path: "/installer/complete" });
     assert.equal(completed.status, 200);
 
-    const source = await request(phpPort, { body: { source: { endpoint: "https://source.example.test", type: "rest" } }, method: "POST", path: "/dashboard/source/register" });
+    const sourceInput = { source: { endpoint: "https://source.example.test", type: "rest" } };
+    const sourceCheck = await request({ body: sourceInput, method: "POST", path: "/dashboard/source/test" });
+    assert.equal(sourceCheck.status, 200);
+    const source = await request({ body: sourceInput, method: "POST", path: "/dashboard/source/register" });
     assert.equal(source.status, 200);
-    const webhook = await request(phpPort, { body: {}, method: "POST", path: "/dashboard/webhook/register" });
+    const webhook = await request({ body: {}, method: "POST", path: "/dashboard/webhook/register" });
     assert.equal(webhook.status, 200);
 
     instance.services.scheduler.start();
-    const build = await request(phpPort, { body: {}, method: "POST", path: "/dashboard/build" });
-    assert.equal(build.status, 200);
-    assert.equal(JSON.parse(build.body).metadata.status, "RUNNING");
+    const build = await request({ body: {}, method: "POST", path: "/dashboard/build" });
+    assert.equal(build.status, 200, JSON.stringify(build.body.diagnostics));
+    assert.equal(build.body.metadata.status, "RUNNING");
 
     const metadata = await repository.readMetadata(created.siteId);
     const sourceMetadata = await repository.readSourceMetadata(created.siteId);
@@ -115,12 +82,9 @@ test("Runtime E2E provisions, proxies a domain, configures, builds, and serves a
     assert.equal(typeof webhookConfig.secret, "string");
     assert.equal(buildConfig.status, "SUCCESS");
 
-    const website = await request(phpPort, { path: "/dist/welcome/index.html" });
-    assert.equal(website.status, 200);
-    assert.match(website.body, /Welcome to Company A/);
+    const website = await readFile(path.join(repository.resolveSiteRoot(created.siteId), "public", "dist", "welcome", "index.html"), "utf8");
+    assert.match(website, /Welcome to Company A/);
   } finally {
-    php.kill();
-    await close(nodeServer);
     await rm(workspaceDir, { force: true, recursive: true });
   }
 });

@@ -3,7 +3,7 @@ import test from "node:test";
 import createSiteUuid, {
   isSiteUuid,
   SITE_UUID_VERSION
-} from "../src/site/createSiteUuid.js";
+} from "../framework/src/site/createSiteUuid.js";
 
 test("createSiteUuid creates or validates architecture v2 UUIDs", () => {
   const uuid = createSiteUuid({

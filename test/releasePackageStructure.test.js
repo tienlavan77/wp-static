@@ -4,7 +4,7 @@ import createReleasePackageStructure, {
   RELEASE_PACKAGE_DIRECTORIES,
   RELEASE_PACKAGE_FILES,
   RELEASE_PACKAGE_STRUCTURE_VERSION
-} from "../src/release/createReleasePackageStructure.js";
+} from "../framework/src/release/createReleasePackageStructure.js";
 
 test("createReleasePackageStructure defines stable release layout", () => {
   const structure = createReleasePackageStructure({

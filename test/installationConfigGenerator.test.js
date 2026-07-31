@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import createInstallationConfigGenerator, {
   INSTALLATION_CONFIG_GENERATOR_VERSION
-} from "../src/installer/createInstallationConfigGenerator.js";
+} from "../framework/src/installer/createInstallationConfigGenerator.js";
 
 test("createInstallationConfigGenerator creates project and runtime config", () => {
   const result = createInstallationConfigGenerator({

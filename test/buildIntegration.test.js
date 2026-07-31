@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import createBuildEngine, { BuildClient, BuildState } from "../src/build/createBuildEngine.js";
-import createBuildIntegration from "../src/build/createBuildIntegration.js";
+import createBuildEngine, { BuildClient, BuildState } from "../framework/src/build/createBuildEngine.js";
+import createBuildIntegration from "../framework/src/build/createBuildIntegration.js";
 
 test("Build Integration composes Runtime Reader, Builder V1, and Output through Build Engine", async () => {
   const calls = [];
@@ -45,11 +45,13 @@ test("Build Integration delegates prepared content to the Runtime Builder V1 bef
         return { diagnostics: { errors: [], warnings: [] }, generatedFiles: ["/sites/company-a/public/dist/index.html"], ok: true };
       }
     },
+    site: { url: "https://company-a.example.test" },
     runtimeV1Builder: {
       build: async (input) => {
         assert.equal(input.buildId, "build-v1");
         assert.deepEqual(input.changed, ["product:card"]);
         assert.equal(input.collections.terms[0].slug, "cards");
+        assert.deepEqual(input.site, { siteId: "company-a", url: "https://company-a.example.test" });
         return { assets: [{ sourcePath: "/staging/index.html", targetPath: "index.html" }] };
       }
     }

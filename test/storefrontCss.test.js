@@ -3,8 +3,8 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 test("basic shop exposes Tailwind storefront CSS foundation", async () => {
-  const source = await readFile("examples/basic-shop/themes/storefront.css", "utf8");
-  const output = await readFile("examples/basic-shop/public/storefront.css", "utf8");
+  const source = await readFile("fixtures/basic-shop/themes/storefront.css", "utf8");
+  const output = await readFile("fixtures/basic-shop/public/storefront.css", "utf8");
 
   assert.match(source, /@import "tailwindcss"/);
   assert.match(source, /--color-brand-600/);

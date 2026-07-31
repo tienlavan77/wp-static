@@ -5,7 +5,7 @@ import path from "node:path";
 import test from "node:test";
 import createInstallationLock, {
   INSTALLATION_LOCK_VERSION
-} from "../src/release/createInstallationLock.js";
+} from "../framework/src/release/createInstallationLock.js";
 
 async function fixtureDir() {
   return mkdtemp(path.join(tmpdir(), "wpsc-install-lock-"));

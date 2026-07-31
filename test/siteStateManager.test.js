@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import createSiteMetadata from "../src/site/createSiteMetadata.js";
+import createSiteMetadata from "../framework/src/site/createSiteMetadata.js";
 import createSiteStateManager, {
   SITE_STATE_TRANSITIONS
-} from "../src/site/createSiteStateManager.js";
+} from "../framework/src/site/createSiteStateManager.js";
 
 test("createSiteStateManager exposes canonical runtime transitions", () => {
   assert.deepEqual(SITE_STATE_TRANSITIONS.CREATED, ["SETUP_REQUIRED"]);

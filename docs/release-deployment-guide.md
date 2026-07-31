@@ -31,8 +31,8 @@ Use `vps` for the first production deployment whenever possible.
 From the WPSC project root:
 
 ```bash
-node src/cli/index.js release build \
-  --project examples/basic-shop \
+node framework/src/cli/index.js release build \
+  --project fixtures/basic-shop \
   --output-dir release/tinsinhphat \
   --package-name tinsinhphat \
   --mode vps \
@@ -42,8 +42,8 @@ node src/cli/index.js release build \
 For JSON output:
 
 ```bash
-node src/cli/index.js release build \
-  --project examples/basic-shop \
+node framework/src/cli/index.js release build \
+  --project fixtures/basic-shop \
   --output-dir release/tinsinhphat \
   --package-name tinsinhphat \
   --mode vps \

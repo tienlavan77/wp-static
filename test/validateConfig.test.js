@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import validateConfig from "../src/core/validateConfig.js";
+import validateConfig from "../framework/src/core/validateConfig.js";
 
 test("validateConfig accepts a valid mock config", () => {
   const config = validateConfig({

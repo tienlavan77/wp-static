@@ -1,6 +1,6 @@
-import createSourceAdapterLoader from "./src/source/createSourceAdapterLoader.js";
-import createSourceRegistry from "./src/source/createSourceRegistry.js";
-import createWordPressSourceAdapter from "./src/source/createWordPressSourceAdapter.js";
+import createSourceAdapterLoader from "./framework/src/source/createSourceAdapterLoader.js";
+import createSourceRegistry from "./framework/src/source/createSourceRegistry.js";
+import createWordPressSourceAdapter from "./framework/src/source/createWordPressSourceAdapter.js";
 
 const demoAdapter = {
   async initialize() { return { ok: true }; },

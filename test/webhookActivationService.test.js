@@ -3,12 +3,12 @@ import { mkdtemp, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import createSourceAdapterLoader from "../src/source/createSourceAdapterLoader.js";
-import createSourceRegistry from "../src/source/createSourceRegistry.js";
-import createSiteRepository from "../src/site/createSiteRepository.js";
+import createSourceAdapterLoader from "../framework/src/source/createSourceAdapterLoader.js";
+import createSourceRegistry from "../framework/src/source/createSourceRegistry.js";
+import createSiteRepository from "../framework/src/site/createSiteRepository.js";
 import createWebhookActivationService, {
   WebhookActivationEvent
-} from "../src/setup/createWebhookActivationService.js";
+} from "../framework/src/setup/createWebhookActivationService.js";
 
 function ok(extra = {}) {
   return { diagnostics: { errors: [], warnings: [] }, ok: true, ...extra };

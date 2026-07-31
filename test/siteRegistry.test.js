@@ -3,11 +3,12 @@ import { mkdir, mkdtemp, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import createSiteMetadata from "../src/site/createSiteMetadata.js";
+import createSiteMetadata from "../framework/src/site/createSiteMetadata.js";
 import createSiteRegistry, {
-  createSiteRelativePath
-} from "../src/site/createSiteRegistry.js";
-import createSiteRepository from "../src/site/createSiteRepository.js";
+  createSiteRelativePath,
+  SiteOperationalStatus
+} from "../framework/src/site/createSiteRegistry.js";
+import createSiteRepository from "../framework/src/site/createSiteRepository.js";
 
 test("createSiteRegistry lists sites and finds by UUID", async () => {
   const workspaceDir = await mkdtemp(path.join(os.tmpdir(), "wpsc-site-registry-"));
@@ -52,5 +53,39 @@ test("createSiteRegistry lists sites and finds by UUID", async () => {
       force: true,
       recursive: true
     });
+  }
+});
+
+test("Site Registry owns Site-scoped domains and operational lifecycle without changing Site metadata", async () => {
+  const workspaceDir = await mkdtemp(path.join(os.tmpdir(), "wpsc-multisite-registry-"));
+  const repository = createSiteRepository({ workspaceDir });
+
+  try {
+    for (const [siteId, uuid] of [["company-a", "8d20de63-68f1-43cf-a28f-f62a347695a1"], ["company-b", "a489abcf-7f73-476e-9ddd-e55db4f66a55"]]) {
+      await repository.writeMetadata(siteId, createSiteMetadata({ name: siteId, uuid }));
+    }
+    const registry = createSiteRegistry({ repository, now: () => "2026-07-31T00:00:00.000Z" });
+    const registered = await registry.register({
+      domains: ["https://a.example.test", "www.a.example.test"],
+      environment: "production",
+      runtimeConfigRef: "config/runtime.json",
+      siteId: "company-a"
+    });
+
+    assert.equal(registered.status, SiteOperationalStatus.ACTIVE);
+    assert.deepEqual(registered.domains, ["a.example.test", "www.a.example.test"]);
+    assert.equal((await registry.resolveContext("https://a.example.test")).siteId, "company-a");
+    assert.equal((await registry.resolveByDomain("www.a.example.test")).runtimeConfigRef, "config/runtime.json");
+
+    await assert.rejects(
+      registry.register({ domains: ["a.example.test"], siteId: "company-b" }),
+      /already mapped/
+    );
+    await registry.setStatus("company-a", SiteOperationalStatus.SUSPENDED);
+    assert.equal(await registry.resolveContext("a.example.test"), null);
+    assert.equal((await repository.readMetadata("company-a")).status, "CREATED");
+    assert.equal((await registry.read()).sites.length, 1);
+  } finally {
+    await rm(workspaceDir, { force: true, recursive: true });
   }
 });

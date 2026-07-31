@@ -4,10 +4,10 @@
   "description": "CLI and dev server utilities for WPSC.",
   "type": "module",
   "exports": {
-    ".": "./src/index.js"
+    ".": "./framework/src/index.js"
   },
   "bin": {
-    "wpsc": "../../src/cli/index.js"
+    "wpsc": "../../framework/src/cli/index.js"
   },
   "license": "UNLICENSED"
 }

@@ -1,11 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import createProvisioningSecrets from "../src/provision/createProvisioningSecrets.js";
+import createProvisioningSecrets from "../framework/src/provision/createProvisioningSecrets.js";
 import createProvisioningConfig, {
   PROVISIONING_CONFIG_SCHEMA,
   PROVISIONING_CONFIG_SCHEMA_VERSION,
   validateProvisioningConfig
-} from "../src/provision/createProvisioningConfig.js";
+} from "../framework/src/provision/createProvisioningConfig.js";
 
 test("createProvisioningConfig creates an isolated, versioned provisioning config", () => {
   const source = { type: "wordpress", url: "https://example.test" };

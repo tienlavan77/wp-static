@@ -7,7 +7,7 @@ Phase 23 adds the block schema foundation for the future visual builder.
 A block schema describes editor metadata, props, data bindings, and an optional render function:
 
 ```js
-import { createBlockSchema } from "../src/index.js";
+import { createBlockSchema } from "../framework/src/index.js";
 
 const heading = createBlockSchema({
   name: "core/heading",

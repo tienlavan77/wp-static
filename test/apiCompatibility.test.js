@@ -40,7 +40,7 @@ const stableRootExports = [
 ];
 
 test("root package keeps stable public API exports", async () => {
-  const api = await import("../src/index.js");
+  const api = await import("../framework/src/index.js");
 
   for (const exportName of stableRootExports) {
     assert.equal(typeof api[exportName], "function", `${exportName} should be exported`);

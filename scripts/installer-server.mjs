@@ -1,6 +1,6 @@
 import http from "node:http";
-import createHttpInstaller from "../src/release/createHttpInstaller.js";
-import createInstallationLock from "../src/release/createInstallationLock.js";
+import createHttpInstaller from "../framework/src/release/createHttpInstaller.js";
+import createInstallationLock from "../framework/src/release/createInstallationLock.js";
 
 const releaseDir = process.env.WPSC_RELEASE_DIR || "/home/data/sites/statictsp";
 const port = Number(process.env.PORT || 8788);

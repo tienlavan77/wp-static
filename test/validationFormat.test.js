@@ -4,11 +4,11 @@ import {
   createError,
   createOk,
   createWarning
-} from "../src/validation/createValidationResult.js";
+} from "../framework/src/validation/createValidationResult.js";
 import {
   formatValidationResults,
   groupByCategory
-} from "../src/validation/formatValidationResults.js";
+} from "../framework/src/validation/formatValidationResults.js";
 
 test("formatValidationResults groups text output by category with fixes", () => {
   const output = formatValidationResults([

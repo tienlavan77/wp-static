@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import createJobQueue from "../src/scheduler/createJobQueue.js";
-import createScheduler from "../src/scheduler/createScheduler.js";
-import { JobStatus, JobTrigger, SchedulerEvent, SchedulerState } from "../src/scheduler/schedulerContracts.js";
+import createJobQueue from "../framework/src/scheduler/queue/createJobQueue.js";
+import createScheduler from "../framework/src/scheduler/policy/createScheduler.js";
+import { JobStatus, JobTrigger, SchedulerEvent, SchedulerState } from "../framework/src/scheduler/contracts/schedulerContracts.js";
 
 test("Scheduler evaluates due schedules and delegates queued work to injected Dispatcher", async () => {
   const queue = createJobQueue({ createJobId: (() => { let id = 0; return () => `job-${++id}`; })(), now: () => "2026-08-03T00:00:00.000Z" });

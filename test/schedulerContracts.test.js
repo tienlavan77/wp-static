@@ -10,7 +10,7 @@ import {
   assertQueueInterface,
   assertSchedulerInterface,
   createJob
-} from "../src/scheduler/schedulerContracts.js";
+} from "../framework/src/scheduler/contracts/schedulerContracts.js";
 
 test("Scheduler contracts create immutable jobs with stable lifecycle metadata", () => {
   const result = createJob({ createdAt: "2026-07-31T00:00:00.000Z", id: "job-1", siteId: "company-a", triggerType: JobTrigger.WEBHOOK });

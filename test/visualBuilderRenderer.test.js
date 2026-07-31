@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import createBlockRegistry from "../src/blocks/createBlockRegistry.js";
-import coreCommerceBlocks from "../src/blocks/core/commerceBlocks.js";
-import renderLayout from "../src/visual-builder/renderLayout.js";
+import createBlockRegistry from "../framework/src/builder/blocks/createBlockRegistry.js";
+import coreCommerceBlocks from "../framework/src/builder/blocks/core/commerceBlocks.js";
+import renderLayout from "../framework/src/builder/visual-builder/renderLayout.js";
 
 test("renderLayout renders layout JSON to static HTML", () => {
   const result = renderLayout({

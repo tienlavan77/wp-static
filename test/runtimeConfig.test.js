@@ -3,7 +3,7 @@ import test from "node:test";
 import createRuntimeConfig, {
   RUNTIME_CONFIG_VERSION,
   validateRuntimeConfig
-} from "../src/runtime/createRuntimeConfig.js";
+} from "../framework/src/runtime/bootstrap/createRuntimeConfig.js";
 
 test("createRuntimeConfig normalizes runtime configuration", () => {
   function demoPlugin() {}

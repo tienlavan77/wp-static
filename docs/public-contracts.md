@@ -12,7 +12,7 @@ Public contracts are the only supported integration surface for v1.x.
 
 An integration may rely on:
 
-- Root exports from `src/index.js`.
+- Root exports from `framework/src/index.js`.
 - Files documented under `docs/v1*`.
 - The contracts in this document.
 - Declared plugin hooks and runtime endpoints.
@@ -388,5 +388,5 @@ the preferred architecture.
 - [ ] Runtime contract documents session and endpoint boundary.
 - [ ] Theme contract documents config and layout context.
 - [ ] Plugin contract documents hooks and return rules.
-- [ ] Public exports in `src/index.js` line up with documented contracts.
+- [ ] Public exports in `framework/src/index.js` line up with documented contracts.
 - [ ] Internal modules remain replaceable behind public contracts.

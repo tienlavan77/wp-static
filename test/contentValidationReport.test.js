@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import createContentValidationReport from "../src/report/createContentValidationReport.js";
+import createContentValidationReport from "../framework/src/builder/report/createContentValidationReport.js";
 
 test("createContentValidationReport reports duplicate routes", () => {
   const report = createContentValidationReport({

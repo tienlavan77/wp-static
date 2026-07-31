@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import createDashboardSourceController from "../src/runtime/createDashboardSourceController.js";
+import createDashboardSourceController from "../framework/src/runtime/dashboard/createDashboardSourceController.js";
 
 test("Dashboard source actions pass route-owned Site id to shared registration service", async () => {
   const calls = [];

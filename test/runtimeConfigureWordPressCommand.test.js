@@ -3,7 +3,7 @@ import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import createRuntimeConfigureWordPressCommand from "../src/cli/createRuntimeConfigureWordPressCommand.js";
+import createRuntimeConfigureWordPressCommand from "../framework/src/cli/createRuntimeConfigureWordPressCommand.js";
 
 test("runtime:configure-wordpress backs up config and creates private credentials file", async () => {
   const workspaceDir = await mkdtemp(path.join(os.tmpdir(), "wpsc-runtime-configure-"));

@@ -3,11 +3,11 @@ import { mkdtemp, readFile, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import createInstallerController from "../src/runtime/createInstallerController.js";
-import createSiteRuntime, { createInstallationCheck, createSiteResolver, createSiteRuntimeSkeleton } from "../src/runtime/createSiteRuntime.js";
-import createSetupService from "../src/setup/createSetupService.js";
-import createSiteRepository from "../src/site/createSiteRepository.js";
-import createSiteStateManager from "../src/site/createSiteStateManager.js";
+import createInstallerController from "../framework/src/runtime/installer/createInstallerController.js";
+import createSiteRuntime, { createInstallationCheck, createSiteResolver, createSiteRuntimeSkeleton } from "../framework/src/runtime/bootstrap/createSiteRuntime.js";
+import createSetupService from "../framework/src/setup/createSetupService.js";
+import createSiteRepository from "../framework/src/site/createSiteRepository.js";
+import createSiteStateManager from "../framework/src/site/createSiteStateManager.js";
 
 test("Installer shares Setup Service, persists configuration, and makes the Site ready for first build", async () => {
   const workspaceDir = await mkdtemp(path.join(os.tmpdir(), "wpsc-installer-"));

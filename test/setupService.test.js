@@ -5,8 +5,8 @@ import createSetupService, {
   SetupClient,
   SetupEvent,
   validateSetupContext
-} from "../src/setup/createSetupService.js";
-import { SetupState } from "../src/setup/createSetupStateMachine.js";
+} from "../framework/src/setup/createSetupService.js";
+import { SetupState } from "../framework/src/setup/createSetupStateMachine.js";
 
 test("createSetupService creates an immutable shared setup context", () => {
   const observedEvents = [];

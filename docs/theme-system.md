@@ -57,7 +57,7 @@ layout template to render. Template values are HTML-escaped by default.
 ## Storefront Component Structure
 
 The basic shop theme now keeps storefront UI in small component modules under
-`examples/basic-shop/theme/components`.
+`fixtures/basic-shop/theme/components`.
 
 ```text
 components/

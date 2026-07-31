@@ -3,7 +3,7 @@ import test from "node:test";
 import createInstallationSession, {
   INSTALLATION_SESSION_VERSION,
   INSTALLATION_STEPS
-} from "../src/installer/createInstallationSession.js";
+} from "../framework/src/installer/createInstallationSession.js";
 
 test("createInstallationSession starts with lifecycle metadata", () => {
   const session = createInstallationSession({

@@ -3,9 +3,9 @@ import { mkdtemp, mkdir, readFile, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import buildSite from "../src/builder/buildSite.js";
-import compile from "../src/core/compile.js";
-import buildProjectOnce from "../src/dev-server/buildProjectOnce.js";
+import buildSite from "../framework/src/builder/buildSite.js";
+import compile from "../framework/src/core/compile.js";
+import buildProjectOnce from "../framework/src/dev-server/buildProjectOnce.js";
 
 test("buildProjectOnce reuses content and route render caches", async () => {
   const projectDir = await createLargeCatalogProject(6);

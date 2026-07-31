@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import createRebuildQueue from "../src/queue/createRebuildQueue.js";
-import createWebhookReceiver from "../src/webhook/createWebhookReceiver.js";
-import mapWebhookChanges from "../src/webhook/mapWebhookChanges.js";
-import normalizeWebhookPayload from "../src/webhook/normalizeWebhookPayload.js";
+import createRebuildQueue from "../framework/src/scheduler/queue/createRebuildQueue.js";
+import createWebhookReceiver from "../framework/src/webhook/createWebhookReceiver.js";
+import mapWebhookChanges from "../framework/src/webhook/mapWebhookChanges.js";
+import normalizeWebhookPayload from "../framework/src/webhook/normalizeWebhookPayload.js";
 
 test("normalizeWebhookPayload accepts WordPress and WooCommerce changes", () => {
   const wordpress = normalizeWebhookPayload({

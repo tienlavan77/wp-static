@@ -1,10 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import createInstallationConfigGenerator from "../src/installer/createInstallationConfigGenerator.js";
+import createInstallationConfigGenerator from "../framework/src/installer/createInstallationConfigGenerator.js";
 import createInstallationReport, {
   INSTALLATION_REPORT_VERSION
-} from "../src/installer/createInstallationReport.js";
-import createInstallationSession from "../src/installer/createInstallationSession.js";
+} from "../framework/src/installer/createInstallationReport.js";
+import createInstallationSession from "../framework/src/installer/createInstallationSession.js";
 
 function createFinishedSession() {
   const session = createInstallationSession({

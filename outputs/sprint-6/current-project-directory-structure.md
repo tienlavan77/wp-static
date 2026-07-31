@@ -29,7 +29,7 @@ Code is edited in the workspace path above. The VPS mapping sees the same projec
 ```text
 wpstatic/
 |
-|- src/                         [source] WPSC Framework implementation
+|- framework/src/                         [source] WPSC Framework implementation
 |- test/                        [source] Node test suite and fixtures
 |- themes/                      [source] Shared WPSC themes
 |- integrations/                [source] Installable external-system bridges
@@ -61,12 +61,12 @@ wpstatic/
 `- .gitignore                  [source] Generated/private file policy
 ```
 
-## Framework Source: `src/`
+## Framework Source: `framework/src/`
 
-`src/` is the WPSC v2 source of truth. It is grouped by domain ownership rather than by Browser or CLI screen.
+`framework/src/` is the WPSC v2 source of truth. It is grouped by domain ownership rather than by Browser or CLI screen.
 
 ```text
-src/
+framework/src/
 |
 |- site/                        Site metadata, lifecycle, repository and isolation
 |- provision/                   Provisioning plans, transactions and rollback
@@ -135,16 +135,16 @@ src/
 
 ```text
 Browser/CLI
-    -> src/runtime or src/setup gateways
-    -> src/setup / src/scheduler / src/build domain services
-    -> src/builder (Builder V1 static-output semantics)
-    -> src/output (only filesystem publisher)
+    -> framework/src/runtime or framework/src/setup gateways
+    -> framework/src/setup / framework/src/scheduler / framework/src/build domain services
+    -> framework/src/builder (Builder V1 static-output semantics)
+    -> framework/src/output (only filesystem publisher)
 ```
 
-- `src/runtime/` owns dynamic APIs, HTTP-only customer sessions and Runtime composition.
-- `src/builder/` owns Builder V1 static build behavior: templates, assets, route data, fragments, search, SEO and manifests.
-- `src/output/` is the only Framework layer that publishes a Site output directory.
-- `src/scheduler/` is the single entry for Browser, CLI and webhook build requests.
+- `framework/src/runtime/` owns dynamic APIs, HTTP-only customer sessions and Runtime composition.
+- `framework/src/builder/` owns Builder V1 static build behavior: templates, assets, route data, fragments, search, SEO and manifests.
+- `framework/src/output/` is the only Framework layer that publishes a Site output directory.
+- `framework/src/scheduler/` is the single entry for Browser, CLI and webhook build requests.
 
 ## Shared Theme: `themes/storefront/`
 
@@ -251,7 +251,7 @@ sites/
 ### Site Runtime File Rules
 
 - `config/source-credentials.json` is private; never include it in documentation, Git commits or browser responses.
-- `public/index.php` is source-like Runtime entry code generated from `src/runtime/createSiteRuntime.js`; update the template and regenerate/update the Site entry together.
+- `public/index.php` is source-like Runtime entry code generated from `framework/src/runtime/createSiteRuntime.js`; update the template and regenerate/update the Site entry together.
 - `public/dist/` is generated. It is replaced by `runtime:build`; never manually repair individual generated routes or assets.
 - `storage/cache/`, `storage/tmp/` and `storage/sessions/` are runtime state, not Framework source.
 - Runtime Build and Runtime service output are owned by `www-data`.
@@ -332,7 +332,7 @@ Run these on the VPS mapping when validating the real Site Runtime:
 ```sh
 cd /home/data/sites/wp-static
 
-sudo -u www-data /usr/bin/node src/cli/index.js runtime:build \
+sudo -u www-data /usr/bin/node framework/src/cli/index.js runtime:build \
   --site tinsinhphat \
   --config runtime.config.js \
   --project /home/data/sites/wp-static
@@ -347,7 +347,7 @@ The build command regenerates `sites/tinsinhphat/public/dist/`. The service rest
 Before adding a new file, choose the owner first:
 
 ```text
-Framework business logic?       -> src/<domain>/
+Framework business logic?       -> framework/src/<domain>/
 Shared storefront template?     -> themes/storefront/
 WordPress-side integration?     -> integrations/wordpress/<bridge>/
 Specific Site configuration?    -> sites/<site-id>/config/

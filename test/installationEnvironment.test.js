@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import validateInstallationEnvironment, {
   INSTALLATION_ENVIRONMENT_VERSION
-} from "../src/installer/validateInstallationEnvironment.js";
+} from "../framework/src/installer/validateInstallationEnvironment.js";
 
 function ok(name, detail, category = "environment") {
   return {

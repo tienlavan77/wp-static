@@ -3,10 +3,10 @@ import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import buildProjectOnce from "../src/dev-server/buildProjectOnce.js";
-import compile from "../src/core/compile.js";
-import createContent from "../src/core/createContent.js";
-import filterPublicContents from "../src/preview/filterPublicContents.js";
+import buildProjectOnce from "../framework/src/dev-server/buildProjectOnce.js";
+import compile from "../framework/src/core/compile.js";
+import createContent from "../framework/src/core/createContent.js";
+import filterPublicContents from "../framework/src/preview/filterPublicContents.js";
 
 test("filterPublicContents excludes draft and private content by default", () => {
   const contents = [

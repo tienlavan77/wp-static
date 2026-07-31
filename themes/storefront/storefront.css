@@ -1838,6 +1838,62 @@
     padding: 10px 11px;
   }
 
+  .storefront-checkout-notification-wrap {
+    margin-top: 18px;
+  }
+
+  .storefront-checkout-notification {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    width: 100%;
+    border: 1px solid color-mix(in oklab, #c2410c 42%, var(--storefront-line));
+    border-left: 5px solid #c2410c;
+    background: color-mix(in oklab, #c2410c 8%, var(--storefront-surface));
+    padding: 18px 20px;
+  }
+
+  .storefront-checkout-notification[hidden] {
+    display: none;
+  }
+
+  .storefront-checkout-notification__copy {
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .storefront-checkout-notification__copy strong {
+    color: var(--storefront-ink);
+    font-size: 1rem;
+  }
+
+  .storefront-checkout-notification__copy p {
+    color: var(--storefront-ink);
+    font-size: 0.92rem;
+    line-height: 1.55;
+  }
+
+  .storefront-checkout-notification__copy small {
+    color: var(--storefront-muted);
+    font-size: 0.82rem;
+    line-height: 1.45;
+  }
+
+  .storefront-checkout-notification__actions {
+    display: flex;
+    flex: 0 0 auto;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+
+  .storefront-checkout-notification__actions .storefront-button,
+  .storefront-checkout-notification__actions .storefront-button-secondary {
+    white-space: nowrap;
+  }
+
   .storefront-thankyou-layout {
     display: grid;
     gap: 18px;
@@ -4013,10 +4069,27 @@
     flex-direction: column;
   }
 
-  .storefront-account-form button {
-    width: 100%;
+    .storefront-account-form button {
+      width: 100%;
+    }
+
+    .storefront-checkout-notification {
+      align-items: stretch;
+      flex-direction: column;
+      gap: 16px;
+      padding: 16px;
+    }
+
+    .storefront-checkout-notification__actions {
+      justify-content: stretch;
+    }
+
+    .storefront-checkout-notification__actions .storefront-button,
+    .storefront-checkout-notification__actions .storefront-button-secondary {
+      flex: 1 1 100%;
+      width: 100%;
+    }
   }
-}
 
 .storefront-account-form label.storefront-checkout-terms {
   align-items: flex-start !important;

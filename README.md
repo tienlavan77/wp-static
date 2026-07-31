@@ -12,31 +12,31 @@ npm run build:example
 Or run the CLI directly:
 
 ```bash
-node src/cli/index.js build --project examples/basic-shop
-node src/cli/index.js --help
-node src/cli/index.js --version
+node framework/src/cli/index.js build --project fixtures/basic-shop
+node framework/src/cli/index.js --help
+node framework/src/cli/index.js --version
 ```
 
 Useful project commands:
 
 ```bash
-node src/cli/index.js clean --project examples/basic-shop
-node src/cli/index.js doctor --project examples/basic-shop
-node src/cli/index.js serve --project examples/basic-shop --port 8080
+node framework/src/cli/index.js clean --project fixtures/basic-shop
+node framework/src/cli/index.js doctor --project fixtures/basic-shop
+node framework/src/cli/index.js serve --project fixtures/basic-shop --port 8080
 ```
 
 The command reads:
 
 ```text
-examples/basic-shop/content.json
-examples/basic-shop/wpsc.config.js
-examples/basic-shop/theme/layout.js
+fixtures/basic-shop/content.json
+fixtures/basic-shop/wpsc.config.js
+fixtures/basic-shop/theme/layout.js
 ```
 
 It writes static HTML to:
 
 ```text
-examples/basic-shop/dist/
+fixtures/basic-shop/dist/
 ```
 
 The npm scripts run the CLI entry:
@@ -72,8 +72,8 @@ Not included yet:
 ## Create A Project
 
 ```bash
-node src/cli/index.js create work/my-shop
-node src/cli/index.js build --project work/my-shop
+node framework/src/cli/index.js create work/my-shop
+node framework/src/cli/index.js build --project work/my-shop
 ```
 
 ## Test

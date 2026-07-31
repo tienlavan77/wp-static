@@ -3,10 +3,10 @@ import { mkdtemp, readFile, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import createFirstBuildController from "../src/runtime/createFirstBuildController.js";
-import createSiteMetadata from "../src/site/createSiteMetadata.js";
-import createSiteRepository from "../src/site/createSiteRepository.js";
-import createSiteStateManager from "../src/site/createSiteStateManager.js";
+import createFirstBuildController from "../framework/src/runtime/dashboard/createFirstBuildController.js";
+import createSiteMetadata from "../framework/src/site/createSiteMetadata.js";
+import createSiteRepository from "../framework/src/site/createSiteRepository.js";
+import createSiteStateManager from "../framework/src/site/createSiteStateManager.js";
 
 test("First Build Controller uses Scheduler and transitions a ready Site to running", async () => {
   const workspaceDir = await mkdtemp(path.join(os.tmpdir(), "wpsc-first-build-"));

@@ -5,14 +5,14 @@ WPSC output can be uploaded to object storage because the build result is static
 Typical flow:
 
 ```bash
-node src/cli/index.js build --project examples/basic-shop
-aws s3 sync examples/basic-shop/dist s3://your-bucket --delete
+node framework/src/cli/index.js build --project fixtures/basic-shop
+aws s3 sync fixtures/basic-shop/dist s3://your-bucket --delete
 ```
 
 For Cloudflare R2, use an S3-compatible client with your R2 endpoint:
 
 ```bash
-aws s3 sync examples/basic-shop/dist s3://your-r2-bucket \
+aws s3 sync fixtures/basic-shop/dist s3://your-r2-bucket \
   --delete \
   --endpoint-url https://<account-id>.r2.cloudflarestorage.com
 ```

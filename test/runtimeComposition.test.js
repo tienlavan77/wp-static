@@ -3,9 +3,9 @@ import { mkdtemp, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import createRuntimeComposition from "../src/runtime/createRuntimeComposition.js";
-import { SITE_RUNTIME_INDEX_PHP, createSiteRuntimeSkeleton } from "../src/runtime/createSiteRuntime.js";
-import createSiteRepository from "../src/site/createSiteRepository.js";
+import createRuntimeComposition from "../framework/src/runtime/bootstrap/createRuntimeComposition.js";
+import { SITE_RUNTIME_INDEX_PHP, createSiteRuntimeSkeleton } from "../framework/src/runtime/bootstrap/createSiteRuntime.js";
+import createSiteRepository from "../framework/src/site/createSiteRepository.js";
 
 test("Runtime Composition wires one shared Repository, Setup Service, and Runtime controllers", async () => {
   const workspaceDir = await mkdtemp(path.join(os.tmpdir(), "wpsc-composition-"));

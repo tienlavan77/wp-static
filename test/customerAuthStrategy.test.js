@@ -6,7 +6,7 @@ import {
   CUSTOMER_AUTH_BOUNDARY,
   CUSTOMER_AUTH_MODES,
   validateCustomerAuthMode
-} from "../src/runtime/customerAuthStrategy.js";
+} from "../framework/src/runtime/auth/customerAuthStrategy.js";
 
 test("customer auth strategy defines supported auth modes", () => {
   assert.equal(validateCustomerAuthMode(CUSTOMER_AUTH_MODES.NO_LOGIN), "no-login");

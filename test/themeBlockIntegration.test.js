@@ -3,13 +3,13 @@ import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import loadConfig from "../src/core/loadConfig.js";
-import resolveTheme from "../src/theme/resolveTheme.js";
-import renderLayout from "../src/visual-builder/renderLayout.js";
-import renderThemePreview from "../src/visual-builder/renderThemePreview.js";
+import loadConfig from "../framework/src/core/loadConfig.js";
+import resolveTheme from "../framework/src/builder/theme/resolveTheme.js";
+import renderLayout from "../framework/src/builder/visual-builder/renderLayout.js";
+import renderThemePreview from "../framework/src/builder/visual-builder/renderThemePreview.js";
 
 test("theme exposes a block library", async () => {
-  const config = await loadConfig("examples/basic-shop");
+  const config = await loadConfig("fixtures/basic-shop");
   const theme = await resolveTheme(config, config._paths.projectDir);
 
   assert.equal(theme.blocks.some((block) => block.name === "theme/badge"), true);
@@ -17,7 +17,7 @@ test("theme exposes a block library", async () => {
 });
 
 test("builder loads theme blocks and theme overrides", async () => {
-  const config = await loadConfig("examples/basic-shop");
+  const config = await loadConfig("fixtures/basic-shop");
   const theme = await resolveTheme(config, config._paths.projectDir);
   const result = renderLayout({
     contentTypes: ["page"],
@@ -76,7 +76,7 @@ test("project blocks override theme blocks", async () => {
 });
 
 test("theme preview wraps rendered blocks with theme metadata", async () => {
-  const config = await loadConfig("examples/basic-shop");
+  const config = await loadConfig("fixtures/basic-shop");
   const theme = await resolveTheme(config, config._paths.projectDir);
   const result = renderThemePreview({
     contentTypes: ["page"],

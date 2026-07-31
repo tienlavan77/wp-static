@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import createFirstBuildReadinessService from "../src/setup/createFirstBuildReadinessService.js";
-import createSetupService, { SetupClient } from "../src/setup/createSetupService.js";
-import { SetupState } from "../src/setup/createSetupStateMachine.js";
+import createFirstBuildReadinessService from "../framework/src/setup/createFirstBuildReadinessService.js";
+import createSetupService, { SetupClient } from "../framework/src/setup/createSetupService.js";
+import { SetupState } from "../framework/src/setup/createSetupStateMachine.js";
 
 function metadata(extra = {}) {
   return { adapterVersion: "1.0", capabilities: [], endpoint: "https://source.example", schema: "source-metadata", schemaVersion: 1, sourceType: "rest", ...extra };

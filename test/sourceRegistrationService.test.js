@@ -3,12 +3,12 @@ import { mkdtemp, readFile, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import createSourceAdapterLoader from "../src/source/createSourceAdapterLoader.js";
-import createSourceRegistry from "../src/source/createSourceRegistry.js";
-import createSiteRepository from "../src/site/createSiteRepository.js";
+import createSourceAdapterLoader from "../framework/src/source/createSourceAdapterLoader.js";
+import createSourceRegistry from "../framework/src/source/createSourceRegistry.js";
+import createSiteRepository from "../framework/src/site/createSiteRepository.js";
 import createSourceRegistrationService, {
   SourceRegistrationEvent
-} from "../src/setup/createSourceRegistrationService.js";
+} from "../framework/src/setup/createSourceRegistrationService.js";
 
 function ok() {
   return { diagnostics: { errors: [], warnings: [] }, ok: true };

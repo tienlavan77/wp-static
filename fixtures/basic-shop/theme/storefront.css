@@ -1,0 +1,93 @@
+@import "tailwindcss";
+
+@source "./**/*.js";
+@source "../layouts/**/*.json";
+@source "../public/**/*.html";
+
+@theme {
+  --color-brand-50: #eefbf5;
+  --color-brand-100: #d7f4e6;
+  --color-brand-200: #b4e8d0;
+  --color-brand-300: #82d5b1;
+  --color-brand-400: #4bb98d;
+  --color-brand-500: #24986e;
+  --color-brand-600: #157a59;
+  --color-brand-700: #0f6048;
+  --color-brand-800: #0e4d3c;
+  --color-brand-900: #0c4033;
+  --color-ink-50: #f7faf7;
+  --color-ink-100: #eef3ef;
+  --color-ink-200: #dbe5dc;
+  --color-ink-300: #bdccbf;
+  --color-ink-400: #94a897;
+  --color-ink-500: #708674;
+  --color-ink-600: #566b5a;
+  --color-ink-700: #455648;
+  --color-ink-800: #37453b;
+  --color-ink-900: #162019;
+  --color-paper: #fbfbf7;
+  --color-surface: #ffffff;
+  --color-line: #d8dfd8;
+  --shadow-storefront: 0 14px 44px rgb(22 32 25 / 10%);
+  --radius-panel: 8px;
+}
+
+@layer base {
+  :root {
+    --storefront-paper: #fbfbf7;
+    --storefront-surface: #ffffff;
+    --storefront-ink: #162019;
+    --storefront-muted: #5f6f64;
+    --storefront-line: #d8dfd8;
+    --storefront-brand: #157a59;
+    --storefront-brand-strong: #0f6048;
+  }
+
+  :root[data-theme="dark"] {
+    --storefront-paper: #101712;
+    --storefront-surface: #17221a;
+    --storefront-ink: #edf6ef;
+    --storefront-muted: #a9baad;
+    --storefront-line: #314137;
+    --storefront-brand: #57d3ad;
+    --storefront-brand-strong: #8be8c8;
+  }
+
+  body {
+    background: var(--storefront-paper);
+    color: var(--storefront-ink);
+  }
+}
+
+@layer components {
+  .storefront-container {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
+  .storefront-panel {
+    border-color: var(--storefront-line);
+    background: var(--storefront-surface);
+    color: var(--storefront-ink);
+    @apply rounded-panel border shadow-storefront;
+  }
+
+  .storefront-button {
+    background: var(--storefront-brand);
+    @apply inline-flex min-h-10 items-center justify-center gap-2 rounded-md px-4 text-sm font-bold text-white transition hover:opacity-90;
+  }
+
+  .storefront-button-secondary {
+    border-color: var(--storefront-line);
+    color: var(--storefront-brand-strong);
+    @apply inline-flex min-h-10 items-center justify-center gap-2 rounded-md border bg-transparent px-4 text-sm font-bold transition hover:bg-black/5;
+  }
+
+  :root[data-theme="dark"] .storefront-button-secondary {
+    @apply hover:bg-white/10;
+  }
+
+  .storefront-kicker {
+    color: var(--storefront-muted);
+    @apply text-xs font-bold uppercase tracking-normal;
+  }
+}

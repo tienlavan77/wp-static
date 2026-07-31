@@ -6,7 +6,7 @@ import {
   renderLoginView,
   renderLogoutView,
   renderOrderHistoryView
-} from "../src/index.js";
+} from "../framework/src/index.js";
 
 test("account UI renders login and logout views", () => {
   const login = renderLoginView();

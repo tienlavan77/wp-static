@@ -1,10 +1,10 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
-import normalizeWordPressContent from "../src/adapters/wordpress/normalizeWordPressContent.js";
-import normalizeRankMathSeo from "../src/adapters/wordpress/normalizeRankMathSeo.js";
-import createWordPressRepository from "../src/adapters/wordpress/wordpressRepository.js";
-import createWordPressAdapter from "../src/adapters/wordpress/wordpressAdapter.js";
+import normalizeWordPressContent from "../framework/src/adapters/wordpress/normalizeWordPressContent.js";
+import normalizeRankMathSeo from "../framework/src/adapters/wordpress/normalizeRankMathSeo.js";
+import createWordPressRepository from "../framework/src/adapters/wordpress/wordpressRepository.js";
+import createWordPressAdapter from "../framework/src/adapters/wordpress/wordpressAdapter.js";
 
 test("normalizeWordPressContent maps raw WordPress page into content input", () => {
   const content = normalizeWordPressContent({
@@ -33,6 +33,34 @@ test("normalizeWordPressContent maps ACF, featured media, terms, and Rank Math S
   assert.equal(content.seo.title, "SEO Title");
   assert.deepEqual(content.seo.robots, ["index", "follow"]);
   assert.equal(content.seo.openGraph.image, "https://example.com/og.jpg");
+});
+
+test("normalizeWordPressContent exposes an embedded author through the stable content shape", () => {
+  const content = normalizeWordPressContent({
+    _embedded: {
+      author: [{
+        avatar_urls: { "96": "https://example.com/avatar.jpg" },
+        id: 8,
+        link: "https://example.com/author/editor",
+        name: "Editor",
+        slug: "editor"
+      }]
+    },
+    content: { rendered: "" },
+    excerpt: { rendered: "" },
+    id: 12,
+    slug: "about",
+    title: { rendered: "About" }
+  });
+
+  assert.deepEqual(content.data.author, {
+    avatarUrl: "https://example.com/avatar.jpg",
+    description: "",
+    id: "8",
+    name: "Editor",
+    slug: "editor",
+    url: "https://example.com/author/editor"
+  });
 });
 
 test("normalizeRankMathSeo returns a normalized SEO object", () => {
@@ -99,8 +127,43 @@ test("WordPress repository normalizes collection taxonomy names", async () => {
   ]);
 });
 
+test("WordPress adapter returns a versioned provider contract for pages, posts, terms, and authors", async () => {
+  const client = {
+    async getCollection(pathname) {
+      if (pathname.endsWith("users")) {
+        return [{ id: 3, name: "Admin", slug: "admin" }];
+      }
+      if (pathname.endsWith("categories")) {
+        return [{ id: 5, name: "News", slug: "news" }];
+      }
+      if (pathname.endsWith("tags")) return [];
+      return [{ content: { rendered: "" }, excerpt: { rendered: "" }, id: pathname.endsWith("pages") ? 1 : 2, slug: "item", title: { rendered: "Item" } }];
+    }
+  };
+  const adapter = createWordPressAdapter({
+    baseUrl: "https://cms.example.test",
+    client
+  });
+  const contract = await adapter.getContentContract();
+
+  assert.equal(contract.schema, "wpsc.wordpress-content");
+  assert.equal(contract.schemaVersion, 1);
+  assert.equal(contract.provider, "wordpress");
+  assert.deepEqual(contract.contents.map((content) => content.type), ["page", "post"]);
+  assert.deepEqual(contract.terms.map((term) => term.taxonomy), ["category"]);
+  assert.deepEqual(contract.authors, [{
+    avatarUrl: null,
+    description: "",
+    id: "3",
+    name: "Admin",
+    slug: "admin",
+    url: null
+  }]);
+  assert.equal(Object.isFrozen(contract), true);
+});
+
 test("WordPress client tolerates PHP warnings before JSON", async () => {
-  const { default: createWordPressClient } = await import("../src/adapters/wordpress/wordpressClient.js");
+  const { default: createWordPressClient } = await import("../framework/src/adapters/wordpress/wordpressClient.js");
   const client = createWordPressClient({
     baseUrl: "https://example.com",
     fetchImpl: async () => ({

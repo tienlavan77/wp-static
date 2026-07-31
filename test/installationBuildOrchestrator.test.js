@@ -2,8 +2,8 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import createInstallationBuildOrchestrator, {
   INSTALLATION_BUILD_ORCHESTRATOR_VERSION
-} from "../src/installer/createInstallationBuildOrchestrator.js";
-import createInstallationSession from "../src/installer/createInstallationSession.js";
+} from "../framework/src/installer/createInstallationBuildOrchestrator.js";
+import createInstallationSession from "../framework/src/installer/createInstallationSession.js";
 
 function createValidatedSession() {
   const session = createInstallationSession({

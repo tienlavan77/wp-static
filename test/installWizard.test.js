@@ -3,8 +3,8 @@ import { access, mkdtemp, readFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import createInstallConfiguration from "../src/core/createInstallConfiguration.js";
-import validateProjectConfig from "../src/validation/validateProjectConfig.js";
+import createInstallConfiguration from "../framework/src/core/createInstallConfiguration.js";
+import validateProjectConfig from "../framework/src/validation/validateProjectConfig.js";
 
 test("createInstallConfiguration generates install files", async () => {
   const projectDir = await mkdtemp(path.join(os.tmpdir(), "wpsc-install-"));

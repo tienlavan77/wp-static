@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import createHookSystem, {
   HOOK_SYSTEM_VERSION
-} from "../src/runtime/createHookSystem.js";
+} from "../framework/src/runtime/extensions/createHookSystem.js";
 
 test("createHookSystem runs hooks by priority and registration order", async () => {
   const hooks = createHookSystem();

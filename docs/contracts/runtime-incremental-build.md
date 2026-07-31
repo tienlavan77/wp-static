@@ -33,7 +33,7 @@ is the single entry point for both manual and webhook-triggered rebuilds.
 The Runtime command is:
 
 ```sh
-node src/cli/index.js runtime:build --site <site-id> --config runtime.config.js
+node framework/src/cli/index.js runtime:build --site <site-id> --config runtime.config.js
 ```
 
 With no `--changed` value, Runtime performs a full build.
@@ -41,7 +41,7 @@ With no `--changed` value, Runtime performs a full build.
 To request an incremental build, repeat `--changed` as needed:
 
 ```sh
-node src/cli/index.js runtime:build \
+node framework/src/cli/index.js runtime:build \
   --site tinsinhphat \
   --config runtime.config.js \
   --changed product:bao-thu
@@ -57,18 +57,19 @@ node src/cli/index.js runtime:build \
 | `term:<taxonomy>:<slug>` | A taxonomy term changed, for example `term:product_cat:bao-thu`. |
 | `menu:<id-or-slug>` | A navigation menu changed. |
 | `theme:<id-or-slug>` | A shared theme/layout dependency changed. |
+| `site:seo` | A site-wide setting changed, such as canonical URL or SEO policy. |
 
 Examples:
 
 ```sh
 # Product route and its affected product category archives.
-node src/cli/index.js runtime:build --site tinsinhphat --changed product:bao-thu
+node framework/src/cli/index.js runtime:build --site tinsinhphat --changed product:bao-thu
 
 # Product category archive and its paginated archive routes.
-node src/cli/index.js runtime:build --site tinsinhphat --changed term:product_cat:bao-thu
+node framework/src/cli/index.js runtime:build --site tinsinhphat --changed term:product_cat:bao-thu
 
 # Shared navigation or theme dependency: all dependent routes.
-node src/cli/index.js runtime:build --site tinsinhphat --changed menu:primary --changed theme:layout
+node framework/src/cli/index.js runtime:build --site tinsinhphat --changed menu:primary --changed theme:layout
 ```
 
 ## Rebuild Scope
@@ -79,6 +80,7 @@ Builder V1 evaluates each hint with the Route Dependency Graph.
 - A changed page or post rebuilds its route and any related archive route.
 - A changed term rebuilds its archive route and archive pagination.
 - A changed menu, media item, or theme/layout dependency rebuilds every dependent route.
+- A changed site setting rebuilds every route because canonical metadata and shared SEO outputs depend on the Site identity.
 - Multiple hints are combined into one immutable Job snapshot and one publish operation.
 
 ## Required Shared Artifact Refresh

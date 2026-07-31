@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import compilePreparedSite from "../src/core/compilePreparedSite.js";
-import createSharedStorefrontBuildConfig from "../src/runtime/createSharedStorefrontBuildConfig.js";
+import compilePreparedSite from "../framework/src/core/compilePreparedSite.js";
+import createSharedStorefrontBuildConfig from "../framework/src/runtime/build/createSharedStorefrontBuildConfig.js";
 
 test("prepared Runtime content uses Builder V1 routes to select page, product, archive, and system layouts", async () => {
   const plan = await compilePreparedSite({

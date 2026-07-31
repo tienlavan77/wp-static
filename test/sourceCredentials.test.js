@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { resolveWooCommerceCredentials, resolveWordPressAuth } from "../src/auth/sourceCredentials.js";
+import { resolveWooCommerceCredentials, resolveWordPressAuth } from "../framework/src/auth/sourceCredentials.js";
 
 test("resolveWordPressAuth supports application passwords from env", () => {
   const auth = resolveWordPressAuth({

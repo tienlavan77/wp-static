@@ -1,11 +1,11 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import createSourceAdapterLoader from "../src/source/createSourceAdapterLoader.js";
-import createSourceRegistry from "../src/source/createSourceRegistry.js";
+import createSourceAdapterLoader from "../framework/src/source/createSourceAdapterLoader.js";
+import createSourceRegistry from "../framework/src/source/createSourceRegistry.js";
 import {
   SOURCE_ADAPTER_REQUIRED_METHODS,
   validateSourceAdapter
-} from "../src/source/sourceAdapterContract.js";
+} from "../framework/src/source/sourceAdapterContract.js";
 
 function createAdapter() {
   return Object.fromEntries(

@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import createJobDispatcher from "../src/scheduler/createJobDispatcher.js";
-import createJobQueue from "../src/scheduler/createJobQueue.js";
-import { JobEvent, JobStatus, JobTrigger } from "../src/scheduler/schedulerContracts.js";
+import createJobDispatcher from "../framework/src/scheduler/dispatcher/createJobDispatcher.js";
+import createJobQueue from "../framework/src/scheduler/queue/createJobQueue.js";
+import { JobEvent, JobStatus, JobTrigger } from "../framework/src/scheduler/contracts/schedulerContracts.js";
 
 test("Job Dispatcher claims a queued job, calls injected Build Engine, and completes Queue state", async () => {
   const queue = createJobQueue({ createJobId: () => "job-1", now: () => "2026-08-02T00:00:00.000Z" });

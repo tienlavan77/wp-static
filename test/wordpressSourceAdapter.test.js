@@ -1,9 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import createWordPressSourceAdapter from "../src/source/createWordPressSourceAdapter.js";
-import { validateSourceAdapter } from "../src/source/sourceAdapterContract.js";
+import createWordPressSourceAdapter from "../framework/src/source/createWordPressSourceAdapter.js";
+import { validateSourceAdapter } from "../framework/src/source/sourceAdapterContract.js";
 
 function response(body = {}, status = 200) { return { ok: status >= 200 && status < 300, status, statusText: status === 200 ? "OK" : "Error", text: async () => JSON.stringify(body) }; }
+function collectionResponse(body = []) { return { ...response(body), headers: new Headers({ "x-wp-totalpages": "1" }) }; }
 
 test("WordPress Source Adapter implements Source lifecycle and configurable webhook bridge", async () => {
   const calls = [];
@@ -81,4 +82,23 @@ test("WordPress Source Adapter exposes WooCommerce when saved consumer credentia
     fetchImpl: async () => response({ ok: true })
   });
   assert.deepEqual((await adapter.getMetadata()).capabilities, ["supportsWebhook", "supportsWooCommerce"]);
+});
+
+test("WordPress Source Adapter exposes the versioned provider content contract", async () => {
+  const adapter = createWordPressSourceAdapter({
+    fetchImpl: async (url) => {
+      const requestUrl = String(url);
+      if (requestUrl.includes("/categories")) return collectionResponse([{ id: 7, name: "News", slug: "news" }]);
+      if (requestUrl.includes("/users")) return collectionResponse([{ id: 4, name: "Editor", slug: "editor" }]);
+      return collectionResponse([{ content: { rendered: "" }, excerpt: { rendered: "" }, id: 1, slug: "welcome", title: { rendered: "Welcome" } }]);
+    }
+  });
+  await adapter.initialize({ endpoint: "https://cms.example.test" });
+  const contract = await adapter.getContentContract();
+
+  assert.equal(contract.schema, "wpsc.wordpress-content");
+  assert.equal(contract.schemaVersion, 1);
+  assert.deepEqual(contract.contents.map((content) => content.type), ["page", "post"]);
+  assert.equal(contract.terms[0].taxonomy, "category");
+  assert.equal(contract.authors[0].slug, "editor");
 });

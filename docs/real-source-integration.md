@@ -56,7 +56,7 @@ already exist in the shell are kept, so deployment environments can override loc
 For the Basic Shop example:
 
 ```sh
-cp examples/basic-shop/.env.example examples/basic-shop/.env
+cp fixtures/basic-shop/.env.example fixtures/basic-shop/.env
 ```
 
 Then fill:
@@ -68,7 +68,7 @@ WPSC_WP_USERNAME=
 WPSC_WP_APP_PASSWORD=
 ```
 
-Keep `examples/basic-shop/.env` private. It is ignored by git.
+Keep `fixtures/basic-shop/.env` private. It is ignored by git.
 
 ## WordPress And WooCommerce Together
 
@@ -111,8 +111,8 @@ export default {
 };
 ```
 
-The example project includes `examples/basic-shop/wpsc.real.config.js` with this shape.
-To build against the real source, copy that file to `examples/basic-shop/wpsc.config.js`
+The example project includes `fixtures/basic-shop/wpsc.real.config.js` with this shape.
+To build against the real source, copy that file to `fixtures/basic-shop/wpsc.config.js`
 or move its `adapter` block into the active config.
 
 ## Real Project Checklist

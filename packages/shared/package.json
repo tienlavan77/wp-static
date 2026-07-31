@@ -4,7 +4,7 @@
   "description": "Shared utilities and errors for WPSC.",
   "type": "module",
   "exports": {
-    ".": "./src/index.js"
+    ".": "./framework/src/index.js"
   },
   "license": "UNLICENSED"
 }

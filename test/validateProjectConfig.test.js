@@ -3,8 +3,8 @@ import { mkdtemp, mkdir, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import validateProjectConfig from "../src/validation/validateProjectConfig.js";
-import { formatValidationResults } from "../src/validation/formatValidationResults.js";
+import validateProjectConfig from "../framework/src/validation/validateProjectConfig.js";
+import { formatValidationResults } from "../framework/src/validation/formatValidationResults.js";
 
 test("validateProjectConfig reports valid project checks before build", async () => {
   const projectDir = await createProject({

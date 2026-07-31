@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import createBuildReport from "../src/report/createBuildReport.js";
+import createBuildReport from "../framework/src/builder/report/createBuildReport.js";
 
 test("createBuildReport renders build summary and pipeline details", () => {
   const report = createBuildReport({

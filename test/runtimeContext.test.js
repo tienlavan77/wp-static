@@ -5,7 +5,7 @@ import createRuntimeContext, {
   createRuntimeEnvironment,
   createRuntimePaths,
   RUNTIME_CONTEXT_VERSION
-} from "../src/runtime/createRuntimeContext.js";
+} from "../framework/src/runtime/bootstrap/createRuntimeContext.js";
 
 test("createRuntimeEnvironment normalizes mode and booleans", () => {
   const environment = createRuntimeEnvironment({

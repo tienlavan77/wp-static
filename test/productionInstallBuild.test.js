@@ -3,11 +3,11 @@ import { mkdtemp } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import createInstallationConfigGenerator from "../src/installer/createInstallationConfigGenerator.js";
-import persistInstallationConfiguration from "../src/release/persistInstallationConfiguration.js";
+import createInstallationConfigGenerator from "../framework/src/installer/createInstallationConfigGenerator.js";
+import persistInstallationConfiguration from "../framework/src/release/persistInstallationConfiguration.js";
 import createProductionInstallBuild, {
   PRODUCTION_INSTALL_BUILD_VERSION
-} from "../src/release/createProductionInstallBuild.js";
+} from "../framework/src/release/createProductionInstallBuild.js";
 
 async function createPersistedConfig() {
   const releaseDir = await mkdtemp(path.join(os.tmpdir(), "wpsc-release-"));

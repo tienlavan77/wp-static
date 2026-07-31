@@ -19,8 +19,8 @@ test("builder UI prototype includes palette, canvas, props, preview, and save co
 });
 
 test("basic shop exposes builder demo in public assets", async () => {
-  const html = await readFile(new URL("../examples/basic-shop/public/builder.html", import.meta.url), "utf8");
-  const script = await readFile(new URL("../examples/basic-shop/public/builder-ui/builder.js", import.meta.url), "utf8");
+  const html = await readFile(new URL("../fixtures/basic-shop/public/builder.html", import.meta.url), "utf8");
+  const script = await readFile(new URL("../fixtures/basic-shop/public/builder-ui/builder.js", import.meta.url), "utf8");
 
   assert.match(html, /\/builder-ui\/builder.css/);
   assert.match(html, /\/builder-ui\/builder.js/);

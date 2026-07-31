@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import createBlockRegistry from "../src/blocks/createBlockRegistry.js";
-import createBlockSchema from "../src/blocks/createBlockSchema.js";
+import createBlockRegistry from "../framework/src/builder/blocks/createBlockRegistry.js";
+import createBlockSchema from "../framework/src/builder/blocks/createBlockSchema.js";
 import coreCommerceBlocks, {
   archiveLinksBlock,
   darkModeToggleBlock,
@@ -9,11 +9,11 @@ import coreCommerceBlocks, {
   siteHeaderBlock,
   siteLogoBlock,
   siteNavBlock
-} from "../src/blocks/core/commerceBlocks.js";
-import renderBlock from "../src/blocks/renderBlock.js";
-import resolveBlockBindings from "../src/blocks/resolveBlockBindings.js";
-import validateBlockProps from "../src/blocks/validateBlockProps.js";
-import html from "../src/renderer/html.js";
+} from "../framework/src/builder/blocks/core/commerceBlocks.js";
+import renderBlock from "../framework/src/builder/blocks/renderBlock.js";
+import resolveBlockBindings from "../framework/src/builder/blocks/resolveBlockBindings.js";
+import validateBlockProps from "../framework/src/builder/blocks/validateBlockProps.js";
+import html from "../framework/src/builder/renderer/html.js";
 
 test("createBlockSchema normalizes block metadata and schemas", () => {
   const block = createBlockSchema({

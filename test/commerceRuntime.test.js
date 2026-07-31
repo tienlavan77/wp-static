@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import createCommerceRuntime from "../src/runtime/commerce/createCommerceRuntime.js";
-import createWooCommerceAccountService from "../src/runtime/commerce/createWooCommerceAccountService.js";
-import createWordPressAuthService from "../src/runtime/commerce/createWordPressAuthService.js";
+import createCommerceRuntime from "../framework/src/runtime/commerce/createCommerceRuntime.js";
+import createWooCommerceAccountService from "../framework/src/runtime/commerce/createWooCommerceAccountService.js";
+import createWordPressAuthService from "../framework/src/runtime/commerce/createWordPressAuthService.js";
 
 test("commerce runtime serves health and creates customer session cookie", async () => {
   const runtime = createCommerceRuntime();
@@ -15,7 +15,14 @@ test("commerce runtime serves health and creates customer session cookie", async
 });
 
 test("commerce runtime supports cart add, merge, read, and delete", async () => {
-  const runtime = createCommerceRuntime();
+  const runtime = createCommerceRuntime({
+    resolveCartItems: async ({ items }) => items.map((item) => ({
+      ...item,
+      currency: "VND",
+      inStock: true,
+      price: 50000
+    }))
+  });
   const first = await runtime.handle(new Request("http://runtime.local/cart/items", {
     body: JSON.stringify({
       productId: 44,
@@ -37,9 +44,30 @@ test("commerce runtime supports cart add, merge, read, and delete", async () => 
   const cart = await second.json();
 
   assert.deepEqual(cart.items, [{
-    productId: 44,
-    quantity: 3
+    available: null,
+    inStock: null,
+    key: "44:0",
+    pricing: { currency: null, lineTotal: null, unitPrice: null },
+    product: { id: "44" },
+    quantity: 3,
+    variation: null
   }]);
+
+  const refreshed = await runtime.handle(new Request("http://runtime.local/cart/refresh", {
+    headers: { cookie },
+    method: "POST"
+  }));
+  const refreshedCart = await refreshed.json();
+  assert.equal(refreshedCart.items[0].pricing.unitPrice, 50000);
+  assert.equal(refreshedCart.items[0].pricing.lineTotal, 150000);
+  assert.equal(refreshedCart.items[0].inStock, true);
+
+  const updated = await runtime.handle(new Request("http://runtime.local/cart/items/44:0", {
+    body: JSON.stringify({ quantity: 2 }),
+    headers: { cookie },
+    method: "PATCH"
+  }));
+  assert.equal((await updated.json()).items[0].quantity, 2);
 
   const removed = await runtime.handle(new Request("http://runtime.local/cart/items/44", {
     headers: {
@@ -48,7 +76,9 @@ test("commerce runtime supports cart add, merge, read, and delete", async () => 
     method: "DELETE"
   }));
 
-  assert.deepEqual(await removed.json(), { items: [] });
+  const removedCart = await removed.json();
+  assert.equal(removedCart.schema, "wpsc.cart");
+  assert.deepEqual(removedCart.items, []);
 });
 
 test("commerce runtime delegates checkout and order lookup to server-side handlers", async () => {
@@ -80,6 +110,11 @@ test("commerce runtime delegates checkout and order lookup to server-side handle
   const cookie = add.headers.get("set-cookie");
   const checkout = await runtime.handle(new Request("http://runtime.local/checkout", {
     body: JSON.stringify({
+      customer: {
+        address: "So 2 Dong Ho",
+        email: "anh@example.com",
+        name: "Anh Tien"
+      },
       paymentMethod: "cod"
     }),
     headers: {
@@ -94,10 +129,11 @@ test("commerce runtime delegates checkout and order lookup to server-side handle
   }));
 
   assert.equal(checkout.status, 201);
-  assert.deepEqual(await checkout.json(), {
-    orderId: 1001,
-    status: 201
-  });
+  const checkoutPayload = await checkout.json();
+  assert.equal(checkoutPayload.orderId, 1001);
+  assert.equal(checkoutPayload.status, 201);
+  assert.equal(checkoutPayload.checkout.schema, "wpsc.checkout");
+  assert.equal(checkoutPayload.checkout.status, "submitted");
   assert.deepEqual(await order.json(), {
     id: "1001",
     status: "processing"
@@ -106,6 +142,52 @@ test("commerce runtime delegates checkout and order lookup to server-side handle
     ["checkout", 1],
     ["order", "1001"]
   ]);
+});
+
+test("commerce runtime hydrates an empty Cart from a legacy checkout selection", async () => {
+  const calls = [];
+  const runtime = createCommerceRuntime({
+    checkoutProxy(request) {
+      calls.push(request);
+      return { orderId: 1002, status: 201 };
+    }
+  });
+  const checkout = await runtime.handle(new Request("http://runtime.local/checkout", {
+    body: JSON.stringify({
+      customer: { address: "So 2 Dong Ho", email: "anh@example.com", name: "Anh Tien" },
+      items: [{ price: 1, productId: 44, quantity: 2, variant: { id: 501 } }],
+      payment: "cod"
+    }),
+    method: "POST"
+  }));
+
+  assert.equal(checkout.status, 201);
+  assert.deepEqual(calls[0].payload.items, [{ productId: 44, quantity: 2, variationId: 501, variant: { id: 501 } }]);
+});
+
+test("commerce runtime exposes an invalid provider product ID as a checkout diagnostic", async () => {
+  const runtime = createCommerceRuntime({
+    checkoutProxy() {
+      const error = new Error("Cart contains no valid WooCommerce product.");
+      error.code = "checkout.cart.product.invalid";
+      throw error;
+    }
+  });
+  const added = await runtime.handle(new Request("http://runtime.local/cart/items", {
+    body: JSON.stringify({ productId: "product-44", quantity: 1 }),
+    method: "POST"
+  }));
+  const checkout = await runtime.handle(new Request("http://runtime.local/checkout", {
+    body: JSON.stringify({
+      customer: { address: "So 2 Dong Ho", email: "anh@example.com", name: "Anh Tien" },
+      payment: "cod"
+    }),
+    headers: { cookie: added.headers.get("set-cookie") },
+    method: "POST"
+  }));
+
+  assert.equal(checkout.status, 400);
+  assert.equal((await checkout.json()).diagnostics.errors[0].code, "checkout.cart.product.invalid");
 });
 
 test("commerce runtime authenticates account through server-side handlers", async () => {
@@ -176,17 +258,23 @@ test("commerce runtime authenticates account through server-side handlers", asyn
   assert.equal(unauthenticated.status, 200);
   assert.deepEqual(await unauthenticated.json(), {
     authenticated: false,
+    identity: null,
     user: null
   });
   assert.equal(login.status, 200);
   assert.match(cookie, /wpsc_session=/);
-  assert.deepEqual(await account.json(), {
+  const accountPayload = await account.json();
+  assert.equal(accountPayload.identity.schema, "wpsc.customer-identity");
+  assert.equal(accountPayload.identity.siteId, "default");
+  assert.equal(accountPayload.identity.customerId, "123");
+  assert.deepEqual({ ...accountPayload, identity: undefined }, {
     addresses: {
       shipping: {
         address1: "So 2 Dong Ho",
         city: "TP.HCM"
       }
     },
+    identity: undefined,
     orders: [{
       id: 99,
       status: "processing",
@@ -205,6 +293,7 @@ test("commerce runtime authenticates account through server-side handlers", asyn
   assert.equal(afterLogout.status, 200);
   assert.deepEqual(await afterLogout.json(), {
     authenticated: false,
+    identity: null,
     user: null
   });
   assert.deepEqual(calls, [
@@ -520,6 +609,31 @@ test("WooCommerce account service creates checkout order", async () => {
     quantity: 2,
     variation_id: 55
   }]);
+});
+
+test("WooCommerce account service rejects framework Content IDs before creating an empty order", async () => {
+  let called = false;
+  const service = createWooCommerceAccountService({
+    client: {
+      async createResource() {
+        called = true;
+        return {};
+      }
+    }
+  });
+
+  await assert.rejects(
+    () => service.checkoutProxy({
+      payload: {
+        customer: { address: "So 2 Dong Ho", email: "anh@example.com", name: "Anh Tien" },
+        items: [{ productId: "product-44", quantity: 1 }],
+        payment: "cod"
+      },
+      session: {}
+    }),
+    (error) => error.code === "checkout.cart.product.invalid"
+  );
+  assert.equal(called, false);
 });
 
 test("WooCommerce account service protects public order lookup by contact", async () => {

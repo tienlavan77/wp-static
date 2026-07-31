@@ -3,7 +3,7 @@ import { mkdtemp, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import loadConfig from "../src/core/loadConfig.js";
+import loadConfig from "../framework/src/core/loadConfig.js";
 
 test("loadConfig loads wpsc.config.js from project dir", async () => {
   const projectDir = await mkdtemp(path.join(os.tmpdir(), "wpsc-config-"));

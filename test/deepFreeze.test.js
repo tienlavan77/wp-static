@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import deepFreeze from "../src/shared/deepFreeze.js";
+import deepFreeze from "../framework/src/shared/deepFreeze.js";
 
 test("deepFreeze freezes nested objects", () => {
   const value = deepFreeze({

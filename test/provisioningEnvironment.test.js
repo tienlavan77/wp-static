@@ -3,11 +3,11 @@ import { mkdtemp, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import { createError, createOk } from "../src/validation/createValidationResult.js";
+import { createError, createOk } from "../framework/src/validation/createValidationResult.js";
 import validateProvisioningEnvironment, {
   PROVISIONING_ENVIRONMENT_VERSION,
   ProvisioningEnvironmentSeverity
-} from "../src/provision/validateProvisioningEnvironment.js";
+} from "../framework/src/provision/validateProvisioningEnvironment.js";
 
 test("validateProvisioningEnvironment accepts a supported runtime and writable sites directory", async () => {
   const workspaceDir = await mkdtemp(path.join(os.tmpdir(), "wpsc-provision-environment-"));

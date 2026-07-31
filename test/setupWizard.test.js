@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import createSetupWizard, {
   BROWSER_SETUP_WIZARD_VERSION
-} from "../src/browser/createSetupWizard.js";
+} from "../framework/src/browser/createSetupWizard.js";
 
 test("createSetupWizard renders a REST-driven browser shell", () => {
   const wizard = createSetupWizard({ apiBase: "/api/setup/" });

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import createWordPressWooCommerceAdapter from "../src/adapters/wordpressWooCommerce/wordpressWooCommerceAdapter.js";
-import compile from "../src/core/compile.js";
+import createWordPressWooCommerceAdapter from "../framework/src/adapters/wordpressWooCommerce/wordpressWooCommerceAdapter.js";
+import compile from "../framework/src/core/compile.js";
 
 test("WordPress WooCommerce adapter merges content and collections", async () => {
   const responses = new Map([
@@ -163,8 +163,8 @@ test("compile supports wordpressWooCommerce adapter config", async () => {
       url: "https://example.com"
     },
     theme: {
-      components: "./examples/basic-shop/theme/components/index.js",
-      layout: "./examples/basic-shop/theme/layout.js"
+      components: "./fixtures/basic-shop/theme/components/index.js",
+      layout: "./fixtures/basic-shop/theme/layout.js"
     }
   }, {
     projectDir: process.cwd()

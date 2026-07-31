@@ -149,7 +149,7 @@ npm run serve:runtime:example
 
 It serves:
 
-- static files from `examples/basic-shop/dist`
+- static files from `fixtures/basic-shop/dist`
 - `/api/*` through `createCommerceRuntime()`
 - `/health` for runtime health checks
 
@@ -162,7 +162,7 @@ http://localhost:8787
 Environment file:
 
 ```text
-examples/basic-shop/.env
+fixtures/basic-shop/.env
 ```
 
 Required values:

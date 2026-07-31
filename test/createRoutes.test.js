@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import createContent from "../src/core/createContent.js";
-import createRoutes from "../src/router/createRoutes.js";
+import createContent from "../framework/src/core/createContent.js";
+import createRoutes from "../framework/src/builder/router/createRoutes.js";
 
 test("createRoutes maps homepage and normal slugs", () => {
   const routes = createRoutes([

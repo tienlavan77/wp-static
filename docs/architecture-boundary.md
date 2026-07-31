@@ -133,15 +133,15 @@ Owns writing build artifacts.
 
 Current areas:
 
-- `src/builder/`
-- `src/cache/`
-- `src/planner/`
-- `src/graph/`
-- `src/queue/`
-- `src/invalidate/`
-- `src/progress/`
-- `src/watcher/`
-- `src/webhook/`
+- `framework/src/builder/`
+- `framework/src/cache/`
+- `framework/src/planner/`
+- `framework/src/graph/`
+- `framework/src/queue/`
+- `framework/src/invalidate/`
+- `framework/src/progress/`
+- `framework/src/watcher/`
+- `framework/src/webhook/`
 
 May do:
 
@@ -166,15 +166,15 @@ Owns dynamic customer workflows that cannot be fully static.
 
 Current areas:
 
-- `src/runtime/api/`
-- `src/runtime/auth/`
-- `src/runtime/account/`
-- `src/runtime/cart/`
-- `src/runtime/checkout/`
-- `src/runtime/order/`
-- `src/runtime/session/`
-- `src/runtime/commerce/`
-- `src/runtime/frontend/`
+- `framework/src/runtime/api/`
+- `framework/src/runtime/auth/`
+- `framework/src/runtime/account/`
+- `framework/src/runtime/cart/`
+- `framework/src/runtime/checkout/`
+- `framework/src/runtime/order/`
+- `framework/src/runtime/session/`
+- `framework/src/runtime/commerce/`
+- `framework/src/runtime/frontend/`
 
 May do:
 
@@ -198,11 +198,11 @@ Owns static storefront rendering.
 
 Current areas:
 
-- `src/theme/`
-- `src/templates/`
-- `src/blocks/`
-- `src/visual-builder/`
-- `examples/basic-shop/theme/`
+- `framework/src/theme/`
+- `framework/src/templates/`
+- `framework/src/blocks/`
+- `framework/src/visual-builder/`
+- `fixtures/basic-shop/theme/`
 
 May do:
 
@@ -266,7 +266,7 @@ Plugin -> Private internal module as stable API
 
 ## Public vs Internal API
 
-Public APIs are exported from `src/index.js` or documented under `docs/v1*`.
+Public APIs are exported from `framework/src/index.js` or documented under `docs/v1*`.
 
 Internal APIs are file paths inside subsystem folders. They may be refactored
 within v1 as long as public contracts remain compatible.
@@ -304,6 +304,6 @@ clearer subsystem names.
 - [ ] Runtime frontend imports only browser-safe modules.
 - [ ] Theme code renders from public context only.
 - [ ] Plugin hooks expose stable context.
-- [ ] Public exports in `src/index.js` match documented contracts.
+- [ ] Public exports in `framework/src/index.js` match documented contracts.
 - [ ] Compatibility bridges are documented and intentionally temporary.
 - [ ] Tests cover at least one path through source, compile, build, runtime, and webhook.

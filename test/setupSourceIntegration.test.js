@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import createSetupApi from "../src/api/createSetupApi.js";
-import createSiteSetupCommand from "../src/cli/createSiteSetupCommand.js";
-import createSetupService, { SetupClient } from "../src/setup/createSetupService.js";
-import { SetupState } from "../src/setup/createSetupStateMachine.js";
+import createSetupApi from "../framework/src/api/createSetupApi.js";
+import createSiteSetupCommand from "../framework/src/cli/createSiteSetupCommand.js";
+import createSetupService, { SetupClient } from "../framework/src/setup/createSetupService.js";
+import { SetupState } from "../framework/src/setup/createSetupStateMachine.js";
 
 function createRegistrationService(calls) {
   return {

@@ -10,15 +10,15 @@ During local development, run commands from the repository root:
 ```bash
 npm test
 npm run build:example
-node src/cli/index.js dev --project examples/basic-shop --port 8080
+node framework/src/cli/index.js dev --project fixtures/basic-shop --port 8080
 ```
 
 For a new project, start with the Sprint 1 installer:
 
 ```bash
-node src/cli/index.js create my-shop --template commerce
-node src/cli/index.js validate --project my-shop
-node src/cli/index.js build --project my-shop
+node framework/src/cli/index.js create my-shop --template commerce
+node framework/src/cli/index.js validate --project my-shop
+node framework/src/cli/index.js build --project my-shop
 ```
 
 For the full installation flow, see [Installation Guide](installation.md).
@@ -40,7 +40,7 @@ my-shop/
 ## Build
 
 ```bash
-node src/cli/index.js build --project examples/basic-shop
+node framework/src/cli/index.js build --project fixtures/basic-shop
 ```
 
 The build writes static output to `dist`, including:
@@ -57,7 +57,7 @@ The build writes static output to `dist`, including:
 ## Dev
 
 ```bash
-node src/cli/index.js dev --project examples/basic-shop --port 8080
+node framework/src/cli/index.js dev --project fixtures/basic-shop --port 8080
 ```
 
 Dev mode performs an initial build, serves the output, watches config/content/theme

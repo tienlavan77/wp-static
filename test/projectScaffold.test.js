@@ -6,8 +6,8 @@ import test from "node:test";
 import createProjectScaffold, {
   STARTER_TEMPLATES,
   normalizeTemplate
-} from "../src/core/createProjectScaffold.js";
-import validateProjectConfig from "../src/validation/validateProjectConfig.js";
+} from "../framework/src/core/createProjectScaffold.js";
+import validateProjectConfig from "../framework/src/validation/validateProjectConfig.js";
 
 test("createProjectScaffold lists supported starter templates", () => {
   assert.deepEqual(STARTER_TEMPLATES, [

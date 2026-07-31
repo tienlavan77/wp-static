@@ -5,7 +5,7 @@ import os from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
 import test from "node:test";
-import buildProductionProjectOnce from "../src/dev-server/buildProductionProjectOnce.js";
+import buildProductionProjectOnce from "../framework/src/dev-server/buildProductionProjectOnce.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -27,7 +27,7 @@ test("buildProductionProjectOnce marks result and manifest as production", async
 test("cli build --production reports production mode", async () => {
   const projectDir = await createIsolatedCommerceProject("wpsc-production-cli-");
   const result = await execFileAsync("node", [
-    "src/cli/index.js",
+    "framework/src/cli/index.js",
     "build",
     "--project",
     projectDir,

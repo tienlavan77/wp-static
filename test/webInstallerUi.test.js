@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import createWebInstallerUi, {
   WEB_INSTALLER_UI_VERSION
-} from "../src/installer/createWebInstallerUi.js";
+} from "../framework/src/installer/createWebInstallerUi.js";
 
 test("createWebInstallerUi renders installer shell", () => {
   const ui = createWebInstallerUi({

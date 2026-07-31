@@ -7,7 +7,7 @@ import createBuildEngine, {
   BuildState,
   createBuildContext,
   createBuildResult
-} from "../src/build/createBuildEngine.js";
+} from "../framework/src/build/createBuildEngine.js";
 
 test("Build Engine foundation creates an immutable validated context", () => {
   const result = createBuildContext({ client: BuildClient.CLI, siteId: " company-a " });

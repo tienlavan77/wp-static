@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import createJobQueue from "../src/scheduler/createJobQueue.js";
-import { JobStatus, JobTrigger } from "../src/scheduler/schedulerContracts.js";
+import createJobQueue from "../framework/src/scheduler/queue/createJobQueue.js";
+import { JobStatus, JobTrigger } from "../framework/src/scheduler/contracts/schedulerContracts.js";
 
 test("Job Queue stores immutable pending, running, and finished snapshots", () => {
   const times = ["2026-08-01T00:00:00.000Z", "2026-08-01T00:00:02.000Z", "2026-08-01T00:00:04.000Z"];

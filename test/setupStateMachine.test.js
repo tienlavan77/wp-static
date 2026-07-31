@@ -3,7 +3,7 @@ import test from "node:test";
 import createSetupStateMachine, {
   canTransition,
   SetupState
-} from "../src/setup/createSetupStateMachine.js";
+} from "../framework/src/setup/createSetupStateMachine.js";
 
 test("setup state machine follows the Phase 3 workflow transitions", () => {
   const machine = createSetupStateMachine();

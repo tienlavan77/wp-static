@@ -3,10 +3,10 @@ import { cp, mkdtemp } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import buildProjectOnce from "../src/dev-server/buildProjectOnce.js";
-import watchBuildProject from "../src/dev-server/watchBuildProject.js";
-import createWatchTargets from "../src/watcher/createWatchTargets.js";
-import loadConfig from "../src/core/loadConfig.js";
+import buildProjectOnce from "../framework/src/dev-server/buildProjectOnce.js";
+import watchBuildProject from "../framework/src/dev-server/watchBuildProject.js";
+import createWatchTargets from "../framework/src/watcher/createWatchTargets.js";
+import loadConfig from "../framework/src/core/loadConfig.js";
 
 test("buildProjectOnce builds a project for dev mode", async () => {
   const projectDir = await createIsolatedCommerceProject("wpsc-dev-build-");

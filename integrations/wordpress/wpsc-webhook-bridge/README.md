@@ -55,7 +55,7 @@ WP-Cron debounce to group multiple editor saves into one rebuild.
 The secret must match the WPSC receiver:
 
 ```bash
-WPSC_WEBHOOK_SECRET=replace-with-a-long-random-secret node src/cli/index.js webhook --project examples/basic-shop --port 8787
+WPSC_WEBHOOK_SECRET=replace-with-a-long-random-secret node framework/src/cli/index.js webhook --project fixtures/basic-shop --port 8787
 ```
 
 ## Install

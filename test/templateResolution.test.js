@@ -3,11 +3,11 @@ import { mkdir, mkdtemp, readFile, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import buildSite from "../src/builder/buildSite.js";
-import compile from "../src/core/compile.js";
-import loadConfig from "../src/core/loadConfig.js";
-import createTemplateManifest, { createTemplateScope } from "../src/templates/createTemplateManifest.js";
-import resolveTemplateForRoute, { createTemplateCandidates } from "../src/templates/resolveTemplateForRoute.js";
+import buildSite from "../framework/src/builder/buildSite.js";
+import compile from "../framework/src/core/compile.js";
+import loadConfig from "../framework/src/core/loadConfig.js";
+import createTemplateManifest, { createTemplateScope } from "../framework/src/builder/templates/createTemplateManifest.js";
+import resolveTemplateForRoute, { createTemplateCandidates } from "../framework/src/builder/templates/resolveTemplateForRoute.js";
 
 test("createTemplateCandidates orders exact, home, type, taxonomy, and archive fallbacks", () => {
   assert.deepEqual(createTemplateCandidates({
@@ -78,7 +78,7 @@ test("resolveTemplateForRoute loads the first matching template document", async
 });
 
 test("createTemplateManifest indexes stored builder templates by scope", async () => {
-  const config = await loadConfig("examples/basic-shop");
+  const config = await loadConfig("fixtures/basic-shop");
   const manifest = await createTemplateManifest({
     config,
     projectDir: config._paths.projectDir
@@ -103,7 +103,7 @@ test("createTemplateManifest indexes stored builder templates by scope", async (
 
 test("compile renders homepage from builder template JSON", async () => {
   const outputDir = await mkdtemp(path.join(os.tmpdir(), "wpsc-template-home-"));
-  const config = await loadConfig("examples/basic-shop");
+  const config = await loadConfig("fixtures/basic-shop");
   const testConfig = {
     ...config,
     adapter: {

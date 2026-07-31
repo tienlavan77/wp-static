@@ -9,10 +9,10 @@ import createProvisioningService, {
   PROVISIONING_SERVICE_VERSION,
   SITE_PROVISIONING_DIRECTORIES,
   planCreateSite
-} from "../src/provision/createProvisioningService.js";
-import { SiteState } from "../src/site/createSiteMetadata.js";
-import createSiteLoader from "../src/site/createSiteLoader.js";
-import createSiteRepository from "../src/site/createSiteRepository.js";
+} from "../framework/src/provision/createProvisioningService.js";
+import { SiteState } from "../framework/src/site/createSiteMetadata.js";
+import createSiteLoader from "../framework/src/site/createSiteLoader.js";
+import createSiteRepository from "../framework/src/site/createSiteRepository.js";
 
 test("createProvisioningService creates an isolated site skeleton", async () => {
   const workspaceDir = await mkdtemp(path.join(os.tmpdir(), "wpsc-provision-"));

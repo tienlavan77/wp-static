@@ -3,9 +3,9 @@ import test from "node:test";
 import createSetupSessionManager, {
   SETUP_SESSION_VERSION,
   validateSetupSession
-} from "../src/setup/createSetupSessionManager.js";
-import createSetupSessionRepository from "../src/setup/createSetupSessionRepository.js";
-import { isSiteUuid } from "../src/site/createSiteUuid.js";
+} from "../framework/src/setup/createSetupSessionManager.js";
+import createSetupSessionRepository from "../framework/src/setup/createSetupSessionRepository.js";
+import { isSiteUuid } from "../framework/src/site/createSiteUuid.js";
 
 const validContext = Object.freeze({ client: "browser", siteId: "company-a" });
 const validateContext = (context) => ({

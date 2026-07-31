@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createContentModel } from "../src/content/createContentPipeline.js";
-import createThemeRenderer, { THEME_RENDERER_VERSION } from "../src/renderer/createThemeRenderer.js";
+import { createContentModel } from "../framework/src/builder/content/createContentPipeline.js";
+import createThemeRenderer, { THEME_RENDERER_VERSION } from "../framework/src/builder/renderer/createThemeRenderer.js";
 
 test("Theme Renderer renders Content Model through type layouts without source access", () => {
   const model = createContentModel([{ data: {}, id: "1", slug: "welcome", title: "Welcome", type: "page" }]);

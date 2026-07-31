@@ -38,7 +38,7 @@ Major releases may include breaking changes. Each breaking change must include:
 
 1. Read the release notes.
 2. Run `npm test`.
-3. Run `node src/cli/index.js doctor --project <project-dir>`.
+3. Run `node framework/src/cli/index.js doctor --project <project-dir>`.
 4. Run a full build.
 5. Check route contract: `domain/slug`, no trailing slash.
 6. Check SEO output, sitemap, robots.txt.

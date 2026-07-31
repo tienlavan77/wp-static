@@ -3,14 +3,14 @@ import { mkdtemp, readFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import buildSite from "../src/builder/buildSite.js";
-import compile from "../src/core/compile.js";
-import loadConfig from "../src/core/loadConfig.js";
+import buildSite from "../framework/src/builder/buildSite.js";
+import compile from "../framework/src/core/compile.js";
+import loadConfig from "../framework/src/core/loadConfig.js";
 
 test("plugin hooks can transform data, render html, and observe builds", async () => {
   const outputDir = await mkdtemp(path.join(os.tmpdir(), "wpsc-plugin-"));
   const markerPath = path.join(outputDir, "plugin-marker.txt");
-  const config = await loadConfig("examples/basic-shop");
+  const config = await loadConfig("fixtures/basic-shop");
   const testConfig = {
     ...config,
     outputDir,

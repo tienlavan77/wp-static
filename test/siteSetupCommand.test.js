@@ -2,9 +2,9 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import createSiteSetupCommand, {
   SITE_SETUP_COMMAND_VERSION
-} from "../src/cli/createSiteSetupCommand.js";
-import createSetupService, { SetupClient } from "../src/setup/createSetupService.js";
-import { SetupState } from "../src/setup/createSetupStateMachine.js";
+} from "../framework/src/cli/createSiteSetupCommand.js";
+import createSetupService, { SetupClient } from "../framework/src/setup/createSetupService.js";
+import { SetupState } from "../framework/src/setup/createSetupStateMachine.js";
 
 test("site setup command calls Setup Service directly and writes service progress", async () => {
   const output = [];

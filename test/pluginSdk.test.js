@@ -1,10 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import createHookSystem from "../src/runtime/createHookSystem.js";
+import createHookSystem from "../framework/src/runtime/extensions/createHookSystem.js";
 import createPluginSdk, {
   PLUGIN_SDK_VERSION
-} from "../src/runtime/createPluginSdk.js";
-import createRuntimeContext from "../src/runtime/createRuntimeContext.js";
+} from "../framework/src/runtime/extensions/createPluginSdk.js";
+import createRuntimeContext from "../framework/src/runtime/bootstrap/createRuntimeContext.js";
 
 test("createPluginSdk exposes stable plugin metadata and context accessors", () => {
   const context = createRuntimeContext({

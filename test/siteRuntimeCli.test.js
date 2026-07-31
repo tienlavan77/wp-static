@@ -3,10 +3,10 @@ import { mkdtemp, readFile, rm } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import createSiteCreateCommand from "../src/cli/createSiteCreateCommand.js";
-import createRuntimeServeCommand from "../src/cli/createRuntimeServeCommand.js";
-import createProvisioningService from "../src/provision/createProvisioningService.js";
-import createSiteRepository from "../src/site/createSiteRepository.js";
+import createSiteCreateCommand from "../framework/src/cli/createSiteCreateCommand.js";
+import createRuntimeServeCommand from "../framework/src/cli/createRuntimeServeCommand.js";
+import createProvisioningService from "../framework/src/provision/createProvisioningService.js";
+import createSiteRepository from "../framework/src/site/createSiteRepository.js";
 
 test("site:create provisions a Site Skeleton and persists its domain mapping", async () => {
   const workspaceDir = await mkdtemp(path.join(os.tmpdir(), "wpsc-site-create-"));
