@@ -1,55 +1,48 @@
 # Changelog
 
+All notable WPSC changes are recorded here. The project uses an architecture-
+first development model: a feature is complete only when its ownership,
+contracts, tests, and operating boundary agree.
+
+## Unreleased
+
+### Shared Runtime Platform
+
+- Added `wpsc platform:provision` to generate a reusable Runtime configuration,
+  private environment template, systemd unit, Site Nginx virtual host, and
+  activation instructions.
+- Kept privileged activation outside the Node/Browser boundary: WPSC generates
+  reviewed artifacts but never executes `sudo`, `systemctl`, or Nginx reloads.
+- Added a Site-specific webhook callback resolver so one shared Runtime can
+  register callbacks for multiple Site domains without routing every callback
+  through the first Site domain.
+
+### Runtime Control UI
+
+- Redesigned Installer and Dashboard as a dedicated Runtime Control UI.
+- Added a separately compiled Tailwind stylesheet served before any Site build.
+- Added Light/Dark theme preference with a manual toggle and local persistence.
+- Replaced raw JSON status output with success, warning, error, and info notices.
+- Added immediate field validation for Site setup, WordPress connection, and
+  optional WooCommerce credential pairs.
+- Preserved the existing Runtime HTTP endpoints and stable backend diagnostics
+  contract while improving user-facing presentation.
+
 ## 1.0.0
 
-- Froze the v1 plugin, theme, and adapter API contracts.
-- Added the v1 documentation set.
-- Promoted the root package and workspace packages to `1.0.0`.
-- Marked WPSC as a stable production framework release.
+- Froze the public plugin, theme, adapter, and product package contracts.
+- Delivered Site provisioning, Setup, WordPress/WooCommerce source integration,
+  webhook registration, first build, static output, Runtime commerce APIs,
+  Scheduler, Queue, Dispatcher, operations, backup, deployment, and release
+  package foundations.
+- Added Builder V1 capability integration for route templates, assets, SEO,
+  manifests, search, cache metadata, fragments, and incremental build planning.
+- Added production-oriented deployment artifacts, secret boundary services,
+  product diagnostics/support bundles, migration scaffolding, and installation
+  validation.
+- Established the WPSC Architecture v2 ownership model and project layout.
 
 ## 0.1.0
 
-- Added architecture draft for WPSC Mini Core.
-- Initialized the ESM Node.js package.
-- Added the Basic Shop example.
-- Added immutable Content models.
-- Added mock adapter, router, renderer, compiler, builder, and CLI example build.
-- Added focused tests for shared utilities and routing.
-- Split the CLI entry from the library API entry.
-- Added `wpsc build --project <project-dir>` CLI behavior.
-- Added config loader, public asset copying, styled Basic Shop output, project template creation, WordPress adapter draft, Nginx deployment notes, and CLI smoke tests.
-- Removed trailing slashes from public slug routes.
-- Added config validation, build summaries, clean, doctor, and static serve commands.
-- Added typed WPSC errors, quiet/verbose logging, normalized config paths, build manifests, pipeline integration tests, and public API draft docs.
-- Expanded the WordPress adapter draft with paginated collection fetching, pages/posts/CPT repository support, ACF fields, embedded media/terms, and Rank Math SEO normalization.
-- Added a WooCommerce adapter draft with paginated product fetching, categories, tags, variations, product normalization, and Rank Math product SEO normalization.
-- Added a unified content graph with content, term, media, and menu lookup services.
-- Added SEO output rendering for metadata, canonical, robots, Open Graph, Twitter Cards, sitemap.xml, and robots.txt.
-- Added a theme resolver with content type layouts, fallback layout, components, theme metadata, and theme asset copying.
-- Added a remote image asset pipeline with download cache, HTML URL rewriting, and asset manifests.
-- Added a dev server workflow with watch targets, rebuild support, and live reload injection.
-- Added a plugin system with data, route, render, and build hooks.
-- Prepared v0.1.0 workspace package boundaries and getting started documentation.
-- Added real source auth support for WordPress and WooCommerce using environment-backed credentials.
-- Added preview build safety with draft/private filtering and token guarded preview builds.
-- Added customer auth strategy contracts for static/runtime boundaries and frontend secret safety.
-- Added a runtime commerce API scaffold with session-backed cart, checkout proxy, and order lookup handlers.
-- Added customer account UI helpers for login, logout, dashboard, orders, and addresses.
-- Added taxonomy archive route generation, archive pagination, and sitemap coverage for category/tag/product archives using the `domain/slug` URL contract.
-- Added a guarded webhook rebuild receiver, source event normalization, rebuild queue, and validation report.
-- Added incremental build planning with route dependency tracking, changed item parsing, input hashes, and affected page writes.
-- Added content, collection, route render, and asset cache stats with parallel route rendering and asset work.
-- Added block schemas, props validation, data bindings, and starter commerce blocks for the visual builder foundation.
-- Added visual builder layout JSON documents with content type mapping, nested section/block nodes, and responsive settings.
-- Added visual builder layout rendering with content bindings, commerce blocks, taxonomy archive blocks, and safe missing-block fallbacks.
-- Added a dependency-free visual builder UI prototype with block palette, canvas ordering, props editing, live preview, and JSON export.
-- Added theme block libraries, project block overrides, and theme-aware builder preview rendering.
-- Added production builder foundations with editor auth, layout revisions, draft/publish state, and rebuild triggers.
-- Added advanced commerce data for parent product variants, sale/stock collections, and related products.
-- Added deployment helpers and guides for rsync, Cloudflare Pages, S3/R2, and GitHub Actions.
-- Marked stable public APIs and added API migration, compatibility, and deprecation policy docs.
-- Added public route data JSON output for theme, builder, SEO, and commerce UI data.
-- Added a Tailwind storefront CSS pipeline and design token foundation for the next UI phases.
-- Added a single-route storefront UI demo page for iterative header and footer design.
-
-Status: WPSC v1.0 production framework ready.
+- Initialized the original WPSC static build prototype with immutable Content,
+  routing, rendering, output, project configuration, CLI, and test foundations.

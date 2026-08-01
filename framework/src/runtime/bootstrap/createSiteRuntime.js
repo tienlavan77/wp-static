@@ -43,7 +43,7 @@ if (($method === 'GET' || $method === 'HEAD') && is_dir($distDir)) {
     }
 
     // Keep Runtime APIs dynamic, but serve Builder V1's branded static 404 for unknown public URLs.
-    $isRuntimeEndpoint = preg_match('#^/(api/|dashboard(?:/|$)|installer(?:/|$)|webhook/)#', $requestPath) === 1;
+    $isRuntimeEndpoint = preg_match('#^/(api/|dashboard(?:/|$)|installer(?:/|$)|webhook/|_wpsc/)#', $requestPath) === 1;
     $notFoundPath = realpath($distDir . '/404.html');
     if (!$isRuntimeEndpoint && $realDistDir !== false && $notFoundPath !== false && str_starts_with($notFoundPath, $realDistDir . DIRECTORY_SEPARATOR) && is_file($notFoundPath)) {
         http_response_code(404);

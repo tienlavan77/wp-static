@@ -36,6 +36,19 @@ function createBuildStatusProvider(repository) {
   };
 }
 
+function createWebhookBaseUrlResolver(options = {}) {
+  const fallback = String(options.webhookBaseUrl || "").replace(/\/$/, "");
+  return (siteId) => {
+    const domain = Object.entries(options.domains || {}).find(([, mappedSiteId]) => mappedSiteId === siteId)?.[0];
+    if (!domain) return fallback;
+    try {
+      const url = new URL(fallback);
+      url.host = domain;
+      return url.toString().replace(/\/$/, "");
+    } catch { return fallback; }
+  };
+}
+
 export default function createSiteRuntimeInstance(options = {}) {
   if (!options.adapterLoader || !options.webhookBaseUrl) {
     throw new TypeError("Site Runtime Instance requires adapterLoader and webhookBaseUrl.");
@@ -63,7 +76,7 @@ export default function createSiteRuntimeInstance(options = {}) {
   // Runtime owns the Scheduler lifecycle; browser requests can only trigger an active scheduler.
   scheduler.start();
   const dashboardSource = createDashboardSourceController({ sourceRegistrationService });
-  const webhookRegistration = createWebhookRegistrationController({ repository, webhookActivationService, webhookBaseUrl: options.webhookBaseUrl });
+  const webhookRegistration = createWebhookRegistrationController({ repository, webhookActivationService, webhookBaseUrl: options.webhookBaseUrl, resolveWebhookBaseUrl: createWebhookBaseUrlResolver(options) });
   const webhookReceiver = createRuntimeWebhookReceiver({ repository, scheduler });
   const firstBuild = createFirstBuildController({ repository, scheduler, stateManager: base.get("stateManager") });
   const dashboard = createDashboardController({ buildStatusProvider: createBuildStatusProvider(repository), credentialStore, repository });

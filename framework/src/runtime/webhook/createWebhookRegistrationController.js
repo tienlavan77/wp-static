@@ -17,6 +17,7 @@ export default function createWebhookRegistrationController(options = {}) {
   const webhookActivationService = options.webhookActivationService;
   const secretProvider = options.secretProvider || createRandomSecretProvider();
   const webhookBaseUrl = String(options.webhookBaseUrl || "").replace(/\/$/, "");
+  const resolveWebhookBaseUrl = options.resolveWebhookBaseUrl || (() => webhookBaseUrl);
   if (!repository || typeof repository.readMetadata !== "function" || typeof repository.resolveSiteRoot !== "function") throw new TypeError("Webhook Registration requires a Site Repository.");
   if (!webhookActivationService || typeof webhookActivationService.activate !== "function") throw new TypeError("Webhook Registration requires Webhook Activation Service.");
   if (!webhookBaseUrl) throw new TypeError("Webhook Registration requires webhookBaseUrl.");
@@ -29,7 +30,7 @@ export default function createWebhookRegistrationController(options = {}) {
       const secret = existing?.secret || secretProvider.create(ProvisioningSecretType.WEBHOOK_SECRET);
       const secretValue = typeof secret === "string" ? secret : secret.value;
       const secretMetadata = typeof secret === "string" ? null : secret.metadata;
-      const webhookUrl = `${webhookBaseUrl}/${metadata.uuid}`;
+      const webhookUrl = `${String(resolveWebhookBaseUrl(siteId) || webhookBaseUrl).replace(/\/$/, "")}/${metadata.uuid}`;
       const pendingConfiguration = {
         schema: WEBHOOK_RUNTIME_SCHEMA,
         schemaVersion: WEBHOOK_RUNTIME_SCHEMA_VERSION,

@@ -48,3 +48,20 @@ test("Runtime persists a pending webhook secret before WordPress verifies its ca
     assert.ok(config.secret.length >= 32);
   } finally { await rm(workspaceDir, { force: true, recursive: true }); }
 });
+
+test("Runtime can resolve a Site-specific webhook base URL without changing the webhook contract", async () => {
+  const workspaceDir = await mkdtemp(path.join(os.tmpdir(), "wpsc-webhook-runtime-"));
+  const repository = createSiteRepository({ workspaceDir });
+  try {
+    await repository.writeMetadata("company-a", createSiteMetadata({ name: "Company A", uuid: "8d20de63-68f1-43cf-a28f-f62a347695a1" }));
+    const calls = [];
+    const controller = createWebhookRegistrationController({
+      repository,
+      resolveWebhookBaseUrl: (siteId) => `https://${siteId}.test/webhook`,
+      webhookActivationService: { activate: async (input) => { calls.push(input); return { diagnostics: { errors: [], warnings: [] }, metadata: { webhookId: "source-hook-1", webhookStatus: "verified" }, ok: true }; } },
+      webhookBaseUrl: "https://runtime.test/webhook"
+    });
+    await controller.register("company-a");
+    assert.equal(calls[0].webhookUrl, "https://company-a.test/webhook/8d20de63-68f1-43cf-a28f-f62a347695a1");
+  } finally { await rm(workspaceDir, { force: true, recursive: true }); }
+});

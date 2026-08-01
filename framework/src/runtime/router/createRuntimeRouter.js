@@ -20,6 +20,11 @@ export default function createRuntimeRouter(options = {}) {
     const body = request.body || {};
     const siteId = resolved.siteId;
 
+    if (method === "GET" && path === "/_wpsc/runtime-control.css") {
+      const browserViews = service("browserViews");
+      return response(200, browserViews?.stylesheet?.() || "", { "cache-control": "public, max-age=3600", "content-type": "text/css; charset=utf-8" });
+    }
+
     if (path.startsWith("/api/")) {
       const commerceGateway = service("commerceGateway");
       if (!commerceGateway) return failure("runtime.account.unavailable", "Account service is not configured.", 503);

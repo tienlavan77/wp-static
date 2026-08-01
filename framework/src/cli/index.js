@@ -19,6 +19,7 @@ import createDeploymentOrchestrationService from "../deployment/createDeployment
 import createRuntimeHardeningService from "../runtime/hardening/createRuntimeHardeningService.js";
 import createProductManagementCli from "./createProductManagementCli.js";
 import createProductManifest from "../product/createProductManifest.js";
+import createRuntimePlatformProvisioningService from "../product/createRuntimePlatformProvisioningService.js";
 import createSiteRuntimeInstance from "../runtime/bootstrap/createSiteRuntimeInstance.js";
 import createRuntimeHttpServer from "../runtime/bootstrap/createRuntimeHttpServer.js";
 import loadSiteRuntimeConfig from "../runtime/bootstrap/loadSiteRuntimeConfig.js";
@@ -174,6 +175,21 @@ async function main(cliArgs) {
   if (cliArgs[0] === "site:create") {
     await createSite(readRequiredArg(cliArgs, "--site"), {
       domain: readOptionalArg(cliArgs, "--domain"),
+      workspaceDir: readProjectArg(cliArgs)
+    });
+    return;
+  }
+
+  if (cliArgs[0] === "platform:provision") {
+    await provisionRuntimePlatform({
+      domain: readRequiredArg(cliArgs, "--domain"),
+      nodePath: readOptionalArg(cliArgs, "--node"),
+      port: readOptionalArg(cliArgs, "--port"),
+      runtimeOrigin: readOptionalArg(cliArgs, "--runtime-origin"),
+      serviceGroup: readOptionalArg(cliArgs, "--service-group"),
+      serviceUser: readOptionalArg(cliArgs, "--service-user"),
+      siteId: readRequiredArg(cliArgs, "--site"),
+      webhookBaseUrl: readOptionalArg(cliArgs, "--webhook-base-url"),
       workspaceDir: readProjectArg(cliArgs)
     });
     return;
@@ -529,6 +545,13 @@ async function configureRuntimeWordPress(options = {}) {
   await command.run({ webhookBaseUrl: options.webhookBaseUrl });
 }
 
+async function provisionRuntimePlatform(options = {}) {
+  const result = await createRuntimePlatformProvisioningService({ workspaceDir: options.workspaceDir }).provision(options);
+  logger.info(`Runtime platform artifacts created for ${result.siteId} (${result.domain})`);
+  logger.info(`Environment: ${result.environmentPath}`);
+  logger.info(`Activation: ${result.activationPath}`);
+}
+
 async function deployRsync(projectArg, options = {}) {
   if (!options.target) {
     throw new Error('CLI option "--target" is required for deploy rsync.');
@@ -678,6 +701,7 @@ function printHelp() {
   wpsc release validate [--release-dir <release-dir>] [--json]
   wpsc serve [--project <project-dir>] [--port <port>]
   wpsc site:create --site <site-id> [--domain <domain>] [--project <workspace>]
+  wpsc platform:provision --site <site-id> --domain <domain> [--project <workspace>] [--runtime-origin <url>] [--webhook-base-url <url>] [--port <port>]
   wpsc status [--project <workspace>] [--json]
   wpsc site list [--project <workspace>] [--json]
   wpsc site inspect <site-id> [--project <workspace>] [--json]
