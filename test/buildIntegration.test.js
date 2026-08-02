@@ -52,7 +52,7 @@ test("Build Integration delegates prepared content to the Runtime Builder V1 bef
         assert.deepEqual(input.changed, ["product:card"]);
         assert.equal(input.collections.terms[0].slug, "cards");
         assert.deepEqual(input.site, { siteId: "company-a", url: "https://company-a.example.test" });
-        return { assets: [{ sourcePath: "/staging/index.html", targetPath: "index.html" }] };
+        return { assets: [{ sourcePath: "/staging/index.html", targetPath: "index.html" }], incremental: { fullBuild: false } };
       }
     }
   });
@@ -61,4 +61,51 @@ test("Build Integration delegates prepared content to the Runtime Builder V1 bef
   assert.equal(result.status, BuildState.SUCCESS);
   assert.equal(calls[0].assets[0].targetPath, "index.html");
   assert.deepEqual(calls[0].pages, []);
+  assert.equal(calls[0].replace, false);
+});
+
+test("Build Integration persists a dependency snapshot only after output succeeds", async () => {
+  const calls = [];
+  const integration = createBuildIntegration({
+    buildEngine: createBuildEngine({ createBuildId: () => "build-manifest", now: () => "2026-07-30T00:00:00.000Z" }),
+    contentReader: { read: async () => ({ items: [] }) },
+    dependencyManifestStore: {
+      load: async (siteId) => { calls.push(`load:${siteId}`); return null; },
+      save: async (input) => { calls.push(`save:${input.buildId}:${input.siteId}`); }
+    },
+    outputPipeline: { write: async () => { calls.push("write"); return { diagnostics: { errors: [], warnings: [] }, generatedFiles: [], ok: true }; } },
+    runtimeV1Builder: { build: async (input) => ({ assets: [], incremental: { dependencyGraph: { "/": {} }, fullBuild: true }, input }) }
+  });
+
+  const result = await integration.build({ siteId: "company-a" });
+  assert.equal(result.status, BuildState.SUCCESS);
+  assert.deepEqual(calls, ["load:company-a", "write", "save:build-manifest:company-a"]);
+});
+
+test("Build Integration does not persist a dependency snapshot when output fails", async () => {
+  let saved = false;
+  const integration = createBuildIntegration({
+    buildEngine: createBuildEngine({ createBuildId: () => "build-fail", now: () => "2026-07-30T00:00:00.000Z" }),
+    contentReader: { read: async () => ({ items: [] }) },
+    dependencyManifestStore: { load: async () => null, save: async () => { saved = true; } },
+    outputPipeline: { write: async () => ({ diagnostics: { errors: [{ code: "output.failed", message: "No publish", severity: "error" }], warnings: [] }, ok: false }) },
+    runtimeV1Builder: { build: async () => ({ assets: [], incremental: { dependencyGraph: { "/": {} }, fullBuild: true } }) }
+  });
+
+  assert.equal((await integration.build({ siteId: "company-a" })).status, BuildState.FAILED);
+  assert.equal(saved, false);
+});
+
+test("Build Integration saves a content snapshot after a successful publish", async () => {
+  const saved = [];
+  const integration = createBuildIntegration({
+    buildEngine: createBuildEngine({ createBuildId: () => "build-content", now: () => "2026-07-30T00:00:00.000Z" }),
+    contentReader: { read: async (input) => ({ collections: { terms: [] }, items: [{ id: "product-1", slug: "product", type: "product" }], input }) },
+    contentSnapshotStore: { load: async () => null, save: async (input) => saved.push(input) },
+    outputPipeline: { write: async () => ({ diagnostics: { errors: [], warnings: [] }, generatedFiles: [], ok: true }) },
+    runtimeV1Builder: { build: async () => ({ assets: [], incremental: { fullBuild: true } }) }
+  });
+
+  assert.equal((await integration.build({ changed: ["product:product"], siteId: "company-a" })).status, BuildState.SUCCESS);
+  assert.deepEqual(saved, [{ buildId: "build-content", collections: { terms: [] }, items: [{ id: "product-1", slug: "product", type: "product" }], siteId: "company-a" }]);
 });

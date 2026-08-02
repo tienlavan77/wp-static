@@ -9,6 +9,8 @@ import buildProjectOnce from "../framework/src/dev-server/buildProjectOnce.js";
 import createRouteDependencyGraph from "../framework/src/builder/graph/createRouteDependencyGraph.js";
 import parseChangedItem from "../framework/src/builder/planner/parseChangedItem.js";
 import planIncrementalBuild from "../framework/src/builder/planner/planIncrementalBuild.js";
+import { createDependencyManifest } from "../framework/src/runtime/build/createDependencyManifestStore.js";
+import createIncrementalArtifactPlan from "../framework/src/builder/planner/createIncrementalArtifactPlan.js";
 
 const execFileAsync = promisify(execFile);
 
@@ -36,6 +38,78 @@ test("route dependency graph maps changed products to product and archive routes
   assert.equal(affected.includes("/iphone-15"), true);
   assert.equal(affected.includes("/dien-thoai"), true);
   assert.equal(affected.includes("/thoi-trang"), false);
+});
+
+test("route dependency graph rebuilds pages with nested featured and related Product cards", () => {
+  const plan = createIncrementalFixtureSitePlan();
+  plan.routes.push({
+    content: { id: "home", slug: "", type: "page", data: { featuredProducts: [{ id: "iphone-15", slug: "iphone-15", type: "product" }] } },
+    outputPath: "index.html",
+    path: "/"
+  });
+  const changed = parseChangedItem("product:iphone-15");
+  assert.equal(createRouteDependencyGraph(plan).findAffectedRoutes([changed]).includes("/"), true);
+});
+
+test("incremental planner falls back to a full build when changed content is absent from the current plan", () => {
+  const plan = planIncrementalBuild(createIncrementalFixtureSitePlan(), [parseChangedItem("product:deleted-product")]);
+  assert.equal(plan.fullBuild, true);
+});
+
+test("Runtime incremental planning uses a persisted dependency manifest for targeted routes", () => {
+  const sitePlan = createIncrementalFixtureSitePlan();
+  const graph = createRouteDependencyGraph(sitePlan);
+  const manifest = createDependencyManifest({
+    buildId: "build-previous",
+    dependenciesByRoute: graph.dependenciesByRoute,
+    siteId: "company-a"
+  });
+  const plan = planIncrementalBuild(sitePlan, [parseChangedItem("product:iphone-15")], {
+    dependencyManifest: manifest,
+    requirePersistedDependencyManifest: true
+  });
+
+  assert.equal(plan.fullBuild, false);
+  assert.deepEqual(plan.changedRoutes, ["/dien-thoai", "/iphone-15"]);
+});
+
+test("Runtime incremental planning safely falls back when no persisted manifest can prove impact", () => {
+  const plan = planIncrementalBuild(createIncrementalFixtureSitePlan(), [parseChangedItem("product:iphone-15")], {
+    requirePersistedDependencyManifest: true
+  });
+
+  assert.equal(plan.fullBuild, true);
+});
+
+test("Runtime incremental planning falls back when a persisted route no longer exists", () => {
+  const plan = planIncrementalBuild(createIncrementalFixtureSitePlan(), [parseChangedItem("product:iphone-15")], {
+    dependencyManifest: { contentToRoutes: { "product:iphone-15": ["/removed-route"] } },
+    requirePersistedDependencyManifest: true
+  });
+
+  assert.equal(plan.fullBuild, true);
+});
+
+test("Incremental Artifact Planner scopes route outputs and explicitly retains global derived artifacts", () => {
+  const artifactPlan = createIncrementalArtifactPlan({
+    allRoutes: ["/", "/product", "/category"],
+    changedRoutes: ["/product", "/category"],
+    fullBuild: false
+  });
+
+  assert.deepEqual(artifactPlan.routes.html, ["/category", "/product"]);
+  assert.deepEqual(artifactPlan.routes.fragments, ["/category", "/product"]);
+  assert.deepEqual(artifactPlan.routes.routeData, ["/category", "/product"]);
+  assert.equal(artifactPlan.media.strategy, "affected-route-assets");
+  assert.equal(artifactPlan.global.artifacts.includes("searchIndex"), true);
+  assert.equal(artifactPlan.global.artifacts.includes("sitemap"), true);
+  assert.equal(artifactPlan.global.artifacts.includes("routeManifest"), true);
+});
+
+test("Incremental Artifact Planner makes all route artifacts Site-wide for a full build", () => {
+  const artifactPlan = createIncrementalArtifactPlan({ allRoutes: ["/", "/product"], changedRoutes: ["/product"], fullBuild: true });
+  assert.deepEqual(artifactPlan.routes.html, ["/", "/product"]);
+  assert.equal(artifactPlan.media.strategy, "site-wide");
 });
 
 test("site SEO changes rebuild every route that carries site-wide canonical metadata", () => {

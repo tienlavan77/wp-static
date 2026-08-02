@@ -1,8 +1,16 @@
 export default function createRouteDependencyGraph(sitePlan = {}) {
   const dependenciesByRoute = new Map();
+  // A theme explicitly declares when its Homepage renders catalog cards from
+  // the complete graph. Generic themes must not inherit this dependency.
+  const homepageProducts = sitePlan.theme?.metadata?.capabilities?.includes("catalog-homepage-products")
+    ? (sitePlan.routes ?? [])
+      .map((route) => route.content)
+      .filter((content) => content?.type === "product")
+      .map((content) => ({ id: content.id, slug: content.slug, type: "product" }))
+    : [];
 
   for (const route of sitePlan.routes ?? []) {
-    dependenciesByRoute.set(route.path, collectRouteDependencies(route));
+    dependenciesByRoute.set(route.path, collectRouteDependencies(route, homepageProducts));
   }
 
   return {
@@ -17,11 +25,14 @@ export default function createRouteDependencyGraph(sitePlan = {}) {
       }
 
       return [...affected];
+    },
+    hasRouteFor(change) {
+      return [...dependenciesByRoute.values()].some((dependencies) => matchesDependency(change, dependencies));
     }
   };
 }
 
-function collectRouteDependencies(route) {
+function collectRouteDependencies(route, homepageProducts = []) {
   const content = route.content ?? {};
   const terms = [
     ...(content.data?.terms ?? []),
@@ -52,8 +63,26 @@ function collectRouteDependencies(route) {
       id: item.id ?? null,
       slug: item.slug ?? null,
       type: normalizeContentType(item.type)
-    }))
+    })),
+    // Themes, blocks, and collection payloads can embed Product cards below data.
+    // Track those references so a Product update rebuilds every rendered card.
+    productReferences: [
+      ...collectProductReferences(content.data),
+      ...(route.path === "/" ? homepageProducts : [])
+    ]
   };
+}
+
+function collectProductReferences(value, references = [], seen = new Set()) {
+  if (!value || typeof value !== "object" || seen.has(value)) return references;
+  seen.add(value);
+  if (Array.isArray(value)) { for (const entry of value) collectProductReferences(entry, references, seen); return references; }
+  const type = normalizeContentType(value.type ?? value.contentType ?? value.objectType);
+  const id = value.productId ?? value.product_id ?? (type === "product" ? value.id : null);
+  const slug = value.productSlug ?? value.product_slug ?? (type === "product" ? value.slug : null);
+  if (id != null || slug) references.push({ id: id == null ? null : String(id), slug: slug == null ? null : String(slug), type: "product" });
+  for (const entry of Object.values(value)) collectProductReferences(entry, references, seen);
+  return references;
 }
 
 function matchesDependency(item, dependencies) {
@@ -79,7 +108,11 @@ function matchesDependency(item, dependencies) {
       && (archiveItem.id === item.id || archiveItem.slug === item.routeSlug);
   });
 
-  return sameContent || sameParentContent || inArchive;
+  const referencedByRoute = item.type === "product" && dependencies.productReferences.some((reference) => {
+    return reference.id === String(item.id) || reference.slug === item.routeSlug;
+  });
+
+  return sameContent || sameParentContent || inArchive || referencedByRoute;
 }
 
 function normalizeContentType(type) {

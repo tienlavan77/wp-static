@@ -23,8 +23,12 @@ import createRuntimeContentReader from "../source/createRuntimeContentReader.js"
 import createRuntimeWebhookReceiver from "../webhook/createRuntimeWebhookReceiver.js";
 import createSourceCredentialStore from "../source/createSourceCredentialStore.js";
 import createRuntimeV1Builder from "../build/createRuntimeV1Builder.js";
+import createDependencyManifestStore from "../build/createDependencyManifestStore.js";
+import createContentSnapshotStore from "../build/createContentSnapshotStore.js";
+import createBuildTelemetryStore from "../build/createBuildTelemetryStore.js";
 import createSiteCommerceGateway from "../commerce/createSiteCommerceGateway.js";
 import createSiteContext from "../../site/createSiteContext.js";
+import createSiteCacheService from "../../cache/createSiteCacheService.js";
 
 export const SITE_RUNTIME_INSTANCE_VERSION = "1.0";
 
@@ -49,11 +53,22 @@ function createWebhookBaseUrlResolver(options = {}) {
   };
 }
 
+function createRuntimeSiteCache(options = {}) {
+  const caches = new Map();
+  const storage = options.cacheStorage || new Map();
+  function forSite(siteId) {
+    if (!caches.has(siteId)) caches.set(siteId, createSiteCacheService({ siteId, storage }));
+    return caches.get(siteId);
+  }
+  return Object.freeze({ activateBuild(siteId, buildId) { return forSite(siteId).activateBuild(buildId); }, forSite, invalidateEvent(event) { return forSite(event.siteId).invalidateEvent(event); } });
+}
+
 export default function createSiteRuntimeInstance(options = {}) {
   if (!options.adapterLoader || !options.webhookBaseUrl) {
     throw new TypeError("Site Runtime Instance requires adapterLoader and webhookBaseUrl.");
   }
   const repository = options.repository || createSiteRepository(options);
+  const siteCache = options.siteCache || createRuntimeSiteCache(options);
   const siteConfiguration = options.siteConfiguration || createSiteConfigurationService({ repository });
   const credentialStore = createSourceCredentialStore({ repository });
   const contentReader = options.contentReader || createRuntimeContentReader({ adapterLoader: options.adapterLoader, credentialStore, repository });
@@ -68,8 +83,11 @@ export default function createSiteRuntimeInstance(options = {}) {
   const base = createRuntimeComposition({ ...options, buildStatusProvider: createBuildStatusProvider(repository), repository, setupService });
   const outputPipeline = options.outputPipeline || createOutputPipeline({ repository });
   const runtimeV1Builder = options.runtimeV1Builder || createRuntimeV1Builder({ repository });
+  const dependencyManifestStore = options.dependencyManifestStore || createDependencyManifestStore({ repository });
+  const contentSnapshotStore = options.contentSnapshotStore || createContentSnapshotStore({ repository });
+  const telemetryStore = options.telemetryStore || createBuildTelemetryStore({ repository });
   const buildEngine = options.buildEngine || createBuildEngine(options.buildEngineOptions);
-  const buildIntegration = options.buildIntegration || createBuildIntegration({ buildEngine, contentReader, outputPipeline, runtimeV1Builder, site: options.site });
+  const buildIntegration = options.buildIntegration || createBuildIntegration({ buildEngine, cache: siteCache, contentReader, contentSnapshotStore, dependencyManifestStore, outputPipeline, runtimeV1Builder, site: options.site, telemetryStore });
   const queue = options.queue || createJobQueue(options.queueOptions);
   const dispatcher = options.dispatcher || createJobDispatcher({ buildEngine: buildIntegration, queue });
   const scheduler = options.scheduler || createScheduler({ dispatcher, queue, retryPolicy: options.retryPolicy });
@@ -77,7 +95,7 @@ export default function createSiteRuntimeInstance(options = {}) {
   scheduler.start();
   const dashboardSource = createDashboardSourceController({ sourceRegistrationService });
   const webhookRegistration = createWebhookRegistrationController({ repository, webhookActivationService, webhookBaseUrl: options.webhookBaseUrl, resolveWebhookBaseUrl: createWebhookBaseUrlResolver(options) });
-  const webhookReceiver = createRuntimeWebhookReceiver({ repository, scheduler });
+  const webhookReceiver = createRuntimeWebhookReceiver({ cache: siteCache, repository, scheduler });
   const firstBuild = createFirstBuildController({ repository, scheduler, stateManager: base.get("stateManager") });
   const dashboard = createDashboardController({ buildStatusProvider: createBuildStatusProvider(repository), credentialStore, repository });
   const commerceGateway = options.commerceGateway || createSiteCommerceGateway({ credentialStore, repository });
@@ -88,15 +106,18 @@ export default function createSiteRuntimeInstance(options = {}) {
     browserViews,
     buildIntegration,
     commerceGateway,
+    contentSnapshotStore,
     credentialStore,
     dashboard,
     dashboardSource,
+    dependencyManifestStore,
     dispatcher,
     firstBuild,
     outputPipeline,
     queue,
     readinessService,
     scheduler,
+    siteCache,
     siteContext: Object.freeze({ create: createSiteContext }),
     siteConfiguration,
     sourceRegistrationService,

@@ -12,6 +12,7 @@ export default function createRuntimeWebhookReceiver(options = {}) {
   const scheduler = options.scheduler;
   if (!repository || typeof repository.resolveSiteRoot !== "function" || !scheduler || typeof scheduler.trigger !== "function") throw new TypeError("Runtime Webhook Receiver requires Repository and Scheduler.");
   const publishing = options.publishing ?? createPublishEventCoordinator({
+    cache: options.cache,
     idempotencyTtlMs: options.idempotencyTtlMs,
     now: options.now,
     nowMs: options.nowMs,

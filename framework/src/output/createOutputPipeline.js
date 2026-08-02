@@ -1,4 +1,4 @@
-import { copyFile, mkdir, writeFile } from "node:fs/promises";
+import { copyFile, cp, mkdir, readFile, rename, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { SITE_RUNTIME_INDEX_PHP } from "../runtime/bootstrap/createSiteRuntime.js";
 
@@ -36,26 +36,57 @@ export default function createOutputPipeline(options = {}) {
     let publicDir;
     try {
       publicDir = path.join(repository.resolveSiteRoot(input.siteId), "public", "dist");
-      await mkdir(publicDir, { recursive: true });
+      const publicRoot = path.dirname(publicDir);
+      const buildId = String(input.buildId || Date.now()).replace(/[^a-zA-Z0-9_-]/g, "_");
+      const stagingDir = path.join(publicRoot, `.dist-staging-${buildId}`);
+      const backupDir = path.join(publicRoot, `.dist-previous-${buildId}`);
+      await recover(publicDir, backupDir);
+      await rm(stagingDir, { force: true, recursive: true });
+      // Incremental output overlays the last verified snapshot; full output starts clean.
+      if (input.replace !== true && await exists(publicDir)) await cp(publicDir, stagingDir, { recursive: true });
+      else await mkdir(stagingDir, { recursive: true });
       // Keep the Site entrypoint in sync so a completed build takes over from Setup.
-      await writeFile(path.join(path.dirname(publicDir), "index.php"), SITE_RUNTIME_INDEX_PHP, "utf8");
+      await writeFile(path.join(publicRoot, "index.php"), SITE_RUNTIME_INDEX_PHP, "utf8");
       const generatedFiles = [];
       for (const page of pages) {
-        const target = resolveInside(publicDir, pageFilePath(page.path));
+        const target = resolveInside(stagingDir, pageFilePath(page.path));
         await mkdir(path.dirname(target), { recursive: true });
         await writeFile(target, String(page.html || ""), "utf8");
         generatedFiles.push(target);
       }
       for (const asset of assets) {
-        const target = resolveInside(publicDir, asset.targetPath);
+        const target = resolveInside(stagingDir, asset.targetPath);
         await mkdir(path.dirname(target), { recursive: true });
         await copyFile(asset.sourcePath, target);
         generatedFiles.push(target);
       }
-      return { diagnostics: { errors: [], warnings: [] }, generatedFiles, ok: true, publicDir };
+      if (input.verify === true) await verifySnapshot(stagingDir);
+      await publishSnapshot({ backupDir, publicDir, stagingDir });
+      return { diagnostics: { errors: [], warnings: [] }, generatedFiles: generatedFiles.map((file) => path.join(publicDir, path.relative(stagingDir, file))), ok: true, publicDir };
     } catch (error) {
       return { diagnostics: { errors: [diagnostic("output.pipeline.write.failed", error.message)], warnings: [] }, ok: false };
     }
   }
   return Object.freeze({ version: OUTPUT_PIPELINE_VERSION, write });
+}
+
+async function verifySnapshot(root) {
+  const readJson = async (relative) => JSON.parse(await readFile(path.join(root, relative), "utf8"));
+  const manifest = await readJson(".wpsc/manifest.json");
+  const routeData = await readJson("data/manifest.json");
+  if (!Array.isArray(manifest.routes) || !Array.isArray(routeData.routes)) throw new Error("Output integrity manifest is invalid.");
+  for (const route of manifest.routes) {
+    await stat(path.join(root, route.outputPath));
+  }
+  for (const route of routeData.routes) await stat(path.join(root, route.outputPath));
+  await readJson(".wpsc/routes.json");
+  await readJson(".wpsc/media.json");
+}
+
+async function exists(target) { try { await stat(target); return true; } catch { return false; } }
+async function recover(publicDir, backupDir) { if (!await exists(publicDir) && await exists(backupDir)) await rename(backupDir, publicDir); }
+async function publishSnapshot({ backupDir, publicDir, stagingDir }) {
+  if (await exists(publicDir)) await rename(publicDir, backupDir);
+  try { await rename(stagingDir, publicDir); } catch (error) { if (!await exists(publicDir) && await exists(backupDir)) await rename(backupDir, publicDir); throw error; }
+  await rm(backupDir, { force: true, recursive: true });
 }

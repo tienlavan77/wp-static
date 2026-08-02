@@ -26,11 +26,16 @@ export default function createRuntimeV1Builder(options = {}) {
       const root = repository.resolveSiteRoot(input.siteId);
       const outputDir = path.join(root, "storage", "tmp", "builder-v1-full", input.buildId);
       await mkdir(outputDir, { recursive: true });
-      const config = createSharedStorefrontBuildConfig({ outputDir, plugins: input.plugins || [], site: { ...(input.site || {}), siteId: input.siteId } });
+      const config = createSharedStorefrontBuildConfig({ outputDir, plugins: input.plugins || [], routing: { redirects: input.transitionPlan?.redirects || [] }, site: { ...(input.site || {}), siteId: input.siteId } });
       const plugins = await loadPlugins(config, { projectDir: config._paths.projectDir });
       const plan = await compilePreparedSite({ collections: input.collections || {}, config, contents: input.contents || [], plugins });
       const changedItems = (input.changed || []).map(parseChangedItem);
-      const incremental = planIncrementalBuild(plan, changedItems);
+      const incremental = planIncrementalBuild(plan, changedItems, {
+        dependencyManifest: input.dependencyManifest,
+        // Runtime requires a previously published snapshot before it can trust
+        // targeted route selection. The generic Builder contract remains intact.
+        requirePersistedDependencyManifest: changedItems.length > 0
+      });
       const result = await buildSite(plan, {
         config,
         incremental,
@@ -40,7 +45,7 @@ export default function createRuntimeV1Builder(options = {}) {
         siteId: input.siteId,
         themeAssetsDir: plan.theme.assetsDir
       });
-      return Object.freeze({ assets: Object.freeze(await files(outputDir)), incremental, plan, result });
+      return Object.freeze({ assets: Object.freeze(await files(outputDir)), incremental: { ...incremental, transitionPlan: input.transitionPlan || null }, plan, result });
     }
   });
 }

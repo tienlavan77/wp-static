@@ -39,7 +39,7 @@ export default function createPublishEventCoordinator(options = {}) {
       timestamp
     })));
     const changed = events.map(toChangedHint).filter(Boolean);
-    const queued = scheduler.trigger({ changed, siteId, triggerType: JobTrigger.WEBHOOK });
+    const queued = scheduler.trigger({ changed, changes: events, siteId, triggerType: JobTrigger.WEBHOOK });
     const result = { changed, duplicate: false, eventId, events, queued };
     if (queued.ok) {
       for (const event of events) cache?.invalidateEvent?.(event);
@@ -62,10 +62,13 @@ function createPublishEvent(input) {
     siteId: input.siteId,
     productId: input.change.productId,
     productSlug: input.change.productSlug,
+    previousSlug: input.change.previousSlug,
+    previousUrl: input.change.previousUrl,
     slug: input.change.slug,
     source: input.source,
     taxonomy: input.change.taxonomy,
-    timestamp: input.timestamp
+    timestamp: input.timestamp,
+    url: input.change.url
   });
 }
 

@@ -7,11 +7,19 @@ test("Site Cache Service creates deterministic Site-scoped keys and read-through
   const storage = new Map();
   const cache = createSiteCacheService({ siteId: "site-a", storage });
   const input = { key: "post-1", resource: "document", service: CacheDomain.CONTENT };
-  assert.equal(cache.createKey(input), "site-a:content:document:post-1");
+  assert.equal(cache.createKey(input), "site-a:initial:content:document:post-1");
   assert.equal((await cache.readThrough(input, async () => ({ title: "Hello" }))).cached, false);
   assert.deepEqual(await cache.readThrough(input, async () => ({ title: "wrong" })), { cached: true, value: { title: "Hello" } });
   assert.equal(cache.snapshot().metrics.hits, 1);
   assert.equal(cache.snapshot().metrics.misses, 1);
+});
+
+test("Site Cache Service versions entries by published Build snapshot", () => {
+  const cache = createSiteCacheService({ siteId: "site-a" });
+  cache.set({ key: "home", resource: "route", service: CacheDomain.CONTENT }, { title: "old" });
+  cache.activateBuild("build-2");
+  assert.equal(cache.get({ key: "home", resource: "route", service: CacheDomain.CONTENT }), null);
+  assert.equal(cache.snapshot().buildId, "build-2");
 });
 
 test("Site Cache Service isolates Sites even with shared storage", () => {

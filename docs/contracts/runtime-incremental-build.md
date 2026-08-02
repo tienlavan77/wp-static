@@ -3,6 +3,57 @@
 ## Purpose
 
 Runtime uses the Builder V1 incremental build engine for every content change.
+
+## Persisted Dependency Manifest
+
+After a successful Runtime publish, WPSC stores a Site-scoped dependency
+snapshot at:
+
+```text
+sites/<siteId>/storage/build/dependency-manifest.json
+```
+
+The snapshot is versioned and maps both `content -> routes` and
+`route -> dependencies`. A subsequent webhook build uses this published
+snapshot to identify a targeted set of routes. The manifest is written only
+after the Output Pipeline has successfully published the matching build output.
+
+If the snapshot is absent, incompatible, belongs to another Site, or has no
+entry for the changed entity, Runtime performs a safe full build. Dependency
+manifests must not contain provider credentials, webhook secrets, or raw source
+configuration.
+
+## Targeted Source Refresh
+
+Runtime also keeps a published Content Snapshot at:
+
+```text
+sites/<siteId>/storage/build/content-snapshot.json
+```
+
+For a Product, Page, or Post webhook, Runtime may request only the changed
+record from a provider and merge it into this snapshot. It can do so only when
+the Content Snapshot and Dependency Manifest belong to the same published
+`buildId`. Taxonomy, menu, media, site-wide, deletion, renamed, missing, or
+otherwise incomplete provider results always fall back to a full Source read.
+The snapshot is content data only and must not contain credentials or secrets.
+
+## Incremental Artifact Plan
+
+Every Builder V1 build produces an explicit artifact plan in the build manifest.
+For a verified incremental build, route-scoped artifacts are limited to the
+affected route set:
+
+- HTML document and route serve alias
+- navigation fragment
+- route data JSON
+- media processing referenced by those routes
+
+The following artifacts remain deliberately Site-wide because their public
+contract depends on a complete Site view: search index, normalized content
+store, media manifest, route manifest, template manifest, sitemap, robots,
+runtime/static assets, admin app, and build/asset manifests. This is a
+correctness decision, not an untracked full rebuild.
 It does not build a single HTML file in isolation. A changed source item is
 translated into affected public routes, then Builder V1 refreshes both those
 routes and the shared build artifacts needed to serve a consistent Site.
@@ -136,3 +187,22 @@ creates the immutable job input:
 
 Run one full Runtime build after a new Site, source, theme, or Runtime version
 is configured. Use incremental builds only after a valid full output exists.
+
+## Transition Safety
+
+Webhook Job metadata preserves normalized change events in addition to compact
+`changed` hints. Delete and unpublish events force a full Source reconciliation
+and full output replacement, which removes old route HTML, fragments, route
+data, search entries, sitemap URLs, cache-derived artifacts, and dependency
+records together.
+
+A rename with `previousSlug`/`previousUrl` creates a redirect policy entry and
+a browser redirect fallback at the old static route. The route policy retains
+the intended HTTP status (`301` by default); a web-server HTTP redirect is a
+publish/deployment concern and is not claimed merely because an HTML fallback
+exists.
+
+Route SEO data is route-scoped and is regenerated with route data. Sitemap,
+robots, search, media manifest, route/content manifests, and other Site-wide
+SEO-derived artifacts remain global. Artifact planning does not validate or
+publish a snapshot; C025 owns integrity verification.
