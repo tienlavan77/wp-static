@@ -21,6 +21,18 @@ export default function createJobQueue(options = {}) {
   function enqueue(input = {}) {
     const created = createJob({ ...input, createdAt: input.createdAt || now(), id: input.id || createId(), status: JobStatus.QUEUED });
     if (!created.ok) return created;
+    const pendingIndex = pending.findIndex((job) => job.siteId === created.job.siteId);
+    if (pendingIndex >= 0) {
+      const existing = pending[pendingIndex];
+      const merged = createJob({
+        ...existing,
+        changed: [...new Set([...existing.changed, ...created.job.changed])],
+        changes: mergeChanges(existing.changes, created.job.changes),
+        status: JobStatus.QUEUED
+      }).job;
+      pending[pendingIndex] = merged;
+      return { coalesced: true, diagnostics: { errors: [], warnings: [] }, job: merged, ok: true };
+    }
     if (activeSite(created.job.siteId)) {
       return { diagnostics: { errors: [diagnostic("job.queue.site.active", "A build job is already active for this site.")], warnings: [] }, ok: false };
     }
@@ -61,4 +73,13 @@ export default function createJobQueue(options = {}) {
   }
 
   return Object.freeze({ complete, enqueue, list, next, version: JOB_QUEUE_VERSION });
+}
+
+function mergeChanges(previous = [], next = []) {
+  const byIdentity = new Map();
+  for (const change of [...previous, ...next]) {
+    const key = `${change?.entityType || "unknown"}:${change?.entityId || change?.slug || JSON.stringify(change)}`;
+    byIdentity.set(key, change);
+  }
+  return [...byIdentity.values()];
 }
