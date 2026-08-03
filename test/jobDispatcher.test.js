@@ -16,7 +16,7 @@ test("Job Dispatcher claims a queued job, calls injected Build Engine, and compl
   const result = await dispatcher.dispatch();
   assert.equal(result.ok, true);
   assert.equal(result.job.status, JobStatus.SUCCESS);
-  assert.deepEqual(calls, [{ changed: [], siteId: "company-a", triggerType: JobTrigger.WEBHOOK }]);
+  assert.deepEqual(calls, [{ changed: [], changes: [], siteId: "company-a", triggerType: JobTrigger.WEBHOOK }]);
   assert.deepEqual(result.events.map((event) => event.type), [JobEvent.STARTED, JobEvent.COMPLETED]);
 });
 
@@ -27,4 +27,14 @@ test("Job Dispatcher records a failed job when Build Engine throws", async () =>
   assert.equal(result.ok, false);
   assert.equal(result.job.status, JobStatus.FAILED);
   assert.equal(result.diagnostics.errors[0].code, "job.dispatch.failed");
+});
+
+test("Job Queue coalesces pending changes for one Site but preserves a running Site lock", () => {
+  const queue = createJobQueue({ createJobId: () => "job-1" });
+  assert.equal(queue.enqueue({ changed: ["product:a"], siteId: "company-a", triggerType: JobTrigger.WEBHOOK }).ok, true);
+  const merged = queue.enqueue({ changed: ["product:b"], siteId: "company-a", triggerType: JobTrigger.WEBHOOK });
+  assert.equal(merged.coalesced, true);
+  assert.deepEqual(merged.job.changed, ["product:a", "product:b"]);
+  queue.next();
+  assert.equal(queue.enqueue({ changed: ["product:c"], siteId: "company-a", triggerType: JobTrigger.WEBHOOK }).ok, false);
 });

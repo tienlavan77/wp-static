@@ -11,6 +11,7 @@ export default function createJobDispatcher(options = {}) {
   const buildEngine = options.buildEngine;
   const now = options.now || (() => new Date().toISOString());
   const onEvent = typeof options.onEvent === "function" ? options.onEvent : null;
+  const onBuildProgress = typeof options.onBuildProgress === "function" ? options.onBuildProgress : null;
   if (!buildEngine || typeof buildEngine.build !== "function") {
     throw new TypeError("Job Dispatcher requires a Build Engine with build().");
   }
@@ -27,7 +28,9 @@ export default function createJobDispatcher(options = {}) {
     const events = [];
     emit(events, JobEvent.STARTED, { jobId: job.id, siteId: job.siteId, triggerType: job.triggerType });
     try {
-      const build = await buildEngine.build({ changed: job.changed, siteId: job.siteId, triggerType: job.triggerType });
+      const buildInput = { changed: job.changed, changes: job.changes, siteId: job.siteId, triggerType: job.triggerType };
+      if (onBuildProgress) buildInput.onProgress = onBuildProgress;
+      const build = await buildEngine.build(buildInput);
       const status = build?.status === "SUCCESS" ? JobStatus.SUCCESS : JobStatus.FAILED;
       const completed = queue.complete(job.id, { diagnostics: build?.diagnostics, status });
       if (!completed.ok) return { ...completed, events, job };

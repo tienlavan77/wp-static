@@ -38,6 +38,7 @@ export default function createScheduler(options = {}) {
     try {
       const queued = queue.enqueue({
         changed: Array.isArray(input.changed) ? input.changed : [],
+        changes: Array.isArray(input.changes) ? input.changes : [],
         siteId,
         triggerType: input.triggerType || JobTrigger.MANUAL
       });
@@ -82,7 +83,7 @@ export default function createScheduler(options = {}) {
       const attempts = retryAttempts.get(failed.id) || 0;
       const failedAt = Date.parse(failed.finishedAt || failed.createdAt || now());
       if (attempts < retryPolicy.maxRetries && timestamp - failedAt >= retryPolicy.retryDelayMs) {
-        const queued = enqueue({ changed: failed.changed, siteId: failed.siteId, triggerType: failed.triggerType }, events);
+        const queued = enqueue({ changed: failed.changed, changes: failed.changes, siteId: failed.siteId, triggerType: failed.triggerType }, events);
         if (queued.ok) { retryAttempts.set(failed.id, attempts + 1); retriedJobs.add(failed.id); }
       }
     }

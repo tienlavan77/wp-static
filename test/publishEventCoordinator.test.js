@@ -32,6 +32,7 @@ test("Publishing Coordinator normalizes WordPress changes and submits one Schedu
   assert.equal(result.events[0].timestamp, "2026-07-30T10:00:00.000Z");
   assert.deepEqual(calls, [{
     changed: ["post:welcome"],
+    changes: [result.events[0]],
     siteId: "site-a",
     triggerType: "webhook"
   }]);
@@ -83,10 +84,11 @@ test("Scheduler preserves publishing change hints in the queued Build Job", () =
     queue
   });
 
-  scheduler.trigger({ changed: ["post:welcome"], siteId: "site-a", triggerType: "webhook" });
+  scheduler.trigger({ changed: ["post:welcome"], changes: [{ changeType: "update" }], siteId: "site-a", triggerType: "webhook" });
 
   assert.deepEqual(enqueued, [{
     changed: ["post:welcome"],
+    changes: [{ changeType: "update" }],
     siteId: "site-a",
     triggerType: "webhook"
   }]);

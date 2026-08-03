@@ -53,6 +53,7 @@ export function validateJob(job = {}) {
 export function createJob(input = {}) {
   const job = deepFreeze({
     changed: deepFreeze(Array.isArray(input.changed) ? [...input.changed] : []),
+    changes: deepFreeze(Array.isArray(input.changes) ? [...input.changes] : []),
     createdAt: input.createdAt || null,
     diagnostics: deepFreeze(input.diagnostics || { errors: [], warnings: [] }),
     duration: input.duration ?? null,

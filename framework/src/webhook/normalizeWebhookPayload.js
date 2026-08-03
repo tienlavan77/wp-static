@@ -77,6 +77,9 @@ function normalizeChangedItem(item) {
   const taxonomy = normalizeOptionalString(item.taxonomy);
   const productId = normalizeOptionalString(item.productId ?? item.product_id ?? item.parentId ?? item.parent_id);
   const productSlug = normalizeSlug(item.productSlug ?? item.product_slug ?? item.parentSlug ?? item.parent_slug);
+  const previousSlug = normalizeSlug(item.previousSlug ?? item.previous_slug ?? item.oldSlug ?? item.old_slug);
+  const previousUrl = normalizeOptionalString(item.previousUrl ?? item.previous_url ?? item.oldUrl ?? item.old_url);
+  const url = normalizeOptionalString(item.url ?? item.link ?? item.permalink);
 
   if (!type || (!id && !slug)) {
     return null;
@@ -86,9 +89,12 @@ function normalizeChangedItem(item) {
     id,
     productId,
     productSlug,
+    previousSlug,
+    previousUrl,
     slug,
     taxonomy,
-    type
+    type,
+    url
   };
 }
 
