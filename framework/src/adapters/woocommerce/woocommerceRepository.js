@@ -16,6 +16,20 @@ export default function createWooCommerceRepository(client, options = {}) {
       }));
     },
 
+    async getContentsByChanges(changes = []) {
+      const records = await Promise.all(changes.map(async (change) => {
+        if (change.type !== "product") return null;
+        const products = await client.getCollection("/wp-json/wc/v3/products", { slug: change.routeSlug, status: "publish" });
+        const product = products.find((item) => String(item.id) === String(change.id) || item.slug === change.routeSlug);
+        if (!product) return null;
+        const variations = options.includeVariations === true
+          ? await client.getCollection(`/wp-json/wc/v3/products/${product.id}/variations`)
+          : product.variations ?? [];
+        return normalizeWooCommerceProduct({ ...product, variations });
+      }));
+      return records.some((record) => !record) ? null : records;
+    },
+
     async getCategories() {
       if (options.includeCategories === false) {
         return [];

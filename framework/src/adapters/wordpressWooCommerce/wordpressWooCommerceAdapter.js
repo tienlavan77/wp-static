@@ -24,6 +24,18 @@ export default function createWordPressWooCommerceAdapter(options = {}) {
       ];
     },
 
+    async getContentsByChanges(changes = []) {
+      const wordpressChanges = changes.filter((change) => ["page", "post"].includes(change.type));
+      const commerceChanges = changes.filter((change) => change.type === "product");
+      if (wordpressChanges.length + commerceChanges.length !== changes.length) return null;
+      const [wordpressContents, commerceContents] = await Promise.all([
+        wordpressChanges.length ? wordpress.getContentsByChanges?.(wordpressChanges) : [],
+        commerceChanges.length ? woocommerce.getContentsByChanges?.(commerceChanges) : []
+      ]);
+      if (!Array.isArray(wordpressContents) || !Array.isArray(commerceContents)) return null;
+      return [...wordpressContents, ...commerceContents];
+    },
+
     async getCollections() {
       const [wordpressCollections, woocommerceCollections] = await Promise.all([
         readCollections(wordpress),

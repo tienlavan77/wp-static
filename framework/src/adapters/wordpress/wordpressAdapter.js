@@ -13,6 +13,11 @@ export default function createWordPressAdapter(options = {}) {
 
       return contentInputs.map(createContent);
     },
+    async getContentsByChanges(changes) {
+      if (typeof repository.getContentsByChanges !== "function") return null;
+      const contentInputs = await repository.getContentsByChanges(changes);
+      return Array.isArray(contentInputs) ? contentInputs.map(createContent) : null;
+    },
     async getCollections() {
       return {
         authors: await repository.getAuthors(),

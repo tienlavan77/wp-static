@@ -102,3 +102,20 @@ test("WordPress Source Adapter exposes the versioned provider content contract",
   assert.equal(contract.terms[0].taxonomy, "category");
   assert.equal(contract.authors[0].slug, "editor");
 });
+
+test("WordPress Source Adapter fetches an individual changed page by slug", async () => {
+  const requests = [];
+  const adapter = createWordPressSourceAdapter({
+    contentTypes: ["pages"],
+    fetchImpl: async (url) => {
+      requests.push(String(url));
+      return collectionResponse([{ content: { rendered: "Fresh page" }, excerpt: { rendered: "" }, id: 9, slug: "fresh-page", title: { rendered: "Fresh page" } }]);
+    }
+  });
+  await adapter.initialize({ endpoint: "https://cms.example.test" });
+  const items = await adapter.getContentsByChanges([{ id: "fresh-page", routeSlug: "fresh-page", type: "page" }]);
+
+  assert.equal(items[0].slug, "fresh-page");
+  assert.match(requests[0], /\/wp-json\/wp\/v2\/pages/);
+  assert.match(requests[0], /slug=fresh-page/);
+});

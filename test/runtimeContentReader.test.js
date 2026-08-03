@@ -19,3 +19,39 @@ test("Runtime Content Reader preserves source collections for Builder V1 archive
   assert.equal(result.collections.menus[0].id, "primary");
   assert.equal(result.collections.terms[0].slug, "cards");
 });
+
+test("Runtime Content Reader uses a matching published snapshot for a targeted Product refresh", async () => {
+  const calls = [];
+  const reader = createRuntimeContentReader({
+    adapterLoader: { load: () => ({
+      getContents: async () => { calls.push("full"); return []; },
+      getContentsByChanges: async (changes) => { calls.push(changes.map((change) => change.raw)); return [{ id: "product-1", slug: "product-one", title: "Fresh", type: "product" }]; },
+      initialize: async () => ({ ok: true })
+    }) },
+    repository: { readSourceMetadata: async () => ({ endpoint: "https://example.test", sourceType: "wordpress" }) }
+  });
+  const result = await reader.read({
+    changed: ["product:product-one"],
+    dependencyManifest: { buildId: "build-1" },
+    siteId: "company-a",
+    sourceSnapshot: { buildId: "build-1", collections: { terms: [] }, items: [{ id: "product-1", slug: "product-one", title: "Old", type: "product" }] }
+  });
+
+  assert.equal(result.mode, "targeted");
+  assert.equal(result.items[0].title, "Fresh");
+  assert.deepEqual(calls, [["product:product-one"]]);
+});
+
+test("Runtime Content Reader falls back to a full read when targeted source data is incomplete", async () => {
+  const reader = createRuntimeContentReader({
+    adapterLoader: { load: () => ({
+      getCollections: async () => ({ terms: [] }),
+      getContents: async () => [{ id: "product-1", slug: "product-one", type: "product" }],
+      getContentsByChanges: async () => [],
+      initialize: async () => ({ ok: true })
+    }) },
+    repository: { readSourceMetadata: async () => ({ endpoint: "https://example.test", sourceType: "wordpress" }) }
+  });
+  const result = await reader.read({ changed: ["product:product-one"], dependencyManifest: { buildId: "old" }, siteId: "company-a", sourceSnapshot: { buildId: "old", collections: {}, items: [] } });
+  assert.equal(result.mode, "full");
+});

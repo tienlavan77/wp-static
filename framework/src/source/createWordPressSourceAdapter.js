@@ -40,7 +40,7 @@ export default function createWordPressSourceAdapter(options = {}) {
   }
 
   function createContentAdapter() {
-    if (!woocommerceEnabled) return createWordPressAdapter({ ...options, auth: contentAuth, baseUrl: endpoint });
+    if (!woocommerceEnabled) return createWordPressAdapter({ ...options, auth: contentAuth, baseUrl: endpoint, includeMedia: options.includeMedia ?? true });
     return createWordPressWooCommerceAdapter({
       shared: { baseUrl: endpoint, siteId },
       woocommerce: {
@@ -54,7 +54,8 @@ export default function createWordPressSourceAdapter(options = {}) {
         auth: credentials.wordpressUsername && credentials.applicationPassword
           ? { password: credentials.applicationPassword, type: "applicationPassword", username: credentials.wordpressUsername }
           : options.auth,
-        baseUrl: endpoint
+        baseUrl: endpoint,
+        includeMedia: options.includeMedia ?? true
       }
     });
   }
@@ -63,6 +64,11 @@ export default function createWordPressSourceAdapter(options = {}) {
     async getContents() {
       if (!endpoint) throw new Error("WordPress endpoint is not initialized.");
       return createContentAdapter().getContents();
+    },
+    async getContentsByChanges(changes) {
+      if (!endpoint) throw new Error("WordPress endpoint is not initialized.");
+      const adapter = createContentAdapter();
+      return typeof adapter.getContentsByChanges === "function" ? adapter.getContentsByChanges(changes) : null;
     },
     async getCollections() {
       if (!endpoint) throw new Error("WordPress endpoint is not initialized.");

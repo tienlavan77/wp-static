@@ -28,6 +28,22 @@ export default function createWordPressRepository(client, options = {}) {
       return results.flat();
     },
 
+    async getContentsByChanges(changes = []) {
+      const contentTypes = options.contentTypes ?? ["pages", "posts"];
+      const records = await Promise.all(changes.map(async (change) => {
+        const endpoint = change.type === "page" ? "pages" : change.type === "post" ? "posts" : null;
+        if (!endpoint || !contentTypes.includes(endpoint)) return null;
+        const items = await client.getCollection(`/wp-json/wp/v2/${endpoint}`, {
+          _embed: true,
+          slug: change.routeSlug,
+          status: "publish"
+        });
+        const record = items.find((item) => String(item.id) === String(change.id) || item.slug === change.routeSlug);
+        return record ? normalizeWordPressContent(record, change.type) : null;
+      }));
+      return records.some((record) => !record) ? null : records;
+    },
+
     async getTerms() {
       const taxonomies = options.taxonomies ?? ["categories", "tags"];
       const collections = taxonomies.map(async (taxonomy) => {
