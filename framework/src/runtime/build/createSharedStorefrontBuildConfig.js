@@ -28,6 +28,7 @@ export default function createSharedStorefrontBuildConfig(options = {}) {
     outputDir,
     plugins: options.plugins || [],
     publicDir: "./public",
+    routing: options.routing || {},
     site: options.site || {},
     templates: options.templates || { enabled: false },
     theme: {
@@ -42,7 +43,12 @@ export default function createSharedStorefrontBuildConfig(options = {}) {
         search: "./layouts/search.js",
         product: "./layouts/product.js"
       },
-      meta: { description: "Shared WPSC Storefront", name: "Shared Storefront Theme", version: "1.0.0" }
+      meta: {
+        capabilities: ["catalog-homepage-products"],
+        description: "Shared WPSC Storefront",
+        name: "Shared Storefront Theme",
+        version: "1.0.0"
+      }
     }
   };
 }

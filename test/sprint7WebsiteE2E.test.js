@@ -191,6 +191,40 @@ test("Sprint 7 publishes a WordPress website and rebuilds it through the webhook
     assert.equal(publishTick.dispatched.build.status, "SUCCESS");
     assert.match(await readFile(path.join(dist, "sprint-7", "index.html"), "utf8"), /Sprint 7 webhook update/);
 
+    // C026: duplicate delivery remains idempotent and deletion reconciles the
+    // complete public snapshot rather than leaving stale route output.
+    const duplicate = await runtime.services.webhookReceiver.handle(siteId, uuid, {
+      body: { action: "update", changed: [{ id: 12, postType: "post", slug: "sprint-7" }], eventId: "wordpress-post-12-update-1", source: "wordpress" },
+      headers: { "x-wpsc-webhook-secret": webhookSecret }, method: "POST"
+    });
+    assert.equal(duplicate.status, 202);
+    assert.equal(duplicate.body.jobId, webhook.body.jobId);
+
+    state.current = {
+      ...state.current,
+      posts: [{ ...state.current.posts[0], link: "https://cms.example.test/sprint-7-renamed", slug: "sprint-7-renamed" }]
+    };
+    const renamed = await runtime.services.webhookReceiver.handle(siteId, uuid, {
+      body: { action: "update", changed: [{ id: 12, postType: "post", previousSlug: "sprint-7", slug: "sprint-7-renamed" }], eventId: "wordpress-post-12-rename-1", source: "wordpress" },
+      headers: { "x-wpsc-webhook-secret": webhookSecret }, method: "POST"
+    });
+    assert.equal(renamed.status, 202);
+    assert.equal((await runtime.services.scheduler.tick()).dispatched.build.status, "SUCCESS");
+    assert.match(await readFile(path.join(dist, "sprint-7-renamed", "index.html"), "utf8"), /Sprint 7 webhook update/);
+    assert.match(await readFile(path.join(dist, "sprint-7", "index.html"), "utf8"), /sprint-7-renamed/);
+
+    state.current = { ...state.current, posts: [] };
+    const deleted = await runtime.services.webhookReceiver.handle(siteId, uuid, {
+      body: { action: "delete", changed: [{ id: 12, postType: "post", slug: "sprint-7-renamed" }], eventId: "wordpress-post-12-delete-1", source: "wordpress" },
+      headers: { "x-wpsc-webhook-secret": webhookSecret }, method: "POST"
+    });
+    assert.equal(deleted.status, 202);
+    const deleteTick = await runtime.services.scheduler.tick();
+    assert.equal(deleteTick.dispatched.build.status, "SUCCESS");
+    await assert.rejects(access(path.join(dist, "sprint-7-renamed", "index.html")));
+    const afterDeleteSearch = await readJson(path.join(dist, "data", "search-index.json"));
+    assert.equal(afterDeleteSearch.items.some((item) => item.slug === "sprint-7"), false);
+
     const siteBPublic = path.join(repository.resolveSiteRoot(untouchedSiteId), "public");
     await assert.rejects(access(path.join(siteBPublic, "dist")));
   } finally {

@@ -89,7 +89,7 @@ export default function createSiteRuntimeInstance(options = {}) {
   const buildEngine = options.buildEngine || createBuildEngine(options.buildEngineOptions);
   const buildIntegration = options.buildIntegration || createBuildIntegration({ buildEngine, cache: siteCache, contentReader, contentSnapshotStore, dependencyManifestStore, outputPipeline, runtimeV1Builder, site: options.site, telemetryStore });
   const queue = options.queue || createJobQueue(options.queueOptions);
-  const dispatcher = options.dispatcher || createJobDispatcher({ buildEngine: buildIntegration, queue });
+  const dispatcher = options.dispatcher || createJobDispatcher({ buildEngine: buildIntegration, onBuildProgress: options.onBuildProgress, queue });
   const scheduler = options.scheduler || createScheduler({ dispatcher, queue, retryPolicy: options.retryPolicy });
   // Runtime owns the Scheduler lifecycle; browser requests can only trigger an active scheduler.
   scheduler.start();

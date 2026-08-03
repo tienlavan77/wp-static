@@ -43,7 +43,8 @@ export default function createRuntimeV1Builder(options = {}) {
         publicDir: config._paths.publicDir,
         site: config.site,
         siteId: input.siteId,
-        themeAssetsDir: plan.theme.assetsDir
+        themeAssetsDir: plan.theme.assetsDir,
+        onProgress: input.onProgress
       });
       return Object.freeze({ assets: Object.freeze(await files(outputDir)), incremental: { ...incremental, transitionPlan: input.transitionPlan || null }, plan, result });
     }

@@ -15,6 +15,7 @@ export default async function resolveTheme(config, projectDir, options = {}) {
   const projectBlocksPath = config._paths?.projectBlocks ?? resolveOptionalPath(projectDir, config.project?.blocks);
   const assetsDir = config._paths?.themeAssets ?? resolveOptionalPath(projectDir, themeConfig.assets);
   const metadata = {
+    capabilities: Array.isArray(themeConfig.meta?.capabilities) ? [...themeConfig.meta.capabilities] : [],
     name: themeConfig.meta?.name ?? themeConfig.name ?? config.name,
     version: themeConfig.meta?.version ?? null,
     description: themeConfig.meta?.description ?? null,
