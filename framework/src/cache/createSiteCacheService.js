@@ -20,13 +20,14 @@ export default function createSiteCacheService(options = {}) {
   const storage = options.storage ?? new Map();
   const now = options.now ?? (() => new Date().toISOString());
   const performanceService = options.performanceService;
+  let buildId = String(options.buildId || "initial");
   const metrics = { deletes: 0, hits: 0, invalidations: 0, misses: 0, sets: 0 };
 
   function createKey(input = {}) {
     const service = normalizeDomain(input.service);
     const resource = normalizePart(input.resource ?? "default", "Cache resource");
     const key = normalizePart(input.key ?? "default", "Cache key");
-    return [siteId, service, resource, key].map(encodeURIComponent).join(":");
+    return [siteId, buildId, service, resource, key].map(encodeURIComponent).join(":");
   }
 
   function get(input) {
@@ -93,13 +94,22 @@ export default function createSiteCacheService(options = {}) {
     return invalidate({ services });
   }
 
+  function activateBuild(nextBuildId) {
+    const next = normalizePart(nextBuildId, "Build id");
+    if (next === buildId) return deepFreeze({ buildId, invalidated: 0, siteId });
+    const previous = buildId;
+    const invalidated = invalidate({});
+    buildId = next;
+    return deepFreeze({ buildId, invalidated: invalidated.invalidated, previousBuildId: previous, siteId });
+  }
+
   function snapshot() {
     let size = 0;
     for (const key of storage.keys()) if (key.startsWith(`${encodeURIComponent(siteId)}:`)) size += 1;
-    return deepFreeze({ metrics: { ...metrics }, schema: SITE_CACHE_SCHEMA, schemaVersion: SITE_CACHE_VERSION, siteId, size });
+    return deepFreeze({ buildId, metrics: { ...metrics }, schema: SITE_CACHE_SCHEMA, schemaVersion: SITE_CACHE_VERSION, siteId, size });
   }
 
-  return Object.freeze({ createKey, get, invalidate, invalidateEvent, readThrough, remove, set, siteId, snapshot });
+  return Object.freeze({ activateBuild, createKey, get, invalidate, invalidateEvent, readThrough, remove, set, siteId, snapshot });
 }
 
 function descriptor(input = {}) {
