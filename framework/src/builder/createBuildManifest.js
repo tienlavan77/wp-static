@@ -11,6 +11,7 @@ export default function createBuildManifest(sitePlan, buildResult, options = {})
     outputDir: buildResult.outputDir,
     pages: sitePlan.pages.length,
     incremental: {
+      artifacts: buildResult.artifactPlan ?? null,
       changedRoutes: buildResult.changedRoutes ?? [],
       fullBuild: buildResult.fullBuild !== false,
       inputHash: buildResult.inputHash ?? null,

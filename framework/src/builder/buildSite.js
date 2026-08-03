@@ -17,14 +17,20 @@ import writeSearchIndex from "./search/writeSearchIndex.js";
 import writeMediaManifest from "../media/writeMediaManifest.js";
 import writeRouteManifest from "../routing/writeRouteManifest.js";
 import createProgressReporter from "../progress/createProgressReporter.js";
+import createIncrementalArtifactPlan from "./planner/createIncrementalArtifactPlan.js";
+import writeRedirectOutputs from "./writeRedirectOutputs.js";
 
 export default async function buildSite(sitePlan, options = {}) {
   const outputDir = options.outputDir ?? "dist";
   const progress = createProgressReporter(options.onProgress);
   const plugins = sitePlan.plugins ?? [];
   const incremental = options.incremental ?? null;
+  const artifactPlan = incremental?.artifactPlan ?? createIncrementalArtifactPlan({
+    allRoutes: sitePlan.routes.map((route) => route.path),
+    fullBuild: incremental?.fullBuild !== false
+  });
   const pagesToWrite = incremental?.fullBuild === false
-    ? sitePlan.pages.filter((page) => incremental.changedRoutes.includes(page.route.path))
+    ? sitePlan.pages.filter((page) => (artifactPlan?.routes?.html ?? incremental.changedRoutes).includes(page.route.path))
     : sitePlan.pages;
   const pluginContext = createPluginContext(options.config ?? {}, {
     projectDir: options.config?._paths?.projectDir
@@ -108,6 +114,7 @@ export default async function buildSite(sitePlan, options = {}) {
     site: options.site,
     siteId: options.siteId
   });
+  const redirectOutputs = await writeRedirectOutputs(routeManifest.manifest.redirects, { outputDir });
   progress("templates:write", "Writing template manifest");
   const templateManifest = await writeTemplateManifest({
     config: options.config,
@@ -130,6 +137,7 @@ export default async function buildSite(sitePlan, options = {}) {
     assetsDownloaded: assetPipeline.entries.length,
     assetStats: assetPipeline.stats,
     assetPipeline,
+    artifactPlan,
     changedRoutes: incremental?.changedRoutes ?? [],
     fullBuild: incremental?.fullBuild !== false,
     inputHash: incremental?.inputHash ?? null,
@@ -141,6 +149,7 @@ export default async function buildSite(sitePlan, options = {}) {
     contentStore,
     mediaManifest,
     routeManifest,
+    redirectOutputs,
     templateManifest,
     fragmentOutputs,
     adminApp,

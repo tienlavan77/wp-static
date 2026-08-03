@@ -42,6 +42,9 @@ test("build pipeline writes html files and manifest", async () => {
   assert.equal(result.fullBuild, true);
   assert.equal(manifest.pages, 7);
   assert.equal(manifest.incremental.fullBuild, true);
+  assert.equal(manifest.incremental.artifacts.routes.html.length, manifest.pages);
+  assert.equal(manifest.incremental.artifacts.routes.html.includes("/iphone-15"), true);
+  assert.equal(manifest.incremental.artifacts.global.artifacts.includes("searchIndex"), true);
   assert.equal(manifest.routes.some((route) => route.path === "/iphone-15"), true);
   assert.equal(manifest.routes.some((route) => route.path === "/iphone-15-128gb-den"), false);
   assert.equal(manifest.routes.some((route) => route.outputPath === "iphone-15.html"), true);
