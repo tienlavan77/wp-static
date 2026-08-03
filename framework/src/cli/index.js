@@ -528,7 +528,11 @@ async function buildRuntimeSite(siteId, options = {}) {
   if (!environment.ok) throw environment.error;
   const loaded = await loadSiteRuntimeConfig({ configPath: options.configPath, workspaceDir });
   if (!loaded.ok) throw new Error(loaded.diagnostics.errors.map((item) => item.message).join(" "));
-  const instance = createSiteRuntimeInstance({ ...loaded.config, workspaceDir: loaded.workspaceDir });
+  const instance = createSiteRuntimeInstance({
+    ...loaded.config,
+    onBuildProgress: (event) => logger.info(`[build] ${event.stage}: ${event.message}`),
+    workspaceDir: loaded.workspaceDir
+  });
   const queued = instance.services.scheduler.trigger({ changed: options.changed || [], siteId, triggerType: "cli" });
   if (!queued.ok) throw new Error(queued.diagnostics.errors.map((item) => item.message).join(" "));
   const tick = await instance.services.scheduler.tick();
