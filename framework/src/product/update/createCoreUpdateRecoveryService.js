@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { cp, mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
+import { cp, lstat, mkdir, readFile, readlink, rename, rm, symlink, writeFile } from "node:fs/promises";
 import path from "node:path";
 import deepFreeze from "../../shared/deepFreeze.js";
 
@@ -16,7 +16,7 @@ export default function createCoreUpdateRecoveryService(options = {}) {
     await mkdir(target, { recursive: true });
     for (const relative of protectedFiles) {
       const source = path.join(workspaceDir, relative);
-      try { await cp(source, path.join(target, relative), { recursive: true }); files.push({ path: relative, sha256: hash(await readFile(source)) }); } catch (error) { if (error.code !== "ENOENT") throw error; }
+      try { const metadata = await lstat(source); await cp(source, path.join(target, relative), { recursive: true, verbatimSymlinks: true }); const symbolic = metadata.isSymbolicLink(); files.push({ path: relative, sha256: hash(symbolic ? await readlink(source) : await readFile(source)), type: symbolic ? "symlink" : "file" }); } catch (error) { if (error.code !== "ENOENT") throw error; }
     }
     const record = { createdAt: now(), files, recoveryId: id, schema: "wpsc.core-update-recovery", schemaVersion: 1 };
     await writeRecoveryManifest(path.join(target, "recovery.json"), record);
@@ -25,9 +25,9 @@ export default function createCoreUpdateRecoveryService(options = {}) {
   async function restore(recoveryId) {
     const target = path.join(root, String(recoveryId));
     const record = JSON.parse(await readFile(path.join(target, "recovery.json"), "utf8"));
-    if (!Array.isArray(record.files) || record.files.some((file) => !protectedFiles.includes(file.path) || !/^[a-f0-9]{64}$/.test(file.sha256))) throw new Error("Recovery manifest is invalid.");
-    for (const file of record.files) { const source = path.join(target, file.path); if (hash(await readFile(source)) !== file.sha256) throw new Error(`Recovery integrity verification failed: ${file.path}.`); }
-    for (const file of record.files) { const destination = path.join(workspaceDir, file.path); await mkdir(path.dirname(destination), { recursive: true }); await rm(destination, { force: true, recursive: true }); await cp(path.join(target, file.path), destination, { recursive: true }); }
+    if (!Array.isArray(record.files) || record.files.some((file) => !protectedFiles.includes(file.path) || !["file", "symlink"].includes(file.type) || !/^[a-f0-9]{64}$/.test(file.sha256))) throw new Error("Recovery manifest is invalid.");
+    for (const file of record.files) { const source = path.join(target, file.path); const value = file.type === "symlink" ? await readlink(source) : await readFile(source); if (hash(value) !== file.sha256) throw new Error(`Recovery integrity verification failed: ${file.path}.`); }
+    for (const file of record.files) { const source = path.join(target, file.path); const destination = path.join(workspaceDir, file.path); await mkdir(path.dirname(destination), { recursive: true }); await rm(destination, { force: true, recursive: true }); if (file.type === "symlink") await symlink(await readlink(source), destination); else await cp(source, destination, { recursive: true }); }
     return success({ restored: record.recoveryId });
   }
   return Object.freeze({ create, restore });
