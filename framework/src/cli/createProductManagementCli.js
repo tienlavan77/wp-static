@@ -1,7 +1,7 @@
 import deepFreeze from "../shared/deepFreeze.js";
 
 export default function createProductManagementCli(options = {}) {
-  const { backup, deployment, operations, product, registry, runtime } = options;
+  const { backup, deployment, operations, product, registry, runtime, update } = options;
   if (!operations?.list || !registry?.read || !backup?.list || !deployment?.status) throw new TypeError("Product CLI requires Product Operations services.");
 
   async function run(args = []) {
@@ -14,6 +14,7 @@ export default function createProductManagementCli(options = {}) {
     else if (command[0] === "backup" && command[1] === "list" && command[2]) result = await backup.list(command[2]);
     else if (command[0] === "deployment" && command[1] === "list" && command[2]) result = await deployment.status(command[2]);
     else if (command[0] === "runtime" && command[1] === "status") result = runtime?.state?.() ?? { readiness: "unknown" };
+    else if (command[0] === "update" && command[1] === "check" && update?.check) result = await update.check();
     else return deepFreeze({ code: 2, output: "Unknown Product command.", result: null });
     const ok = result?.ok !== false;
     return deepFreeze({ code: ok ? 0 : 1, output: json ? JSON.stringify(result, null, 2) : format(result), result });
@@ -27,5 +28,7 @@ function format(result) {
   if (result?.backups) return result.backups.map((backup) => `${backup.backupId}\t${backup.createdAt}`).join("\n");
   if (result?.deployments) return result.deployments.map((deployment) => `${deployment.deploymentId}\t${deployment.state}\t${deployment.artifactId}`).join("\n");
   if (result?.readiness) return `Runtime: ${result.readiness}`;
+  if (result?.status === "UPDATE_AVAILABLE") return `Current: ${result.currentVersion}\nAvailable: ${result.available.version}\nStatus: UPDATE_AVAILABLE`;
+  if (result?.status === "UP_TO_DATE") return `Current: ${result.currentVersion}\nStatus: UP_TO_DATE`;
   return JSON.stringify(result, null, 2);
 }

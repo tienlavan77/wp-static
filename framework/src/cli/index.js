@@ -19,6 +19,8 @@ import createDeploymentOrchestrationService from "../deployment/createDeployment
 import createRuntimeHardeningService from "../runtime/hardening/createRuntimeHardeningService.js";
 import createProductManagementCli from "./createProductManagementCli.js";
 import createProductManifest from "../product/createProductManifest.js";
+import createCoreUpdateReleaseService from "../product/update/createCoreUpdateReleaseService.js";
+import { createLocalPackageSource } from "../product/update/createPackageSources.js";
 import createRuntimePlatformProvisioningService from "../product/createRuntimePlatformProvisioningService.js";
 import createSiteRuntimeInstance from "../runtime/bootstrap/createSiteRuntimeInstance.js";
 import createRuntimeHttpServer from "../runtime/bootstrap/createRuntimeHttpServer.js";
@@ -214,7 +216,7 @@ async function main(cliArgs) {
     return;
   }
 
-  if (["status", "site", "backup", "deployment", "runtime"].includes(cliArgs[0])) {
+  if (["status", "site", "backup", "deployment", "runtime", "update"].includes(cliArgs[0])) {
     await runProductCommand(cliArgs, readProjectArg(cliArgs));
     return;
   }
@@ -489,7 +491,8 @@ async function runProductCommand(cliArgs, workspaceArg) {
     operations: createSiteOperationsService({ registry }),
     product: createProductManifest({ version: getPackageInfo().version }),
     registry,
-    runtime: createRuntimeHardeningService()
+    runtime: createRuntimeHardeningService(),
+    update: createCoreUpdateReleaseService({ currentVersion: getPackageInfo().version, source: createLocalPackageSource({ directory: path.join(workspaceDir, "storage", "core-releases") }) })
   });
   const result = await productCli.run(cliArgs);
   console.log(result.output);
