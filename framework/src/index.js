@@ -478,6 +478,7 @@ export { default as createAtomicJsonStore } from "./product/installer/createAtom
 export { default as createInstallationRegistryService } from "./product/installer/createInstallationRegistryService.js";
 export { default as createInstallationStateService } from "./product/installer/createInstallationStateService.js";
 export { default as createInstallationTransactionService } from "./product/installer/createInstallationTransactionService.js";
+export { PRODUCT_BOOTSTRAP_DIRECTORIES, default as createProductCoreBootstrapService } from "./product/installer/createProductCoreBootstrapService.js";
 export { assertChecksum as assertNodeDistributionChecksum, default as createNodeDistributionService } from "./product/installer/createNodeDistributionService.js";
 export { default as createPrivilegedInstallationExecutor } from "./product/installer/createPrivilegedInstallationExecutor.js";
 export { default as executeNginxActivationBoundary } from "./product/installer/executeNginxActivationBoundary.js";
