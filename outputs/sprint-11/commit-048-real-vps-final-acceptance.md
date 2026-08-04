@@ -109,6 +109,22 @@ Real VPS composition must provide `databaseFingerprint()`. It must inspect the a
 
 `scripts/c048-database-fingerprint.js` fingerprints the configured real database file/directory, including deterministic missing-state identity. Tests prove missing, version 1 and version 2 produce three different SHA-256 digests.
 
+## Production Transport Bundle
+
+`scripts/build-c048-production-bundle.js` converts an already signed C040 Production Package directory into the transport schema consumed by C047 Package Acquisition. It emits exact version, byte size and SHA-256 metadata for release publication. It refuses unsigned input, unsafe symlinks and replacement of an existing immutable output.
+
+Executable evidence proves the complete handoff:
+
+```text
+signed C040 package
+  -> C048 transport bundle
+  -> C047 acquisition
+  -> C041 real signature verification
+  -> accepted
+```
+
+Private signing keys remain release-side only. The bundler does not sign packages and must not run on the VPS with a private key.
+
 C048 compares baseline against both post-dry-run and final post-install state. Any difference prevents PASS with `installation.acceptance.protected_state_changed`.
 
 ## Mandatory VPS Probes
@@ -194,8 +210,8 @@ Focused tests prove:
 Focused C048:
 
 ```text
-tests 11
-pass 11
+tests 13
+pass 13
 fail 0
 cancelled 0
 ```
@@ -203,8 +219,8 @@ cancelled 0
 C028-C048 Core Update, Installer and Product Package regression:
 
 ```text
-tests 139
-pass 139
+tests 141
+pass 141
 fail 0
 cancelled 0
 ```
@@ -226,7 +242,9 @@ cancelled 0
 | Database fingerprint contract | PASS |
 | First-party VPS composition | PASS |
 | Deployment-only config template | PASS |
-| Full local regression | PASS - 139/139 |
+| Production transport bundler | PASS |
+| Bundle -> acquisition -> C041 handoff | PASS |
+| Full local regression | PASS - 141/141 |
 | Real production package acquisition | PENDING VPS |
 | Real C047 lifecycle `COMPLETED` | PENDING VPS |
 | Real global `wpsc` | PENDING VPS |
@@ -242,13 +260,16 @@ cancelled 0
 framework/src/product/installer/createProductInstallerAcceptanceService.js
 framework/src/product/installer/createRealVpsAcceptanceProbes.js
 framework/src/product/installer/createC048VpsRuntime.js
+framework/src/product/package/createProductionPackageBundle.js
 framework/src/index.js
 scripts/c048-vps-installer-acceptance.js
 scripts/c048-database-fingerprint.js
 scripts/c048-installer-runtime.example.mjs
+scripts/build-c048-production-bundle.js
 test/productInstallerAcceptanceService.test.js
 test/realVpsAcceptanceProbes.test.js
 test/c048VpsRuntime.test.js
+test/productionPackageBundle.test.js
 outputs/sprint-11/commit-048-real-vps-final-acceptance.md
 ```
 
