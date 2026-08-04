@@ -471,6 +471,14 @@ export { default as renderOrderHistoryView } from "./runtime/account/renderOrder
 export { default as serveStatic } from "./dev-server/serveStatic.js";
 export { default as startDevServer } from "./dev-server/startDevServer.js";
 export { default as validateConfig } from "./core/validateConfig.js";
+export { default as createAtomicJsonStore } from "./product/installer/createAtomicJsonStore.js";
+export { default as createInstallationRegistryService } from "./product/installer/createInstallationRegistryService.js";
+export { default as createInstallationStateService } from "./product/installer/createInstallationStateService.js";
+export { default as createInstallationTransactionService } from "./product/installer/createInstallationTransactionService.js";
+export { default as createPrivilegedInstallationExecutor } from "./product/installer/createPrivilegedInstallationExecutor.js";
+export { default as executeNginxActivationBoundary } from "./product/installer/executeNginxActivationBoundary.js";
+export { default as resolveInstallationWorkspace } from "./product/installer/resolveInstallationWorkspace.js";
+export * from "./product/installer/installationContract.js";
 export {
   AdapterError,
   BuildError,
