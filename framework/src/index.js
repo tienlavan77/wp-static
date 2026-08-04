@@ -484,6 +484,9 @@ export { default as createInstallationStateService } from "./product/installer/c
 export { default as createInstallationTransactionService } from "./product/installer/createInstallationTransactionService.js";
 export { PRODUCT_BOOTSTRAP_DIRECTORIES, default as createProductCoreBootstrapService } from "./product/installer/createProductCoreBootstrapService.js";
 export { default as createProductInstallerOrchestrator } from "./product/installer/createProductInstallerOrchestrator.js";
+export { createProtectedStateSnapshot, default as createProductInstallerAcceptanceService } from "./product/installer/createProductInstallerAcceptanceService.js";
+export { isRealVpsAcceptanceProbe, default as createRealVpsAcceptanceProbes } from "./product/installer/createRealVpsAcceptanceProbes.js";
+export { default as createC048VpsRuntime } from "./product/installer/createC048VpsRuntime.js";
 export { default as createProductionPackageAcquisitionService } from "./product/installer/createProductionPackageAcquisitionService.js";
 export { default as createSystemdRuntimeInstaller } from "./product/installer/createSystemdRuntimeInstaller.js";
 export { assertChecksum as assertNodeDistributionChecksum, default as createNodeDistributionService } from "./product/installer/createNodeDistributionService.js";
