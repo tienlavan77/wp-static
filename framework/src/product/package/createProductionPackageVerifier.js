@@ -4,6 +4,8 @@ import path from "node:path";
 import { validateProductCompatibility } from "../createProductManifest.js";
 import { deterministicTree } from "./createProductionPackageBuilder.js";
 
+const transportFiles = new Set(["production-package.json", ".wpsc-acquisition.json"]);
+
 export default function createProductionPackageVerifier(options = {}) {
   const expected = { architectureVersion: options.architectureVersion, productId: options.productId ?? "wpsc", runtimeVersion: options.runtimeVersion, nodeVersion: options.nodeVersion };
   const copyFile = options.copyFile ?? cp;
@@ -12,7 +14,7 @@ export default function createProductionPackageVerifier(options = {}) {
       const packageDir = path.resolve(input.packageDir);
       const manifest = JSON.parse(await readFile(path.join(packageDir, "production-package.json"), "utf8"));
       validateManifest(manifest);
-      const tree = await deterministicTree(packageDir);
+      const tree = await deterministicTree(packageDir, transportFiles);
       if (JSON.stringify(tree) !== JSON.stringify(manifest.files)) return reject("product.package.tree.invalid", "Production package tree does not match its manifest.");
       const signingInput = signingBytes(manifest);
       if (sha256(signingInput) !== manifest.integrity?.checksum) return reject("product.package.checksum.invalid", "Production package signing checksum is invalid.");
@@ -38,7 +40,7 @@ export default function createProductionPackageVerifier(options = {}) {
         else throw new TypeError(`Unsupported production package entry type: ${entry.type}.`);
       }
       await writeFile(path.join(staging, "production-package.json"), `${JSON.stringify(verified.manifest, null, 2)}\n`, "utf8");
-      const tree = await deterministicTree(staging);
+      const tree = await deterministicTree(staging, transportFiles);
       if (JSON.stringify(tree) !== JSON.stringify(verified.manifest.files)) throw new Error("Extracted production package tree does not match manifest.");
       if (await exists(target)) throw new Error("Production extraction target already exists.");
       await rename(staging, target);
