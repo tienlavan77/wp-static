@@ -19,8 +19,8 @@ import createDeploymentOrchestrationService from "../deployment/createDeployment
 import createRuntimeHardeningService from "../runtime/hardening/createRuntimeHardeningService.js";
 import createProductManagementCli from "./createProductManagementCli.js";
 import createProductManifest from "../product/createProductManifest.js";
-import createCoreUpdateReleaseService from "../product/update/createCoreUpdateReleaseService.js";
-import { createLocalPackageSource } from "../product/update/createPackageSources.js";
+import createCoreUpdateCoordinator from "../product/update/createCoreUpdateCoordinator.js";
+import { readFile } from "node:fs/promises";
 import createRuntimePlatformProvisioningService from "../product/createRuntimePlatformProvisioningService.js";
 import createSiteRuntimeInstance from "../runtime/bootstrap/createSiteRuntimeInstance.js";
 import createRuntimeHttpServer from "../runtime/bootstrap/createRuntimeHttpServer.js";
@@ -485,18 +485,28 @@ async function runProductCommand(cliArgs, workspaceArg) {
   const workspaceDir = path.resolve(workspaceArg);
   const repository = createSiteRepository({ workspaceDir });
   const registry = createSiteRegistry({ repository });
+  const product = createProductManifest({ version: getPackageInfo().version });
+  const publicKey = await readFile(path.join(workspaceDir, "config", "core-update-public.pem"), "utf8").catch((error) => {
+    if (error.code === "ENOENT") return null;
+    throw error;
+  });
   const productCli = createProductManagementCli({
     backup: createSiteBackupService({ repository, registry }),
     deployment: createDeploymentOrchestrationService({ artifactService: createDeploymentArtifactService({ repository }), repository }),
     operations: createSiteOperationsService({ registry }),
-    product: createProductManifest({ version: getPackageInfo().version }),
+    product,
     registry,
     runtime: createRuntimeHardeningService(),
-    update: createCoreUpdateReleaseService({ currentVersion: getPackageInfo().version, source: createLocalPackageSource({ directory: path.join(workspaceDir, "storage", "core-releases") }) })
+    update: createCoreUpdateCoordinator({ architecture: product.architectureVersion, currentVersion: product.version, publicKey, repository, runtime: product.runtimeVersion, workspaceDir })
   });
-  const result = await productCli.run(cliArgs);
+  const result = await productCli.run(removeOption(cliArgs, "--project"));
   console.log(result.output);
   if (result.code !== 0) process.exitCode = result.code;
+}
+
+function removeOption(cliArgs, option) {
+  const index = cliArgs.indexOf(option);
+  return index === -1 ? cliArgs : [...cliArgs.slice(0, index), ...cliArgs.slice(index + 2)];
 }
 
 async function serveSiteRuntime(options = {}) {

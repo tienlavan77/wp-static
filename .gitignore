@@ -7,6 +7,17 @@ coverage/
 .env
 examples/*/.env
 work/
+core/active
+core/releases/
+runtime/node/
+storage/core-releases/
+config/core-update-public.pem
+config/wpsc.json
+config/installation.json
+sites/registry.json
+storage/migrations/
+storage/updates/
+deploy/
 
 examples/*/dist/
 examples/*/dist-local-preview/

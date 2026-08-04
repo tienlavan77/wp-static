@@ -4,6 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import createCoreUpdateStagingService from "../framework/src/product/update/createCoreUpdateStagingService.js";
+import createCorePackageContent from "../framework/src/product/update/createCorePackageContent.js";
 
 test("Core Update staging installs an isolated release without changing active Core", async () => {
   const workspaceDir = await mkdtemp(path.join(os.tmpdir(), "wpsc-stage-"));
@@ -28,4 +29,18 @@ test("Core Update staging cleans a failed copy and never changes active Core", a
 test("Core Update staging inspection rejects an incomplete release after restart", async () => {
   const workspaceDir = await mkdtemp(path.join(os.tmpdir(), "wpsc-stage-inspect-"));
   try { await mkdir(path.join(workspaceDir, "core/releases/1.1.0"), { recursive: true }); const restarted = createCoreUpdateStagingService({ workspaceDir }); assert.equal((await restarted.inspect("1.1.0")).ok, false); await writeFile(path.join(workspaceDir, "core/releases/1.1.0/.wpsc-staged.json"), '{"version":"1.1.0"}'); assert.equal((await restarted.inspect("1.1.0")).staged, true); } finally { await rm(workspaceDir, { force: true, recursive: true }); }
+});
+
+test("C037 staging rejects a tree that differs from the signed package content", async () => {
+  const workspaceDir = await mkdtemp(path.join(os.tmpdir(), "wpsc-stage-signed-"));
+  const packageDir = await mkdtemp(path.join(os.tmpdir(), "wpsc-package-signed-"));
+  try {
+    await writeFile(path.join(packageDir, "core.js"), "verified");
+    const content = await createCorePackageContent(packageDir);
+    await writeFile(path.join(packageDir, "core.js"), "tampered");
+    const result = await createCoreUpdateStagingService({ workspaceDir }).stage({ packageContent: content, packageDir, version: "1.1.0" });
+    assert.equal(result.ok, false);
+    assert.match(result.diagnostics.errors[0].message, /verified package content/);
+    await assert.rejects(access(path.join(workspaceDir, "core/releases/1.1.0")));
+  } finally { await rm(workspaceDir, { force: true, recursive: true }); await rm(packageDir, { force: true, recursive: true }); }
 });

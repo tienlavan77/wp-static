@@ -16,6 +16,9 @@ export default function createProductManagementCli(options = {}) {
     else if (command[0] === "runtime" && command[1] === "status") result = runtime?.state?.() ?? { readiness: "unknown" };
     else if (command[0] === "update" && command[1] === "check" && update?.check) result = await update.check();
     else if (command[0] === "update" && command[1] === "plan" && update?.plan) result = await update.plan();
+    else if (command[0] === "update" && command.length === 1 && update?.run) result = await update.run();
+    else if (command[0] === "update" && command[1] === "status" && update?.status) result = await update.status();
+    else if (command[0] === "update" && command[1] === "history" && update?.history) result = await update.history();
     else return deepFreeze({ code: 2, output: "Unknown Product command.", result: null });
     const ok = result?.ok !== false;
     return deepFreeze({ code: ok ? 0 : 1, output: json ? JSON.stringify(result, null, 2) : format(result), result });

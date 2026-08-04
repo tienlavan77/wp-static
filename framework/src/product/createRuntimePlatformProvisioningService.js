@@ -25,7 +25,7 @@ async function writePrivate(filePath, contents) {
 }
 
 function serviceTemplate({ nodePath, port, workspaceDir, serviceGroup, serviceUser }) {
-  return `[Unit]\nDescription=WPSC Shared Site Runtime\nAfter=network.target\n\n[Service]\nType=simple\nUser=${serviceUser}\nGroup=${serviceGroup}\nWorkingDirectory=${workspaceDir}\nEnvironmentFile=${workspaceDir}/config/runtime.env\nExecStart=${nodePath} framework/src/cli/index.js runtime:serve --config runtime.config.js --project ${workspaceDir} --host 127.0.0.1 --port ${port}\nRestart=always\nRestartSec=3\n\n[Install]\nWantedBy=multi-user.target\n`;
+  return `[Unit]\nDescription=WPSC Shared Site Runtime\nAfter=network.target\n\n[Service]\nType=simple\nUser=${serviceUser}\nGroup=${serviceGroup}\nWorkingDirectory=${workspaceDir}\nEnvironmentFile=${workspaceDir}/config/runtime.env\nExecStart=${nodePath} core/active/framework/src/cli/index.js runtime:serve --config runtime.config.js --project ${workspaceDir} --host 127.0.0.1 --port ${port}\nRestart=always\nRestartSec=3\n\n[Install]\nWantedBy=multi-user.target\n`;
 }
 
 function nginxTemplate({ domain, publicDir, runtimeOrigin }) {
