@@ -475,10 +475,12 @@ export { default as createAtomicJsonStore } from "./product/installer/createAtom
 export { default as createInstallationRegistryService } from "./product/installer/createInstallationRegistryService.js";
 export { default as createInstallationStateService } from "./product/installer/createInstallationStateService.js";
 export { default as createInstallationTransactionService } from "./product/installer/createInstallationTransactionService.js";
+export { assertChecksum as assertNodeDistributionChecksum, default as createNodeDistributionService } from "./product/installer/createNodeDistributionService.js";
 export { default as createPrivilegedInstallationExecutor } from "./product/installer/createPrivilegedInstallationExecutor.js";
 export { default as executeNginxActivationBoundary } from "./product/installer/executeNginxActivationBoundary.js";
 export { default as resolveInstallationWorkspace } from "./product/installer/resolveInstallationWorkspace.js";
 export * from "./product/installer/installationContract.js";
+export * from "./product/installer/nodeDistributionContract.js";
 export {
   AdapterError,
   BuildError,
