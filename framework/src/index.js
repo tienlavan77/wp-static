@@ -476,6 +476,7 @@ export { default as startDevServer } from "./dev-server/startDevServer.js";
 export { default as validateConfig } from "./core/validateConfig.js";
 export { default as createAtomicJsonStore } from "./product/installer/createAtomicJsonStore.js";
 export { default as createInstallationRegistryService } from "./product/installer/createInstallationRegistryService.js";
+export { default as createInstallationMaintenanceService } from "./product/installer/createInstallationMaintenanceService.js";
 export { default as createNginxInstaller } from "./product/installer/createNginxInstaller.js";
 export { default as createGlobalWpscCommandService } from "./product/installer/createGlobalWpscCommandService.js";
 export { default as createInstallationStateService } from "./product/installer/createInstallationStateService.js";
