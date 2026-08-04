@@ -341,6 +341,7 @@ export {
 } from "./product/createProductPackageService.js";
 export { default as createProductionDependencyEvidence, dependencyEvidenceFiles } from "./product/package/createProductionDependencyEvidence.js";
 export { default as createProductionPackageBuilder, deterministicTree as createProductionPackageTree } from "./product/package/createProductionPackageBuilder.js";
+export { default as createProductionPackageVerifier } from "./product/package/createProductionPackageVerifier.js";
 export {
   PRODUCT_PROFILE_SCHEMA,
   PRODUCT_PROFILE_VERSION,
