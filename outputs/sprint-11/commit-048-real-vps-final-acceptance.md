@@ -33,28 +33,31 @@ Runner:
 scripts/c048-vps-installer-acceptance.js
 ```
 
-Required invocation from the Installation workspace:
+Required invocation from the harness, with an explicit fresh Installation target:
 
 ```bash
-sudo runtime/node/bin/node scripts/c048-vps-installer-acceptance.js --confirm
+sudo runtime/node/bin/node \
+  scripts/c048-vps-installer-acceptance.js \
+  --workspace /home/data/sites/production/wpsctest \
+  --confirm
 ```
 
-The runner requires UID 0 and explicit `--confirm`. It resolves its workspace from its own installed location, not from the current working directory.
+The runner requires UID 0, explicit `--confirm` and an explicit target `--workspace`. It resolves the harness from its own installed location and never silently uses the harness as the Installation target. The target must be absolute, existing, distinct from the harness and write evidence under its own `storage/installer/` directory.
 
-The environment-specific composition root is fixed at:
+The environment-specific composition root is fixed inside the target at:
 
 ```text
 config/c048-installer-runtime.mjs
 ```
 
-The runner canonicalizes both workspace and composition-module paths and rejects a symlink or path that resolves outside the exact Installation-owned config location. The composition module provides already-configured C047 Installer, C046 Maintenance, C047 Health and four VPS probe adapters. Release credentials, signing trust material and deployment-specific values remain outside Git.
+The runner canonicalizes both target workspace and composition-module paths and rejects a symlink or path that resolves outside the exact Installation-owned config location. The composition module receives both `{ harnessWorkspace, workspace }`: it imports the first-party factory from the temporary harness and installs only into the target. Release credentials, signing trust material and deployment-specific values remain outside Git.
 
 ## Required Composition Contract
 
 The default export is an async factory. Production composition must construct probes with `createRealVpsAcceptanceProbes`; plain functions returning `{ ok: true }` are rejected by the VPS runner:
 
 ```js
-export default async function createC048Runtime({ workspace }) {
+export default async function createC048Runtime({ harnessWorkspace, workspace }) {
   const probes = createRealVpsAcceptanceProbes({
     domain: "shop.example.com",
     installationId: "production",
@@ -210,8 +213,8 @@ Focused tests prove:
 Focused C048:
 
 ```text
-tests 13
-pass 13
+tests 14
+pass 14
 fail 0
 cancelled 0
 ```
@@ -219,8 +222,8 @@ cancelled 0
 C028-C048 Core Update, Installer and Product Package regression:
 
 ```text
-tests 141
-pass 141
+tests 142
+pass 142
 fail 0
 cancelled 0
 ```
@@ -244,7 +247,8 @@ cancelled 0
 | Deployment-only config template | PASS |
 | Production transport bundler | PASS |
 | Bundle -> acquisition -> C041 handoff | PASS |
-| Full local regression | PASS - 141/141 |
+| Harness/target separation | PASS |
+| Full local regression | PASS - 142/142 |
 | Real production package acquisition | PENDING VPS |
 | Real C047 lifecycle `COMPLETED` | PENDING VPS |
 | Real global `wpsc` | PENDING VPS |

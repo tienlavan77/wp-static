@@ -1,4 +1,5 @@
-import { createC048VpsRuntime } from "../framework/src/index.js";
+import path from "node:path";
+import { pathToFileURL } from "node:url";
 
 function required(name) {
   const value = process.env[name];
@@ -6,9 +7,11 @@ function required(name) {
   return value;
 }
 
-export default async function createC048Runtime({ workspace }) {
+export default async function createC048Runtime({ harnessWorkspace, workspace }) {
   const installationId = process.env.WPSC_INSTALLATION_ID || "production";
   const nodeVersion = (process.env.WPSC_NODE_VERSION || process.versions.node).replace(/^v/, "");
+  const harness = path.resolve(harnessWorkspace);
+  const { createC048VpsRuntime } = await import(pathToFileURL(path.join(harness, "framework", "src", "index.js")).href);
 
   return createC048VpsRuntime({
     workspace,
@@ -42,8 +45,8 @@ export default async function createC048Runtime({ workspace }) {
 
     database: {
       fingerprintCommand: [
-        `${workspace}/runtime/node/bin/node`,
-        `${workspace}/scripts/c048-database-fingerprint.js`,
+        process.execPath,
+        path.join(harness, "scripts", "c048-database-fingerprint.js"),
         "--path",
         process.env.WPSC_DATABASE_PATH || `${workspace}/storage/data.db`
       ]
