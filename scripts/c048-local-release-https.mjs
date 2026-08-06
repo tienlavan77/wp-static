@@ -14,7 +14,7 @@ const bundleStat = await stat(bundle);
 
 const server = https.createServer({ key: await readFile(key), cert: await readFile(certificate) }, (request, response) => {
   const requested = new URL(request.url || "/", "https://localhost").pathname;
-  if (request.method !== "GET" || requested !== `/${bundleName}`) {
+  if (!["GET", "HEAD"].includes(request.method) || requested !== `/${bundleName}`) {
     response.writeHead(404, { "content-type": "text/plain; charset=utf-8" });
     response.end("Not found\n");
     return;
@@ -24,7 +24,8 @@ const server = https.createServer({ key: await readFile(key), cert: await readFi
     "content-length": bundleStat.size,
     "cache-control": "no-store"
   });
-  createReadStream(bundle).pipe(response);
+  if (request.method === "GET") createReadStream(bundle).pipe(response);
+  else response.end();
 });
 
 server.listen(options.port, options.host, () => {
