@@ -24,7 +24,10 @@ export default function createProductInstallerAcceptanceService(options = {}) {
     assertProtected(baseline, afterDryRun, "dry-run");
 
     const installation = await installer.install({ ...(input.installation ?? {}), installationId: input.installationId, ownerId: input.ownerId, workspace });
-    if (!installation.ok || installation.state !== "COMPLETED") throw coded("installation.acceptance.install_failed", "C047 Installer did not reach COMPLETED.");
+    if (!installation.ok || installation.state !== "COMPLETED") {
+      const reason = installation.diagnostics?.errors?.[0]?.code ?? installation.transaction?.error?.code ?? "unknown";
+      throw coded("installation.acceptance.install_failed", `C047 Installer did not reach COMPLETED (state: ${installation.state ?? "unknown"}; reason: ${reason}). Inspect ${path.join(workspace, "storage", "installer", "transaction.json")}.`);
+    }
     const healthResult = await health.inspect(input.health ?? {});
     if (healthResult.state !== "HEALTHY") throw coded("installation.acceptance.health_failed", `Installation health is ${healthResult.state}.`);
     const probeResults = {};
