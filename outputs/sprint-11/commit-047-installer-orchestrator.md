@@ -196,11 +196,13 @@ All remain byte-identical after the orchestrated systemd failure. Independent pr
 Focused C047 health and orchestrator tests:
 
 ```text
-tests 16
-pass 16
+tests 13
+pass 13
 fail 0
 cancelled 0
 ```
+
+The focused validation consists of `test/productInstallerOrchestrator.test.js` (8 tests) and `test/installationHealthService.test.js` (5 tests). The explicit recovery/retry test is included in the orchestrator suite.
 
 C028-C047 Core Update, Installer, Product Package regression:
 
@@ -211,7 +213,7 @@ fail 0
 cancelled 0
 ```
 
-`git diff --check`: PASS
+`git diff --check`: PASS.
 
 ## Changed Files
 
@@ -229,6 +231,6 @@ outputs/sprint-11/commit-047-installer-orchestrator.md
 
 ## Verdict
 
-C047 implementation is complete and is a PASS candidate. `DOWNLOADING` now has a real Package Acquisition owner with trusted-source, identity, atomicity, no-partial-artifact and retry/restart evidence. The Installer lifecycle is durably coordinated through the existing C038 transaction contract, resumes deterministically, stops on failure, accepts only healthy output, preserves protected state, and emits machine-readable plus human-readable health evidence.
+C047 implementation is complete and is a PASS candidate. `DOWNLOADING` now has a real Package Acquisition owner with trusted-source, identity, atomicity, no-partial-artifact and retry/restart evidence. The Installer lifecycle is durably coordinated through the existing C038 transaction contract, resumes deterministically, stops on failure, accepts only healthy output, preserves protected state, and emits machine-readable plus human-readable health evidence. A failed transaction now has an explicit, repeat-safe recovery boundary before any new Installation transaction is allowed to claim the workspace.
 
 C047 is not committed or marked closed until explicit audit approval. C048 remains pending.
