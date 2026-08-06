@@ -21,6 +21,18 @@ export default function createProductInstallerOrchestrator(options = {}) {
     return advance(input, transaction);
   }
 
+  // Recovery is explicit: a failed transaction must reach a terminal rollback
+  // before a new installation can claim the workspace.
+  async function recover(input = {}) {
+    const transaction = transactionService(input);
+    const current = (await transaction.status()).transaction;
+    if (current.state === "ROLLED_BACK") return Object.freeze({ installationId: input.installationId, ok: true, state: current.state, transaction: current, alreadyCompleted: true });
+    if (current.state !== "FAILED") return Object.freeze({ installationId: input.installationId, ok: false, state: current.state, transaction: current, diagnostics: { errors: [{ code: "installation.recovery.invalid", message: `Cannot recover transaction from ${current.state}.`, severity: "error" }], warnings: [] } });
+    const recovering = await transaction.transition({ fence: current.fence, ownerId: current.ownerId, recovery: input.recovery ?? { resources: ["installation-state", "mutable-directories"] }, state: "RECOVERING" });
+    if (!recovering.ok) return recovering;
+    return transaction.completeRecovery({ fence: recovering.transaction.fence, ownerId: current.ownerId });
+  }
+
   async function advance(input, transaction) {
     try {
       while (true) {
@@ -87,7 +99,7 @@ export default function createProductInstallerOrchestrator(options = {}) {
     });
   }
   async function verify(input) { return requireVerified(await components.package.verifyPackage(packageInput(input)), "Production package verification failed."); }
-  return Object.freeze({ install, resume });
+  return Object.freeze({ install, recover, resume });
 }
 
 async function operationIfPending(transaction, ownership, operationId, type) {

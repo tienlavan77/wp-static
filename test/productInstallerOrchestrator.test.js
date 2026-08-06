@@ -145,6 +145,26 @@ test("C047 persists a redacted FAILED state and never advances through an unheal
   assert.equal((await orchestrator.resume(input(root))).state, "FAILED");
 });
 
+test("C047 requires explicit recovery before retrying a failed installation and makes recovery idempotent", async () => {
+  const root = await workspace();
+  const data = input(root);
+  const first = fixture({ node: { install: async () => { const error = new Error("node unavailable"); error.code = "installation.node.unavailable"; throw error; } } });
+  const orchestrator = createProductInstallerOrchestrator({ components: first.components });
+  const failed = await orchestrator.install(data);
+  assert.equal(failed.state, "FAILED");
+  const blocked = await orchestrator.install(data);
+  assert.equal(blocked.diagnostics.errors[0].code, "installation.transaction.active");
+
+  const recovered = await orchestrator.recover(data);
+  assert.equal(recovered.transaction.state, "ROLLED_BACK");
+  const repeated = await orchestrator.recover(data);
+  assert.equal(repeated.alreadyCompleted, true);
+
+  const second = fixture();
+  const retried = await createProductInstallerOrchestrator({ components: second.components }).install({ ...data, ownerId: "installer-2", transactionId: "install-production-retry" });
+  assert.equal(retried.state, "COMPLETED");
+});
+
 test("C047 preserves Site, credential, public, database and active-Core sentinels on failure", async () => {
   const root = await workspace();
   const sentinels = ["sites/site.json", "config/credentials.json", "public/index.html", "storage/site.db", "core/active-sentinel"];

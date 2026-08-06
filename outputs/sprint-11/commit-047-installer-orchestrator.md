@@ -28,6 +28,16 @@ any orchestrated failure
 
 The orchestrator delegates durable state, revision, fencing, locking, external-operation intent and recovery boundaries to the C038 Installation Transaction Service. It does not create a second transaction system.
 
+## Explicit Recovery Before Retry
+
+A `FAILED` transaction is intentionally not retried by `install()` and cannot be bypassed by starting another transaction. The explicit `recover()` boundary transitions only Installer-owned resources through:
+
+```text
+FAILED -> RECOVERING -> ROLLED_BACK
+```
+
+Recovery is repeat-safe after `ROLLED_BACK`. Only then may a new transaction claim the workspace with a new owner/fence. Focused evidence injects a Node failure, proves a retry is rejected while the transaction is `FAILED`, recovers it once, repeats recovery without mutation, and completes a new Installation transaction. Site, credential, public, database and Core boundaries remain outside recovery scope.
+
 ## Component Ownership
 
 | Phase | Owner invoked by C047 |
@@ -172,6 +182,8 @@ All remain byte-identical after the orchestrated systemd failure. Independent pr
 | Same idempotency identity | PASS | Stable transaction ID and operation ID used on replay |
 | Failure transition | PASS | Component/health failures persist `FAILED` |
 | No silent failed resume | PASS | Resume returns `FAILED` without further execution |
+| Explicit failed recovery | PASS | `FAILED -> RECOVERING -> ROLLED_BACK` before a new retry |
+| Recovery idempotency | PASS | Repeated recovery after `ROLLED_BACK` is a no-op |
 | Health gate | PASS | Only `HEALTHY` reaches `COMPLETED` |
 | Secret hygiene | PASS | Injected secret absent from transaction bytes |
 | Site/Core isolation | PASS | Five protected sentinels remain byte-identical |
