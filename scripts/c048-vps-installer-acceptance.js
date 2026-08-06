@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
-import { lstat, realpath } from "node:fs/promises";
+import { access, lstat, realpath } from "node:fs/promises";
+import { constants as fsConstants } from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { createProductInstallerAcceptanceService, createProtectedStateSnapshot } from "../framework/src/index.js";
@@ -13,6 +14,7 @@ export async function main(args = []) {
   const input = parseRunnerInput(args, harnessWorkspace);
   if (process.getuid?.() !== 0) throw new Error(`Run with: sudo ${path.join(harnessWorkspace, "runtime/node/bin/node")} ${path.join(harnessWorkspace, "scripts/c048-vps-installer-acceptance.js")} --workspace <fresh-installation-root> --confirm`);
   const workspace = await resolveTargetWorkspace(input.workspace);
+  await assertProvisionedNode(workspace);
   const runtimeConfig = path.join(workspace, "config", "c048-installer-runtime.mjs");
   await assertContained(runtimeConfig, workspace);
   const factory = (await import(pathToFileURL(runtimeConfig).href)).default;
@@ -46,6 +48,16 @@ async function resolveTargetWorkspace(workspace) {
   const metadata = await lstat(workspace);
   if (!metadata.isDirectory()) throw new TypeError("C048 target workspace must be an existing directory.");
   return realpath(workspace);
+}
+
+export async function assertProvisionedNode(workspace) {
+  const nodePath = path.join(workspace, "runtime", "node", "bin", "node");
+  try {
+    await access(nodePath, fsConstants.X_OK);
+  } catch (error) {
+    throw new Error(`C048 requires a C039-provisioned executable Node at ${nodePath}. Complete Node provisioning before initial acceptance.`);
+  }
+  return nodePath;
 }
 
 async function assertContained(file, root) {

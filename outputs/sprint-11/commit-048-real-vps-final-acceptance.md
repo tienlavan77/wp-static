@@ -1,10 +1,10 @@
-# C048 - Real VPS E2E and Product Deployment Acceptance
+# C048 - Install CLI Integration and Initial Production Acceptance
 
 Status: IN PROGRESS - runner and local executable evidence complete; real VPS execution pending
 
 ## Objective
 
-C048 is the real-VPS acceptance boundary for the Product Deployment Installer implementation. It does not introduce another installation lifecycle. It runs the closed C038-C047 implementation on a real VPS and writes one atomic, machine-readable verdict. C050 owns the final security/regression audit and C051 owns Installer freeze/close.
+C048 exposes the initial Product Installation acceptance flow through one deterministic CLI runner. It does not introduce another installation lifecycle or an update engine: it composes C046 and C047 after the C039 Node prerequisite has been provisioned. It writes one atomic, machine-readable initial-installation verdict. C049 owns Release N -> N+1 self-update; C050 owns the final security/regression audit and C051 owns Installer freeze/close.
 
 ## Acceptance Flow
 
@@ -43,6 +43,8 @@ sudo runtime/node/bin/node \
 ```
 
 The runner requires UID 0, explicit `--confirm` and an explicit target `--workspace`. It resolves the harness from its own installed location and never silently uses the harness as the Installation target. The target must be absolute, existing, distinct from the harness and write evidence under its own `storage/installer/` directory.
+
+C039 is an explicit prerequisite: before C048 starts any dry-run or installation lifecycle, `runtime/node/bin/node` must exist in the target and be executable. C048 does not download or provision Node; that remains C039 ownership.
 
 The package acquisition endpoint can be started with `scripts/c048-local-release-https.mjs`. It serves one immutable bundle over HTTPS and does not perform signing or package verification. The certificate must cover the configured test hostname/IP; the private signing key is never used by this server.
 
@@ -215,11 +217,13 @@ Focused tests prove:
 Focused C048:
 
 ```text
-tests 14
-pass 14
+tests 13
+pass 13
 fail 0
 cancelled 0
 ```
+
+The focused set covers target/Node prerequisite parsing, first-party composition, database fingerprinting, acceptance ordering, real-probe enforcement, protected-state preservation and C040 transport handoff.
 
 C028-C048 Core Update, Installer and Product Package regression:
 
