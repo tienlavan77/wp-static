@@ -44,6 +44,8 @@ sudo runtime/node/bin/node \
 
 The runner requires UID 0, explicit `--confirm` and an explicit target `--workspace`. It resolves the harness from its own installed location and never silently uses the harness as the Installation target. The target must be absolute, existing, distinct from the harness and write evidence under its own `storage/installer/` directory.
 
+The package acquisition endpoint can be started with `scripts/c048-local-release-https.mjs`. It serves one immutable bundle over HTTPS and does not perform signing or package verification. The certificate must cover the configured test hostname/IP; the private signing key is never used by this server.
+
 The environment-specific composition root is fixed inside the target at:
 
 ```text
@@ -270,6 +272,7 @@ scripts/c048-vps-installer-acceptance.js
 scripts/c048-database-fingerprint.js
 scripts/c048-installer-runtime.example.mjs
 scripts/build-c048-production-bundle.js
+scripts/c048-local-release-https.mjs
 test/productInstallerAcceptanceService.test.js
 test/realVpsAcceptanceProbes.test.js
 test/c048VpsRuntime.test.js
