@@ -116,6 +116,7 @@ Readiness succeeds only after that process evidence exists. This proves the inst
 | Installation identity | Separate production/staging unit names |
 | Multi-installation isolation | Both unit files coexist with distinct content |
 | systemd path syntax | `WorkingDirectory` and `EnvironmentFile` are unquoted directives; whitespace is escaped as `\\x20` |
+| Port ownership | The active systemd `MainPID` must own the configured Runtime port before readiness succeeds |
 
 ## Ownership
 
@@ -149,6 +150,8 @@ cancelled 0
 `git diff --check`: PASS
 
 The C048 VPS diagnostic found that quoted path directives are interpreted as literal quote characters by systemd. C044 now renders unquoted, systemd-escaped paths for these directives while retaining quoted `ExecStart` arguments. The focused renderer regression covers a workspace containing spaces.
+
+C048 also exposed a stale, unmanaged Runtime from the harness holding port `8787`. C044 now rejects the false-positive case where an HTTP health response belongs to another process: `systemctl MainPID` must equal the listener PID before C047 can advance to `HEALTH_CHECK` completion.
 
 ## Verdict
 

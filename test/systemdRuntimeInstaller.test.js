@@ -48,6 +48,14 @@ test("C044 requires stable active and healthy Runtime evidence before succeeding
   assert.equal(probes, 3);
 });
 
+test("C044 rejects a stale Runtime listener that does not belong to the new systemd unit", async () => {
+  const fixture = await runtimeFixture("port-owner");
+  const systemd = { daemonReload: async () => {}, disable: async () => {}, enable: async () => {}, isActive: async () => true, mainPid: async () => 200, restart: async () => {} };
+  const result = await createSystemdRuntimeInstaller({ portOwner: async () => 100, probe: async () => ({ ok: true, status: 200 }), readinessDelayMs: 1, systemd, unitDirectory: fixture.unitDirectory }).install({ installationId: "port-owner", readinessAttempts: 3, workspace: fixture.workspace });
+  assert.equal(result.ok, false);
+  assert.equal(result.diagnostics.errors[0].code, "installation.systemd.activation_failed");
+});
+
 test("C044 backs up an existing unit and restores it when readiness fails", async () => {
   const fixture = await runtimeFixture("production");
   const unitPath = path.join(fixture.unitDirectory, "wpsc-runtime-production.service");

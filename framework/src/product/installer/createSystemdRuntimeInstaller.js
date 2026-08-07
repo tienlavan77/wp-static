@@ -9,6 +9,7 @@ export default function createSystemdRuntimeInstaller(options = {}) {
   const unitDirectory = path.resolve(options.unitDirectory ?? "/etc/systemd/system");
   const systemctl = options.systemd ?? createSystemctlAdapter(options.systemctlPath);
   const probe = options.probe ?? defaultProbe;
+  const portOwner = options.portOwner ?? createPortOwner(options.ssPath);
   const now = options.now ?? (() => new Date().toISOString());
 
   async function render(input = {}) {
@@ -56,7 +57,8 @@ export default function createSystemdRuntimeInstaller(options = {}) {
     for (let attempt = 1; attempt <= attempts; attempt += 1) {
       const active = await systemctl.isActive(unit.unitName);
       const health = active ? await probe({ installationId: unit.installationId, port: unit.port, unit }) : { ok: false };
-      consecutiveHealthy = active && health?.ok ? consecutiveHealthy + 1 : 0;
+      const ownsPort = await runtimeOwnsPort(systemctl, portOwner, unit);
+      consecutiveHealthy = active && health?.ok && ownsPort ? consecutiveHealthy + 1 : 0;
       // A spawned service may briefly look active while it is about to exit.
       if (consecutiveHealthy >= 2) return Object.freeze({ attempts: attempt, ok: true, status: health.status ?? 200 });
       if (attempt < attempts) await new Promise((resolve) => setTimeout(resolve, options.readinessDelayMs ?? 250));
@@ -68,8 +70,10 @@ export default function createSystemdRuntimeInstaller(options = {}) {
 
 function createSystemctlAdapter(systemctlPath = "/usr/bin/systemctl") {
   const run = (...args) => execFile(systemctlPath, args);
-  return Object.freeze({ daemonReload: () => run("daemon-reload"), disable: (unit) => run("disable", unit), enable: (unit) => run("enable", unit), isActive: async (unit) => { try { await run("is-active", "--quiet", unit); return true; } catch { return false; } }, restart: (unit) => run("restart", unit) });
+  return Object.freeze({ daemonReload: () => run("daemon-reload"), disable: (unit) => run("disable", unit), enable: (unit) => run("enable", unit), isActive: async (unit) => { try { await run("is-active", "--quiet", unit); return true; } catch { return false; } }, mainPid: async (unit) => { const value = (await run("show", unit, "--property=MainPID", "--value")).stdout.trim(); const pid = Number(value); return Number.isSafeInteger(pid) && pid > 0 ? pid : null; }, restart: (unit) => run("restart", unit) });
 }
+function createPortOwner(ssPath = "ss") { return async (port) => { try { const output = (await execFile(ssPath, ["-ltnp", `sport = :${port}`], { encoding: "utf8" })).stdout; const match = String(output).match(/pid=(\d+)/); return match ? Number(match[1]) : null; } catch { return null; } }; }
+async function runtimeOwnsPort(systemctl, portOwner, unit) { if (typeof systemctl.mainPid !== "function" || typeof portOwner !== "function") return true; const [mainPid, ownerPid] = await Promise.all([systemctl.mainPid(unit.unitName), portOwner(unit.port)]); return mainPid !== null && mainPid === ownerPid; }
 async function defaultProbe({ port }) { try { const response = await fetch(`http://127.0.0.1:${port}/health`); return { ok: response.ok, status: response.status }; } catch { return { ok: false }; } }
 async function atomicWrite(target, content, mode) { await mkdir(path.dirname(target), { recursive: true }); const temporary = `${target}.${process.pid}.tmp`; await rm(temporary, { force: true }); const handle = await open(temporary, "wx", mode); try { await handle.writeFile(content, "utf8"); await handle.sync(); } finally { await handle.close(); } await rename(temporary, target); const directory = await open(path.dirname(target), "r"); try { await directory.sync(); } finally { await directory.close(); } }
 async function readOptional(file) { try { return await readFile(file, "utf8"); } catch (error) { if (error.code === "ENOENT") return null; throw error; } }
