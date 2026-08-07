@@ -19,6 +19,9 @@ test("C044 renders an Installation-specific www-data unit with absolute Node and
   assert.ok(unit.content.includes(`"${workspace}/runtime/node/bin/node"`));
   assert.ok(unit.content.includes(`"${workspace}/core/active/framework/src/cli/index.js"`));
   assert.ok(unit.content.includes(`"--project" "${workspace}"`));
+  assert.ok(unit.content.includes(`WorkingDirectory=${workspace.replaceAll(" ", "\\x20")}`));
+  assert.ok(unit.content.includes(`EnvironmentFile=${workspace.replaceAll(" ", "\\x20")}/config/runtime.env`));
+  assert.equal(unit.content.includes(`WorkingDirectory="${workspace}"`), false);
 });
 
 test("C044 installs, starts and proves the running process uses Installation Node and active Core", async () => {

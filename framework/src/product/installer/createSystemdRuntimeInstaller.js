@@ -20,7 +20,7 @@ export default function createSystemdRuntimeInstaller(options = {}) {
     const runtimeGroup = safeAccount(input.runtimeGroup ?? runtimeUser);
     const port = validPort(input.port ?? 8787);
     const unitName = `wpsc-runtime-${installationId}.service`;
-    const content = `[Unit]\nDescription=WPSC Runtime (${installationId})\nAfter=network.target\n\n[Service]\nType=simple\nUser=${runtimeUser}\nGroup=${runtimeGroup}\nWorkingDirectory=${unitQuote(workspace)}\nEnvironmentFile=${unitQuote(`${workspace}/config/runtime.env`)}\nExecStart=${[node, cli, "runtime:serve", "--config", `${workspace}/runtime.config.js`, "--project", workspace, "--host", "127.0.0.1", "--port", String(port)].map(unitQuote).join(" ")}\nRestart=always\nRestartSec=3\n\n[Install]\nWantedBy=multi-user.target\n`;
+    const content = `[Unit]\nDescription=WPSC Runtime (${installationId})\nAfter=network.target\n\n[Service]\nType=simple\nUser=${runtimeUser}\nGroup=${runtimeGroup}\nWorkingDirectory=${unitPath(workspace)}\nEnvironmentFile=${unitPath(`${workspace}/config/runtime.env`)}\nExecStart=${[node, cli, "runtime:serve", "--config", `${workspace}/runtime.config.js`, "--project", workspace, "--host", "127.0.0.1", "--port", String(port)].map(unitQuote).join(" ")}\nRestart=always\nRestartSec=3\n\n[Install]\nWantedBy=multi-user.target\n`;
     return Object.freeze({ cli, content, installationId, node, port, runtimeGroup, runtimeUser, unitName, unitPath: path.join(unitDirectory, unitName), workspace });
   }
 
@@ -74,5 +74,7 @@ function safeId(value) { const id = String(value ?? ""); if (!/^[a-zA-Z0-9][a-zA
 function safeAbsolute(value, label) { const result = path.resolve(String(value ?? "")); if (!path.isAbsolute(String(value ?? "")) || /[\r\n]/.test(result)) throw new TypeError(`Systemd ${label} must be an absolute safe path.`); return result; }
 function safeAccount(value) { const result = String(value ?? ""); if (!/^[a-z_][a-z0-9_-]*$/i.test(result)) throw new TypeError("Systemd account is invalid."); return result; }
 function validPort(value) { const port = Number(value); if (!Number.isInteger(port) || port < 1 || port > 65535) throw new TypeError("Runtime port is invalid."); return port; }
+// Path directives are not shell arguments: quotes become literal characters.
+function unitPath(value) { return String(value).replaceAll("%", "%%").replaceAll("\\", "\\\\").replaceAll(" ", "\\x20").replaceAll("\t", "\\t"); }
 function unitQuote(value) { return `"${String(value).replaceAll("%", "%%").replaceAll("\\", "\\\\").replaceAll('"', '\\"')}"`; }
 function failure(code, message, data = {}) { return Object.freeze({ diagnostics: { errors: [{ code, message, severity: "error" }], warnings: [] }, ok: false, ...data }); }

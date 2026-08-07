@@ -115,6 +115,7 @@ Readiness succeeds only after that process evidence exists. This proves the inst
 | Failed first activation | Unit removed and enablement disabled |
 | Installation identity | Separate production/staging unit names |
 | Multi-installation isolation | Both unit files coexist with distinct content |
+| systemd path syntax | `WorkingDirectory` and `EnvironmentFile` are unquoted directives; whitespace is escaped as `\\x20` |
 
 ## Ownership
 
@@ -146,6 +147,8 @@ cancelled 0
 ```
 
 `git diff --check`: PASS
+
+The C048 VPS diagnostic found that quoted path directives are interpreted as literal quote characters by systemd. C044 now renders unquoted, systemd-escaped paths for these directives while retaining quoted `ExecStart` arguments. The focused renderer regression covers a workspace containing spaces.
 
 ## Verdict
 
