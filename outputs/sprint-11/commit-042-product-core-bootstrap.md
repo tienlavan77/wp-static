@@ -38,6 +38,8 @@ require C041 accepted package
 -> atomic rename into releases/<version>
 -> write Product configuration if absent
 -> write Installation bootstrap record if absent
+-> write empty operator-owned runtime.env if absent
+-> write active-Core-relative runtime.config.js if absent
 -> initialize empty Site Registry if absent
 -> create temporary active symlink
 -> atomic rename temporary symlink to core/active
@@ -64,6 +66,8 @@ Executable sentinel evidence proves bootstrap does not overwrite:
 The same sentinels remain byte-identical after both initial bootstrap and idempotent retry.
 
 Existing Product configuration and Installation records are read rather than overwritten. A Product configuration belonging to another version is rejected instead of silently changed.
+
+`config/runtime.env` is created only as an empty operator-owned environment boundary when missing; it never contains generated credentials. `runtime.config.js` is written only when absent and imports runtime adapters through `./core/active/`, so it remains valid after the immutable initial Core pointer exists. Existing operator runtime configuration is preserved byte-identically.
 
 ## Mutable Directories
 

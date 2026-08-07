@@ -95,7 +95,7 @@ export default async function createC048VpsRuntime(options = {}) {
       health: {},
       installation: {
         acquisition: packageConfig,
-        bootstrap: { environment: options.environment ?? "production" },
+        bootstrap: { environment: options.environment ?? "production", runtime: { webhookBaseUrl: `${String(options.domainUrl ?? `http://${domain}/`).replace(/\/$/, "")}/webhook` } },
         globalCommand: {},
         health: {},
         nginx: nginxInput,

@@ -17,6 +17,8 @@ test("C042 bootstraps verified Product/Core version and atomically creates core/
   assert.equal(await readlink(path.join(fixture.workspace, "core", "active")), "releases/1.2.3");
   assert.equal(JSON.parse(await readFile(path.join(fixture.workspace, "core", "releases", "1.2.3", ".wpsc-staged.json"), "utf8")).version, "1.2.3");
   assert.equal(JSON.parse(await readFile(path.join(fixture.workspace, "config", "wpsc.json"), "utf8")).product.version, "1.2.3");
+  assert.match(await readFile(path.join(fixture.workspace, "runtime.config.js"), "utf8"), /core\/active\/framework/);
+  assert.match(await readFile(path.join(fixture.workspace, "config", "runtime.env"), "utf8"), /WPSC Runtime environment/);
   assert.deepEqual((await repository.readRegistry()).sites, []);
 });
 
