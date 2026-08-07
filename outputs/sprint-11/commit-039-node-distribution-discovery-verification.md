@@ -1,6 +1,6 @@
 # C039 - Node Distribution Discovery and Verification
 
-Status: PASS CANDIDATE - awaiting audit and explicit close
+Status: IN PROGRESS - service contract tested; production provisioning boundary incomplete
 
 ## Scope
 
@@ -47,6 +47,25 @@ On any failure:
 - no failed candidate becomes the active Node runtime.
 
 An existing runtime already matching the selected version is preserved without download, extraction or replacement.
+
+## Operational Provisioning Gap
+
+The tested C039 service requires four environment adapters: trusted metadata retrieval, archive download, archive inspection and safe extraction. At this revision no first-party production command binds those adapters and invokes `createNodeDistributionService.install()` for an Installation workspace.
+
+Consequently, the following target prerequisite cannot yet be claimed as executable C039 evidence:
+
+```text
+<installation-workspace>/runtime/node/bin/node
+```
+
+The older VPS guide's `curl -> tar -> mv` sequence is an operator bootstrap shortcut, not C039 execution: it bypasses the service's archive-entry policy, staged exact-version check and atomic previous-runtime restoration. It must not be used to close C039 or C048.
+
+Required corrective work before C039 can support C048:
+
+1. first-party trusted Node metadata adapter;
+2. tar.xz archive inspector that returns entry type and symlink target to C039 policy;
+3. safe staging extractor; and
+4. an explicit provision command that derives `<workspace>/runtime/node`, reports the selected version and persists no Site/Core state.
 
 ## Acceptance Evidence
 
@@ -104,4 +123,4 @@ The Node distribution implementation does not alter the frozen C028-C037 lifecyc
 
 ## Verdict
 
-C039 implementation covers release discovery, trust selection, compatibility, checksum, safe archive-entry inspection and atomic runtime preservation. Focused and combined regression evidence is complete; C039 is ready for audit and explicit close.
+C039 service-level implementation covers release discovery, trust selection, compatibility, checksum, safe archive-entry inspection and atomic runtime preservation under injected adapters. Focused service tests remain valid, but C039 is not operationally complete: a target VPS cannot currently execute the contract through a first-party provisioning command. C039 remains `IN PROGRESS`; C048 must remain blocked until the corrective provisioning boundary and its executable evidence are complete.
