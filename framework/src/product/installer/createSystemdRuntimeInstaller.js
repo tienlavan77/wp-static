@@ -21,7 +21,7 @@ export default function createSystemdRuntimeInstaller(options = {}) {
     const runtimeGroup = safeAccount(input.runtimeGroup ?? runtimeUser);
     const port = validPort(input.port ?? 8787);
     const unitName = `wpsc-runtime-${installationId}.service`;
-    const content = `[Unit]\nDescription=WPSC Runtime (${installationId})\nAfter=network.target\n\n[Service]\nType=simple\nUser=${runtimeUser}\nGroup=${runtimeGroup}\nWorkingDirectory=${unitPath(workspace)}\nEnvironmentFile=${unitPath(`${workspace}/config/runtime.env`)}\nExecStart=${[node, cli, "runtime:serve", "--config", `${workspace}/runtime.config.js`, "--project", workspace, "--host", "127.0.0.1", "--port", String(port)].map(unitQuote).join(" ")}\nRestart=always\nRestartSec=3\n\n[Install]\nWantedBy=multi-user.target\n`;
+    const content = `[Unit]\nDescription=WPSC Runtime (${installationId})\nAfter=network.target\n\n[Service]\nType=simple\nUser=${runtimeUser}\nGroup=${runtimeGroup}\nWorkingDirectory=${unitPath(workspace)}\nEnvironment=WPSC_INSTALLATION_ID=${installationId}\nEnvironmentFile=${unitPath(`${workspace}/config/runtime.env`)}\nExecStart=${[node, cli, "runtime:serve", "--config", `${workspace}/runtime.config.js`, "--project", workspace, "--host", "127.0.0.1", "--port", String(port)].map(unitQuote).join(" ")}\nRestart=always\nRestartSec=3\n\n[Install]\nWantedBy=multi-user.target\n`;
     return Object.freeze({ cli, content, installationId, node, port, runtimeGroup, runtimeUser, unitName, unitPath: path.join(unitDirectory, unitName), workspace });
   }
 

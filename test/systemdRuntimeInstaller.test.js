@@ -16,6 +16,7 @@ test("C044 renders an Installation-specific www-data unit with absolute Node and
   assert.equal(unit.unitName, "wpsc-runtime-production.service");
   assert.match(unit.content, /User=www-data/);
   assert.match(unit.content, /Group=www-data/);
+  assert.match(unit.content, /Environment=WPSC_INSTALLATION_ID=production/);
   assert.ok(unit.content.includes(`"${workspace}/runtime/node/bin/node"`));
   assert.ok(unit.content.includes(`"${workspace}/core/active/framework/src/cli/index.js"`));
   assert.ok(unit.content.includes(`"--project" "${workspace}"`));

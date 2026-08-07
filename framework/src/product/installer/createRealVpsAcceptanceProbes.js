@@ -26,12 +26,13 @@ export default function createRealVpsAcceptanceProbes(options = {}) {
       return { command: commandPath, installationId, ok: true, version: result.stdout.trim() };
     }),
     systemd: mark(async () => {
-      const result = await command(execFile, "systemctl", ["show", unit, "--property=ActiveState,User,Group,ExecStart", "--no-pager"]);
+      const result = await command(execFile, "systemctl", ["show", unit, "--property=ActiveState,User,Group,Environment,ExecStart", "--no-pager"]);
       const properties = parseProperties(result.stdout);
       const nodePath = path.join(workspace, "runtime", "node", "bin", "node");
       const cliPath = path.join(workspace, "core", "active", "framework", "src", "cli", "index.js");
-      const ok = properties.ActiveState === "active" && properties.User === runtimeUser && properties.Group === runtimeGroup && properties.ExecStart?.includes(nodePath) && properties.ExecStart?.includes(cliPath);
-      return { active: properties.ActiveState === "active", coreCli: cliPath, group: properties.Group, node: nodePath, ok, unit, user: properties.User };
+      const identity = `WPSC_INSTALLATION_ID=${installationId}`;
+      const ok = properties.ActiveState === "active" && properties.User === runtimeUser && properties.Group === runtimeGroup && properties.Environment?.split(" ").includes(identity) && properties.ExecStart?.includes(nodePath) && properties.ExecStart?.includes(cliPath);
+      return { active: properties.ActiveState === "active", coreCli: cliPath, environment: properties.Environment?.includes(identity) ? identity : "[MISSING]", group: properties.Group, node: nodePath, ok, unit, user: properties.User };
     }),
     runtime: mark(async () => {
       const response = await fetchImpl(runtimeUrl, { headers: options.runtimeHost ? { host: options.runtimeHost } : undefined, redirect: "manual" });

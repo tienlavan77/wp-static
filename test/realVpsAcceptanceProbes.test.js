@@ -9,7 +9,7 @@ test("C048 real probes execute global wpsc, verify exact systemd identity and re
   const execFile = async (executable, args) => {
     commands.push([executable, args]);
     if (executable === "/usr/local/bin/wpsc") return { stderr: "", stdout: "1.0.0\n" };
-    if (executable === "systemctl") return { stderr: "", stdout: `ActiveState=active\nUser=www-data\nGroup=www-data\nExecStart=${workspace}/runtime/node/bin/node ${workspace}/core/active/framework/src/cli/index.js runtime:serve\n` };
+    if (executable === "systemctl") return { stderr: "", stdout: `ActiveState=active\nUser=www-data\nGroup=www-data\nEnvironment=WPSC_INSTALLATION_ID=production\nExecStart=${workspace}/runtime/node/bin/node ${workspace}/core/active/framework/src/cli/index.js runtime:serve\n` };
     if (executable === "nginx") return { stderr: "", stdout: "syntax is ok\n" };
     throw new Error("unexpected command");
   };
@@ -33,7 +33,7 @@ test("C048 real probes execute global wpsc, verify exact systemd identity and re
 test("C048 systemd probe rejects the wrong user, Node or active-Core command", async () => {
   const probes = createRealVpsAcceptanceProbes({
     domain: "shop.example.com",
-    execFile: async (executable) => executable === "systemctl" ? { stdout: "ActiveState=active\nUser=root\nGroup=root\nExecStart=/usr/bin/node /tmp/cli.js\n" } : { stdout: "ok\n" },
+    execFile: async (executable) => executable === "systemctl" ? { stdout: "ActiveState=active\nUser=root\nGroup=root\nEnvironment=WPSC_INSTALLATION_ID=production\nExecStart=/usr/bin/node /tmp/cli.js\n" } : { stdout: "ok\n" },
     fetch: async () => ({ status: 200 }),
     installationId: "production",
     runtimeUrl: "http://127.0.0.1:8787/health",
