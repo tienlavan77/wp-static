@@ -38,6 +38,16 @@ test("C044 installs, starts and proves the running process uses Installation Nod
   assert.deepEqual(calls.slice(0, 3), ["daemon-reload", "enable:wpsc-runtime-production.service", "restart:wpsc-runtime-production.service"]);
 });
 
+test("C044 requires stable active and healthy Runtime evidence before succeeding", async () => {
+  const fixture = await runtimeFixture("stable");
+  let probes = 0;
+  const systemd = { daemonReload: async () => {}, disable: async () => {}, enable: async () => {}, isActive: async () => true, restart: async () => {} };
+  const result = await createSystemdRuntimeInstaller({ probe: async () => ({ ok: ++probes > 1, status: 200 }), readinessDelayMs: 1, systemd, unitDirectory: fixture.unitDirectory }).install({ installationId: "stable", readinessAttempts: 4, workspace: fixture.workspace });
+  assert.equal(result.ok, true);
+  assert.equal(result.readiness.attempts, 3);
+  assert.equal(probes, 3);
+});
+
 test("C044 backs up an existing unit and restores it when readiness fails", async () => {
   const fixture = await runtimeFixture("production");
   const unitPath = path.join(fixture.unitDirectory, "wpsc-runtime-production.service");

@@ -52,11 +52,14 @@ export default function createSystemdRuntimeInstaller(options = {}) {
     return target;
   }
   async function waitForReadiness(unit, attempts) {
+    let consecutiveHealthy = 0;
     for (let attempt = 1; attempt <= attempts; attempt += 1) {
       const active = await systemctl.isActive(unit.unitName);
       const health = active ? await probe({ installationId: unit.installationId, port: unit.port, unit }) : { ok: false };
-      if (active && health?.ok) return Object.freeze({ attempts: attempt, ok: true, status: health.status ?? 200 });
-      if (attempt < attempts) await new Promise((resolve) => setTimeout(resolve, options.readinessDelayMs ?? 10));
+      consecutiveHealthy = active && health?.ok ? consecutiveHealthy + 1 : 0;
+      // A spawned service may briefly look active while it is about to exit.
+      if (consecutiveHealthy >= 2) return Object.freeze({ attempts: attempt, ok: true, status: health.status ?? 200 });
+      if (attempt < attempts) await new Promise((resolve) => setTimeout(resolve, options.readinessDelayMs ?? 250));
     }
     return Object.freeze({ message: "Runtime did not become active and healthy.", ok: false });
   }
