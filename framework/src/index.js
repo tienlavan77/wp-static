@@ -482,6 +482,8 @@ export { default as createNginxInstaller } from "./product/installer/createNginx
 export { default as createGlobalWpscCommandService } from "./product/installer/createGlobalWpscCommandService.js";
 export { default as createInstallationStateService } from "./product/installer/createInstallationStateService.js";
 export { default as createInstallationTransactionService } from "./product/installer/createInstallationTransactionService.js";
+export { default as createReleaseMetadataService } from "./product/installer/createReleaseMetadataService.js";
+export { default as createReleaseUpdateService } from "./product/installer/createReleaseUpdateService.js";
 export { PRODUCT_BOOTSTRAP_DIRECTORIES, default as createProductCoreBootstrapService } from "./product/installer/createProductCoreBootstrapService.js";
 export { default as createProductInstallerOrchestrator } from "./product/installer/createProductInstallerOrchestrator.js";
 export { createProtectedStateSnapshot, default as createProductInstallerAcceptanceService } from "./product/installer/createProductInstallerAcceptanceService.js";

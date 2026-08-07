@@ -72,10 +72,10 @@ export default function createInstallationTransactionService(options = {}) {
         current = createInstallationTransaction({ ...current, activeOperation: { id: input.operationId, phase: "INTENT_PERSISTED", type: input.type }, revision: current.revision + 1, updatedAt: now() });
         await store.write(current);
       }
-      await handler({ idempotencyKey: `${current.transactionId}:${input.operationId}`, operation: current.activeOperation, transaction: current });
+      const result = await handler({ idempotencyKey: `${current.transactionId}:${input.operationId}`, operation: current.activeOperation, transaction: current });
       const transaction = createInstallationTransaction({ ...current, activeOperation: null, checkpoints: [...current.checkpoints, { at: now(), operationId: input.operationId, revision: current.revision + 1, state: current.state }], revision: current.revision + 1, updatedAt: now() });
       await store.write(transaction);
-      return success({ transaction });
+      return success({ result, transaction });
     });
   }
   async function completeRecovery(input = {}) {
