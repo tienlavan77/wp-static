@@ -3,7 +3,7 @@ import test from "node:test";
 import { mkdtemp, mkdir, writeFile, chmod } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { assertProvisionedNode, parseRunnerInput } from "../scripts/c048-vps-installer-acceptance.js";
+import { assertProvisionedNode, assertTargetNodeRunner, parseRunnerInput } from "../scripts/c048-vps-installer-acceptance.js";
 
 test("C048 runner requires an explicit fresh target distinct from its harness", () => {
   const harness = "/opt/wpsc-harness";
@@ -23,4 +23,10 @@ test("C048 requires executable Node provisioned by C039 before acceptance", asyn
   await writeFile(nodePath, "#!/bin/sh\n");
   await chmod(nodePath, 0o755);
   assert.equal(await assertProvisionedNode(workspace), nodePath);
+});
+
+test("C048 executes through the C039 Installation-owned Node rather than its harness Node", () => {
+  const targetNode = "/srv/wpsctest/runtime/node/bin/node";
+  assert.equal(assertTargetNodeRunner(targetNode, targetNode), targetNode);
+  assert.throws(() => assertTargetNodeRunner(targetNode, "/opt/wpsc-harness/runtime/node/bin/node"), /Installation-owned Node/);
 });

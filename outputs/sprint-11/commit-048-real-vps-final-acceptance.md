@@ -36,15 +36,15 @@ scripts/c048-vps-installer-acceptance.js
 Required invocation from the harness, with an explicit fresh Installation target:
 
 ```bash
-sudo runtime/node/bin/node \
-  scripts/c048-vps-installer-acceptance.js \
+sudo /absolute/installation-root/runtime/node/bin/node \
+  /path/to/harness/scripts/c048-vps-installer-acceptance.js \
   --workspace /home/data/sites/production/wpsctest \
   --confirm
 ```
 
 The runner requires UID 0, explicit `--confirm` and an explicit target `--workspace`. It resolves the harness from its own installed location and never silently uses the harness as the Installation target. The target must be absolute, existing, distinct from the harness and write evidence under its own `storage/installer/` directory.
 
-C039 is an explicit prerequisite: before C048 starts any dry-run or installation lifecycle, `runtime/node/bin/node` must exist in the target and be executable. C048 does not download or provision Node; that remains C039 ownership.
+C039 is an explicit prerequisite: before C048 starts any dry-run or installation lifecycle, `runtime/node/bin/node` must exist in the target and be executable. The runner must itself execute through that exact Installation-owned Node, not a harness or system Node. C048 does not download or provision Node; that remains C039 ownership.
 
 The package acquisition endpoint can be started with `scripts/c048-local-release-https.mjs`. It serves one immutable bundle over HTTPS and does not perform signing or package verification. The certificate must cover the configured test hostname/IP; the private signing key is never used by this server.
 
@@ -217,13 +217,13 @@ Focused tests prove:
 Focused C048:
 
 ```text
-tests 13
-pass 13
+tests 14
+pass 14
 fail 0
 cancelled 0
 ```
 
-The focused set covers target/Node prerequisite parsing, first-party composition, database fingerprinting, acceptance ordering, real-probe enforcement, protected-state preservation and C040 transport handoff.
+The focused set covers target/Node prerequisite parsing, target-owned runner enforcement, first-party composition, database fingerprinting, acceptance ordering, real-probe enforcement, protected-state preservation and C040 transport handoff.
 
 C028-C048 Core Update, Installer and Product Package regression:
 

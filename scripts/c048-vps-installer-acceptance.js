@@ -14,7 +14,8 @@ export async function main(args = []) {
   const input = parseRunnerInput(args, harnessWorkspace);
   if (process.getuid?.() !== 0) throw new Error(`Run with: sudo ${path.join(harnessWorkspace, "runtime/node/bin/node")} ${path.join(harnessWorkspace, "scripts/c048-vps-installer-acceptance.js")} --workspace <fresh-installation-root> --confirm`);
   const workspace = await resolveTargetWorkspace(input.workspace);
-  await assertProvisionedNode(workspace);
+  const targetNode = await assertProvisionedNode(workspace);
+  assertTargetNodeRunner(targetNode, process.execPath);
   const runtimeConfig = path.join(workspace, "config", "c048-installer-runtime.mjs");
   await assertContained(runtimeConfig, workspace);
   const factory = (await import(pathToFileURL(runtimeConfig).href)).default;
@@ -58,6 +59,11 @@ export async function assertProvisionedNode(workspace) {
     throw new Error(`C048 requires a C039-provisioned executable Node at ${nodePath}. Complete Node provisioning before initial acceptance.`);
   }
   return nodePath;
+}
+
+export function assertTargetNodeRunner(targetNode, executable = process.execPath) {
+  if (path.resolve(targetNode) !== path.resolve(executable)) throw new Error(`C048 must run with the Installation-owned Node: ${targetNode}`);
+  return targetNode;
 }
 
 async function assertContained(file, root) {
