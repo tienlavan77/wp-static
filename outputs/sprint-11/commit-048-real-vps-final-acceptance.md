@@ -1,6 +1,6 @@
 # C048 - Install CLI Integration and Initial Production Acceptance
 
-Status: IN PROGRESS - runner and local executable evidence complete; real VPS execution pending
+Status: IN PROGRESS - local implementation complete; target composition readiness and initial acceptance pending
 
 ## Objective
 
@@ -100,6 +100,58 @@ scripts/c048-installer-runtime.example.mjs
 ```
 
 It is copied to `config/c048-installer-runtime.mjs` on the VPS and reads package/domain metadata from environment variables.
+
+## Target Composition Readiness Audit
+
+The C048 target is fixed for the initial acceptance run:
+
+```text
+installationId: wpsctest-c048
+workspace:      /home/data/sites/production/wpsctest
+domain:         wpsctest.local
+domain URL:     http://wpsctest.local/
+runtime:        127.0.0.1:8787
+```
+
+The target-owned composition file is:
+
+```text
+/home/data/sites/production/wpsctest/config/c048-installer-runtime.mjs
+```
+
+It receives `harnessWorkspace` only to import the reviewed first-party composition factory. It must pass the exact target `workspace` to `createC048VpsRuntime`; Product state, Node runtime, Core, installer transaction, output and evidence remain target-owned. The runner canonicalizes the target config path and rejects a composition file outside `workspace/config/`.
+
+Before invoking C048, all gates below must be satisfied:
+
+| Gate | Required evidence | Current state |
+| --- | --- | --- |
+| C039 runtime | Target Node executable and exact version | PASS: `v26.7.0` |
+| C039 artifact identity | Evidence contains trusted URL, size and SHA-256 | PENDING evidence refresh after C039 identity binding |
+| Runner authority | Process executable equals target `runtime/node/bin/node` | PASS local; PENDING target invocation |
+| Package trust | Public key, version, HTTPS URL, size and SHA-256 configured | PENDING target configuration audit |
+| Package transport | HTTPS endpoint returns the immutable C040/C048 bundle | PENDING target probe |
+| Domain probe | Explicit HTTP URL because test Nginx has no TLS contract | PENDING target probe |
+| Database fingerprint | Path identifies actual target database without exposing values | PENDING target configuration audit |
+
+`WPSC_NODE_SIZE=0` and an all-zero Node checksum are rejected by the target composition. C048 reads Node artifact identity only from C039 PASS evidence for the same workspace. This prevents a pre-existing Node binary from silently satisfying an unverified C048 Node configuration.
+
+The required target environment values are:
+
+```text
+WPSC_INSTALLATION_ID=wpsctest-c048
+WPSC_DOMAIN=wpsctest.local
+WPSC_DOMAIN_URL=http://wpsctest.local/
+WPSC_RUNTIME_PORT=8787
+WPSC_PACKAGE_VERSION=1.0.0
+WPSC_PACKAGE_URL=https://wpsctest.local:9443/wpsc-1.0.0.bundle.json
+WPSC_PACKAGE_SIZE=2352445
+WPSC_PACKAGE_SHA256=bd4fb8d3685062234a209277df6d7388d65f67ab0807ed3fb4056a528336a2df
+WPSC_PACKAGE_PUBLIC_KEY=/home/data/sites/production/wpsctest/config/product-package-public.pem
+WPSC_DATABASE_PATH=/home/data/sites/production/wpsctest/storage/data.db
+NODE_EXTRA_CA_CERTS=/home/data/sites/production/c048-release/tls/wpsctest.local-cert.pem
+```
+
+No private signing key, Site credential or runtime secret is supplied to the composition or acceptance evidence.
 
 ## Protected-State Integrity
 
