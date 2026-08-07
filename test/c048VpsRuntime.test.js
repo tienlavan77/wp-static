@@ -18,7 +18,12 @@ test("C048 first-party VPS composition constructs C039-C047 owners from deployme
   const runtime = await createC048VpsRuntime({
     database: { fingerprintCommand: ["/usr/bin/database-fingerprint", "--sha256"] },
     domain: "shop.example.com",
-    execFile: async (command) => command === "/usr/bin/database-fingerprint" ? { stdout: `${digest}\n` } : { stdout: "" },
+    execFile: async (command, args = []) => {
+      if (command === "/usr/bin/database-fingerprint") return { stdout: `${digest}\n` };
+      if (command === "id" && args[0] === "-u") return { stdout: "33\n" };
+      if (command === "id" && args[0] === "-g") return { stdout: "33\n" };
+      return { stdout: "" };
+    },
     fetch: async () => ({ arrayBuffer: async () => new ArrayBuffer(0), ok: true, status: 200, url: "https://releases.example.com/package.json" }),
     installationId: "production",
     node: { sha256: "a".repeat(64), size: 1, url: "https://nodejs.org/dist/v20.19.5/node.tar.xz", version: "20.19.5" },
@@ -32,6 +37,7 @@ test("C048 first-party VPS composition constructs C039-C047 owners from deployme
   assert.equal(await runtime.databaseFingerprint(), digest);
   assert.equal(runtime.input.installationId, "production");
   assert.equal(runtime.input.installation.acquisition.version, "1.0.0");
+  assert.deepEqual(runtime.input.installation.bootstrap.runtime.ownership, { gid: 33, uid: 33 });
   for (const probe of Object.values(runtime.probes)) assert.equal(isRealVpsAcceptanceProbe(probe), true);
 });
 

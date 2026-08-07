@@ -27,6 +27,8 @@ export default async function createC048VpsRuntime(options = {}) {
   const packageConfig = validatePackage(options.package, workspace, installationId);
   const nodeConfig = validateNode(options.node, workspace, installationId);
   const execFile = options.execFile ?? execFileDefault;
+  const databaseFingerprint = createDatabaseFingerprint(options.database, execFile);
+  const runtimeOwnership = await accountOwnership(execFile, runtime.user, runtime.group);
   const fetchImpl = options.fetch ?? globalThis.fetch;
   const registry = createInstallationRegistryService({ path: options.registryPath ?? "/etc/wpsc/installations.json" });
   const installationState = createInstallationStateService({ workspace });
@@ -84,8 +86,6 @@ export default async function createC048VpsRuntime(options = {}) {
       "prepare-directories": async () => ({ ok: true })
     }
   });
-  const databaseFingerprint = createDatabaseFingerprint(options.database, execFile);
-
   return Object.freeze({
     databaseFingerprint,
     health,
@@ -93,7 +93,7 @@ export default async function createC048VpsRuntime(options = {}) {
       health: {},
       installation: {
         acquisition: packageConfig,
-        bootstrap: { environment: options.environment ?? "production", runtime: { webhookBaseUrl: `${String(options.domainUrl ?? `http://${domain}/`).replace(/\/$/, "")}/webhook` } },
+        bootstrap: { environment: options.environment ?? "production", runtime: { ownership: runtimeOwnership, webhookBaseUrl: `${String(options.domainUrl ?? `http://${domain}/`).replace(/\/$/, "")}/webhook` } },
         globalCommand: {},
         health: {},
         nginx: nginxInput,
@@ -114,6 +114,8 @@ export default async function createC048VpsRuntime(options = {}) {
 
 
 async function saveRegistry(service, installationId, workspace) { try { const current = await service.read(); return service.save({ defaultInstallation: current.defaultInstallation ?? installationId, expectedRevision: current.revision, installations: { [installationId]: { workspace } } }); } catch (error) { if (error.code !== "ENOENT") throw error; return service.save({ defaultInstallation: installationId, installations: { [installationId]: { workspace } } }); } }
+async function accountOwnership(execFile, user, group) { const [uid, gid] = await Promise.all([accountId(execFile, "-u", user), accountId(execFile, "-g", group)]); return Object.freeze({ gid, uid }); }
+async function accountId(execFile, flag, account) { const result = await execFile("id", [flag, account], { encoding: "utf8" }); const value = Number(result.stdout.trim()); if (!Number.isSafeInteger(value) || value < 0) throw new TypeError(`C048 Runtime account ${account} has no valid numeric identity.`); return value; }
 function validatePackage(value = {}, workspace, installationId) { const result = { installationId, productId: value.productId ?? "wpsc", publicKeyPath: path.resolve(value.publicKeyPath ?? path.join(workspace, "config", "core-update-public.pem")), sha256: String(value.sha256 ?? ""), size: Number(value.size), targetDir: path.resolve(value.targetDir ?? path.join(workspace, "storage", "installer", "packages", String(value.version))), url: String(value.url ?? ""), version: String(value.version ?? "") }; new URL(result.url); if (!/^\d+\.\d+\.\d+$/.test(result.version) || !/^[a-f0-9]{64}$/.test(result.sha256) || !Number.isSafeInteger(result.size) || result.size <= 0) throw new TypeError("C048 Production package metadata is invalid."); return result; }
 function validateNode(value = {}, workspace, installationId) { const version = String(value.version ?? "").replace(/^v/, ""); const file = { archiveType: value.archiveType ?? "tar.xz", sha256: String(value.sha256 ?? "0".repeat(64)), size: Number(value.size ?? 0), url: String(value.url ?? "https://nodejs.org/dist/") }; if (!/^\d+\.\d+\.\d+$/.test(version)) throw new TypeError("C048 Node version is invalid."); return { installationId, selected: { file, version }, target: path.join(workspace, "runtime", "node"), version }; }
 function inspectNodeVersion(execFile) { return async (target) => (await execFile(path.join(target, "bin", "node"), ["--version"], { encoding: "utf8" })).stdout.trim(); }

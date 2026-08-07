@@ -23,6 +23,14 @@ test("C042 bootstraps verified Product/Core version and atomically creates core/
   assert.deepEqual((await repository.readRegistry()).sites, []);
 });
 
+test("C042 assigns a newly created Runtime environment to the configured Runtime account", async () => {
+  const fixture = await verifiedFixture();
+  const ownership = [];
+  const service = createProductCoreBootstrapService({ chown: async (file, uid, gid) => ownership.push({ file, gid, uid }), repository: createSiteRepository({ workspaceDir: fixture.workspace }), workspace: fixture.workspace });
+  assert.equal((await service.bootstrap({ extractedPath: fixture.extracted, runtime: { ownership: { gid: 33, uid: 33 } }, verified: fixture.verified })).ok, true);
+  assert.deepEqual(ownership, [{ file: path.join(fixture.workspace, "config", "runtime.env"), gid: 33, uid: 33 }]);
+});
+
 test("C042 preserves Site state, credentials, public output and existing mutable data", async () => {
   const fixture = await verifiedFixture();
   const sentinels = { "sites/company/site.json": "site-state", "sites/company/credentials.json": "credential-state", "public/index.html": "public-output", "storage/data.db": "database-state" };
