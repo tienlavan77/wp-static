@@ -30,6 +30,12 @@ export default function createProductionPackageVerifier(options = {}) {
     const source = path.resolve(input.packageDir);
     const target = path.resolve(input.targetDir);
     const staging = `${target}.extracting`;
+    // Reuse a committed extraction only after verifying its complete tree.
+    if (await exists(target)) {
+      const existing = await verifyPackage({ ...input, packageDir: target });
+      if (existing.accepted && sameManifest(existing.manifest, verified.manifest)) return Object.freeze({ extracted: false, manifest: verified.manifest, ok: true, path: target, preserved: true });
+      return reject("product.package.extraction.target_conflict", "Existing production extraction target is not the verified package.");
+    }
     await rm(staging, { force: true, recursive: true });
     await mkdir(staging, { recursive: true });
     try {
@@ -50,6 +56,7 @@ export default function createProductionPackageVerifier(options = {}) {
   return Object.freeze({ extract, verifyPackage });
 }
 
+function sameManifest(left, right) { return JSON.stringify(left) === JSON.stringify(right); }
 function validateManifest(manifest) {
   if (manifest.schema !== "wpsc.production-package" || manifest.schemaVersion !== 1 || !manifest.product || !Array.isArray(manifest.files)) throw new TypeError("Production package manifest is malformed.");
   for (const entry of manifest.files) {

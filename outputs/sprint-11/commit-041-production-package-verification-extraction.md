@@ -97,6 +97,7 @@ Failure behavior:
 | Compatibility mismatch | Product compatibility diagnostic returned |
 | Interrupted extraction | Simulated copy failure cleans staging/final target |
 | Post-extraction mismatch | Copy-time tamper rejected before atomic publish |
+| Retry after later installer failure | Existing target is re-verified and preserved; mismatched target is rejected |
 
 ## Ownership Boundary
 
@@ -127,6 +128,8 @@ cancelled 0
 ```
 
 `git diff --check`: PASS
+
+The retry regression reproduces the C048 failure boundary: when systemd fails after C041 has committed extraction, the next transaction verifies the existing exact tree and does not attempt a destructive second extraction.
 
 ## Verdict
 

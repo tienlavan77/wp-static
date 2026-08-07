@@ -19,6 +19,9 @@ test("C041 verifies a signed production package and atomically extracts its exac
   const extracted = await verifier.extract({ packageDir, publicKey: keys.publicKey, targetDir: path.join(root, "runtime") });
   assert.equal(extracted.extracted, true);
   assert.equal(await readFile(path.join(root, "runtime", "framework", "entry.mjs"), "utf8"), "export default 'runtime';\n");
+  const retry = await verifier.extract({ packageDir, publicKey: keys.publicKey, targetDir: path.join(root, "runtime") });
+  assert.equal(retry.preserved, true);
+  assert.equal(retry.extracted, false);
 });
 
 test("C041 rejects malformed, unauthorized and checksum-tampered manifests", async () => {
