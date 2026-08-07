@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { generateKeyPairSync, sign } from "node:crypto";
-import { mkdir, mkdtemp, readFile, readlink, symlink, writeFile } from "node:fs/promises";
+import { chmod, mkdir, mkdtemp, readFile, readlink, stat, symlink, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { createProductCoreBootstrapService, createProductionDependencyEvidence, createProductionPackageBuilder, createProductionPackageVerifier } from "../framework/src/index.js";
@@ -19,6 +19,7 @@ test("C042 bootstraps verified Product/Core version and atomically creates core/
   assert.equal(JSON.parse(await readFile(path.join(fixture.workspace, "config", "wpsc.json"), "utf8")).product.version, "1.2.3");
   assert.match(await readFile(path.join(fixture.workspace, "runtime.config.js"), "utf8"), /core\/active\/framework/);
   assert.match(await readFile(path.join(fixture.workspace, "config", "runtime.env"), "utf8"), /WPSC Runtime environment/);
+  assert.equal((await stat(path.join(fixture.workspace, "runtime.config.js"))).mode & 0o777, 0o644);
   assert.deepEqual((await repository.readRegistry()).sites, []);
 });
 

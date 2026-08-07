@@ -67,7 +67,7 @@ The same sentinels remain byte-identical after both initial bootstrap and idempo
 
 Existing Product configuration and Installation records are read rather than overwritten. A Product configuration belonging to another version is rejected instead of silently changed.
 
-`config/runtime.env` is created only as an empty operator-owned environment boundary when missing; it never contains generated credentials. `runtime.config.js` is written only when absent and imports runtime adapters through `./core/active/`, so it remains valid after the immutable initial Core pointer exists. Existing operator runtime configuration is preserved byte-identically.
+`config/runtime.env` is created only as an empty operator-owned environment boundary when missing, with mode `0600`; it never contains generated credentials. `runtime.config.js` is written only when absent, with mode `0644`, and imports runtime adapters through `./core/active/`, so it remains valid after the immutable initial Core pointer exists. Existing operator runtime configuration is preserved byte-identically.
 
 ## Mutable Directories
 
@@ -138,6 +138,8 @@ cancelled 0
 ```
 
 `git diff --check`: PASS
+
+The runtime-file hardening regression verifies the C044-required modes (`runtime.env` `0600`, `runtime.config.js` `0644`) and confirms existing operator files are not overwritten.
 
 ## Verdict
 
