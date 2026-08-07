@@ -1,6 +1,6 @@
 # C039 Corrective - Installation-Owned Node Runtime Provisioning
 
-Status: PASS CANDIDATE - local contract and command evidence complete; target execution pending
+Status: PASS / CLOSED
 
 ## Objective
 
@@ -55,6 +55,29 @@ sudo /trusted/bootstrap/node /path/to/scripts/c039-provision-node.mjs \
 
 The bootstrap Node runs the provision command only. It is never accepted as the Installation-owned runtime.
 
-## Remaining Acceptance
+## Target Acceptance Evidence
 
-C039 closes only after the target command yields evidence with `status: PASS`, including an executable contained `runtime/node/bin/node`, exact version match, unchanged protected state and idempotent rerun. Until then C048 remains blocked.
+The C039 command ran on the target Installation:
+
+```text
+installationId: wpsctest-c048
+workspace:      /home/data/sites/production/wpsctest
+platform:       linux-x64
+selectedVersion: 26.7.0
+runtimeVersion:  v26.7.0
+```
+
+Persisted `storage/installer/c039-node-provision-evidence.json` reports:
+
+```text
+nodeExecutable:           true
+versionMatch:             true
+runtimeContained:         true
+protectedStateUnchanged:  true
+idempotentRerun:          true
+changed:                  false
+preservedOnRerun:         true
+status:                   PASS
+```
+
+The first execution atomically installed the selected Node; the accepted second execution preserved that valid runtime. C039 is closed and C048 is unblocked.

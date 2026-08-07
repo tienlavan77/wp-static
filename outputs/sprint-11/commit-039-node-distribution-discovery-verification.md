@@ -1,6 +1,6 @@
 # C039 - Node Distribution Discovery and Verification
 
-Status: PASS CANDIDATE - production provisioning command and local executable evidence complete; VPS execution pending
+Status: PASS / CLOSED
 
 ## Scope
 
@@ -126,4 +126,4 @@ The Node distribution implementation does not alter the frozen C028-C037 lifecyc
 
 ## Verdict
 
-C039 now covers release discovery, trust selection, compatibility, checksum, tar.xz type/symlink inspection, safe staging extraction and atomic runtime preservation through a first-party provision command. Focused local evidence is complete. C039 remains a PASS candidate until the command provisions an executable target Node on the C048 VPS/local-VPS target and that evidence is recorded; C048 remains blocked until then.
+C039 now covers release discovery, trust selection, compatibility, checksum, tar.xz type/symlink inspection, safe staging extraction and atomic runtime preservation through a first-party provision command. Target evidence records Node `v26.7.0` under `/home/data/sites/production/wpsctest/runtime/node`, with canonical containment, exact version, protected-state preservation and idempotent rerun all passing. C039 is closed; C048 may now consume the Installation-owned Node runtime.
