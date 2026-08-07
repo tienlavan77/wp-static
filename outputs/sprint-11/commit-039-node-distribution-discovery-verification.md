@@ -1,6 +1,6 @@
 # C039 - Node Distribution Discovery and Verification
 
-Status: IN PROGRESS - service contract tested; production provisioning boundary incomplete
+Status: PASS CANDIDATE - production provisioning command and local executable evidence complete; VPS execution pending
 
 ## Scope
 
@@ -48,24 +48,27 @@ On any failure:
 
 An existing runtime already matching the selected version is preserved without download, extraction or replacement.
 
-## Operational Provisioning Gap
+## Production Provisioning Command
 
-The tested C039 service requires four environment adapters: trusted metadata retrieval, archive download, archive inspection and safe extraction. At this revision no first-party production command binds those adapters and invokes `createNodeDistributionService.install()` for an Installation workspace.
-
-Consequently, the following target prerequisite cannot yet be claimed as executable C039 evidence:
+`scripts/c039-provision-node.mjs` is the first-party C039 operational boundary. It binds trusted Node metadata retrieval, HTTPS archive download, tar.xz inspection, staging extraction and the C039 atomic installer. The target is always derived from the explicit workspace:
 
 ```text
 <installation-workspace>/runtime/node/bin/node
 ```
 
-The older VPS guide's `curl -> tar -> mv` sequence is an operator bootstrap shortcut, not C039 execution: it bypasses the service's archive-entry policy, staged exact-version check and atomic previous-runtime restoration. It must not be used to close C039 or C048.
+It requires root and `--confirm`, reports the selected version and never reads or mutates Site, credential, public-output, database or Core state:
 
-Required corrective work before C039 can support C048:
+```bash
+sudo /path/to/bootstrap-node scripts/c039-provision-node.mjs \
+  --workspace /absolute/installation-root \
+  --installation production \
+  --majors 20,22,26 \
+  --confirm
+```
 
-1. first-party trusted Node metadata adapter;
-2. tar.xz archive inspector that returns entry type and symlink target to C039 policy;
-3. safe staging extractor; and
-4. an explicit provision command that derives `<workspace>/runtime/node`, reports the selected version and persists no Site/Core state.
+The metadata adapter reads `https://nodejs.org/dist/index.json`, limits selection to stable releases in the certified-major matrix and obtains the artifact SHA-256 from the matching official `SHASUMS256.txt`. Archive metadata and final download URLs remain pinned to `https://nodejs.org`. It records tar entry type and symlink target before C039 path policy permits staging extraction.
+
+The older VPS guide's `curl -> tar -> mv` sequence is superseded and must not be used for C039 evidence.
 
 ## Acceptance Evidence
 
@@ -102,8 +105,8 @@ Required corrective work before C039 can support C048:
 Focused C039:
 
 ```text
-tests 8
-pass 8
+tests 10
+pass 10
 fail 0
 cancelled 0
 ```
@@ -123,4 +126,4 @@ The Node distribution implementation does not alter the frozen C028-C037 lifecyc
 
 ## Verdict
 
-C039 service-level implementation covers release discovery, trust selection, compatibility, checksum, safe archive-entry inspection and atomic runtime preservation under injected adapters. Focused service tests remain valid, but C039 is not operationally complete: a target VPS cannot currently execute the contract through a first-party provisioning command. C039 remains `IN PROGRESS`; C048 must remain blocked until the corrective provisioning boundary and its executable evidence are complete.
+C039 now covers release discovery, trust selection, compatibility, checksum, tar.xz type/symlink inspection, safe staging extraction and atomic runtime preservation through a first-party provision command. Focused local evidence is complete. C039 remains a PASS candidate until the command provisions an executable target Node on the C048 VPS/local-VPS target and that evidence is recorded; C048 remains blocked until then.

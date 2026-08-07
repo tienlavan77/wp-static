@@ -491,6 +491,7 @@ export { default as createProductionPackageBundle } from "./product/package/crea
 export { default as createProductionPackageAcquisitionService } from "./product/installer/createProductionPackageAcquisitionService.js";
 export { default as createSystemdRuntimeInstaller } from "./product/installer/createSystemdRuntimeInstaller.js";
 export { assertChecksum as assertNodeDistributionChecksum, default as createNodeDistributionService } from "./product/installer/createNodeDistributionService.js";
+export { createTrustedNodeMetadataAdapter, downloadNodeArchive, extractTarXzArchive, inspectTarXzArchive } from "./product/installer/createNodeDistributionProductionAdapters.js";
 export { default as createPrivilegedInstallationExecutor } from "./product/installer/createPrivilegedInstallationExecutor.js";
 export { default as executeNginxActivationBoundary } from "./product/installer/executeNginxActivationBoundary.js";
 export { default as resolveInstallationWorkspace } from "./product/installer/resolveInstallationWorkspace.js";
