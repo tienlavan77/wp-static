@@ -311,14 +311,29 @@ cancelled 0
 | Bundle -> acquisition -> C041 handoff | PASS |
 | Harness/target separation | PASS |
 | Full local regression | PASS - 142/142 |
-| Real production package acquisition | PENDING VPS |
-| Real C047 lifecycle `COMPLETED` | PENDING VPS |
-| Real global `wpsc` | PENDING VPS |
-| Real systemd/www-data Runtime | PENDING VPS |
-| Real Runtime readiness | PENDING VPS |
-| Real Nginx/domain route | PENDING VPS |
-| Real protected hashes unchanged | PENDING VPS |
-| `c048-vps-evidence.json` status PASS | PENDING VPS |
+| Real production package acquisition | PASS - signed `1.0.0` transport consumed |
+| Real C047 lifecycle `COMPLETED` | PASS - transaction `install-1786097568173` |
+| Real global `wpsc` | PASS - `/usr/local/bin/wpsc`, version `1.0.0` |
+| Real systemd/www-data Runtime | PASS - `wpsc-runtime-wpsctest-c048.service` |
+| Real Runtime readiness | PASS - target Runtime probe returned `404` within accepted readiness contract |
+| Real Nginx/domain route | PASS - `http://wpsctest.local/`, `404` within accepted route contract |
+| Real protected hashes unchanged | PASS - credentials, database, public output, Site configuration equal before/after |
+| `c048-vps-evidence.json` status PASS | PASS - 2026-08-07T10:12:59.453Z |
+
+## Real VPS Evidence
+
+The confirmed target run used the Installation Node `v26.7.0`, canonical harness `/home/data/sites/wp-static`, target workspace `/home/data/sites/production/wpsctest`, and target-owned composition `config/c048-installer-runtime.mjs`.
+
+`storage/installer/c048-vps-evidence.json` reports `status: PASS` with:
+
+- C046 `REINSTALL` dry-run: PASS with zero protected-state change.
+- C047 transaction: `COMPLETED`; installation ID `wpsctest-c048`.
+- C047 health: `HEALTHY`.
+- C043 global command: PASS.
+- C044 systemd: active as `www-data:www-data`, target Node and target `core/active` CLI, `WPSC_INSTALLATION_ID=wpsctest-c048`.
+- C045 Nginx/domain probe: PASS.
+- C046 `VERIFY`: PASS.
+- Protected credentials, database, public output and Site configuration hashes: unchanged.
 
 ## Changed Files
 
@@ -342,4 +357,4 @@ outputs/sprint-11/commit-048-real-vps-final-acceptance.md
 
 ## Verdict
 
-C048 implementation and local evidence are complete, but C048 is not a PASS candidate yet because its defining real VPS execution has not run. The next action is to create the Installation-owned `config/c048-installer-runtime.mjs` composition for the target VPS and execute the confirmed runner. Only a valid `storage/installer/c048-vps-evidence.json` with all real probes and protected hashes green can close C048 and freeze the Product Deployment Installer sprint.
+C048 real VPS acceptance is PASS. The canonical harness, Installation-owned Node, target composition, C047 lifecycle, C043/C044/C045 probes, C046 verification and protected-state equality all have real executable evidence. C048 is closed subject to the project's final C049-C051 release/self-update, security audit and freeze sequence.
