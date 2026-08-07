@@ -31,9 +31,10 @@ const service = createNodeDistributionService({
   inspectVersion: async (target) => (await execFile(path.join(target, "bin", "node"), ["--version"], { encoding: "utf8" })).stdout.trim(),
   matrix: { majors }
 });
-const result = await service.install({ installationId, target: runtimePath, selected: undefined });
+const selected = await service.discover();
+const result = await service.install({ installationId, target: runtimePath, selected });
 const firstRuntime = await inspectRuntime(installationRoot, result.version);
-const rerun = await service.install({ installationId, target: runtimePath, selected: undefined });
+const rerun = await service.install({ installationId, target: runtimePath, selected });
 const secondRuntime = await inspectRuntime(installationRoot, result.version);
 const after = await protectedSnapshot(installationRoot);
 const protectedStateUnchanged = JSON.stringify(before) === JSON.stringify(after);
@@ -44,6 +45,7 @@ const evidence = {
   workspace: installationRoot,
   platform: `${process.platform}-${process.arch}`,
   selectedVersion: result.version,
+  selectedArtifact: { sha256: selected.file.sha256, size: selected.file.size, url: selected.file.url },
   runtimePath,
   nodeBinary,
   nodeExecutable: firstRuntime.executable,

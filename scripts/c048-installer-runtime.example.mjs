@@ -1,4 +1,5 @@
 import path from "node:path";
+import { readFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 
 function required(name) {
@@ -10,6 +11,7 @@ function required(name) {
 export default async function createC048Runtime({ harnessWorkspace, workspace }) {
   const installationId = process.env.WPSC_INSTALLATION_ID || "production";
   const nodeVersion = (process.env.WPSC_NODE_VERSION || process.versions.node).replace(/^v/, "");
+  const node = await verifiedC039Node(workspace, nodeVersion);
   const harness = path.resolve(harnessWorkspace);
   const { createC048VpsRuntime } = await import(pathToFileURL(path.join(harness, "framework", "src", "index.js")).href);
 
@@ -26,13 +28,7 @@ export default async function createC048Runtime({ harnessWorkspace, workspace })
       group: "www-data"
     },
 
-    node: {
-      version: nodeVersion,
-      url: process.env.WPSC_NODE_URL || `https://nodejs.org/dist/v${nodeVersion}/node-v${nodeVersion}-linux-x64.tar.xz`,
-      size: Number(process.env.WPSC_NODE_SIZE || 0),
-      sha256: process.env.WPSC_NODE_SHA256 || "0".repeat(64),
-      archiveType: "tar.xz"
-    },
+    node,
 
     package: {
       productId: "wpsc",
@@ -55,4 +51,13 @@ export default async function createC048Runtime({ harnessWorkspace, workspace })
     domainUrl: process.env.WPSC_DOMAIN_URL || `https://${required("WPSC_DOMAIN")}/`,
     runtimeHost: process.env.WPSC_RUNTIME_HOST_HEADER || required("WPSC_DOMAIN")
   });
+}
+
+async function verifiedC039Node(workspace, expectedVersion) {
+  const evidencePath = path.join(workspace, "storage", "installer", "c039-node-provision-evidence.json");
+  const evidence = JSON.parse(await readFile(evidencePath, "utf8"));
+  const artifact = evidence.selectedArtifact ?? {};
+  if (evidence.schema !== "wpsc.c039-node-provision" || evidence.status !== "PASS" || evidence.workspace !== workspace) throw new Error("C048 requires PASS C039 Node provisioning evidence for this workspace.");
+  if (evidence.selectedVersion !== expectedVersion || !/^[a-f0-9]{64}$/.test(String(artifact.sha256)) || !Number.isSafeInteger(artifact.size) || artifact.size <= 0 || !String(artifact.url).startsWith("https://nodejs.org/")) throw new Error("C048 C039 Node artifact evidence is incomplete or does not match the executing Node.");
+  return { archiveType: "tar.xz", installationId: evidence.installationId, sha256: artifact.sha256, size: artifact.size, url: artifact.url, version: evidence.selectedVersion };
 }

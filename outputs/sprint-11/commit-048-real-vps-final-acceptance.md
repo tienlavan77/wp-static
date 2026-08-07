@@ -46,6 +46,8 @@ The runner requires UID 0, explicit `--confirm` and an explicit target `--worksp
 
 C039 is an explicit prerequisite: before C048 starts any dry-run or installation lifecycle, `runtime/node/bin/node` must exist in the target and be executable. The runner must itself execute through that exact Installation-owned Node, not a harness or system Node. C048 does not download or provision Node; that remains C039 ownership.
 
+The target composition reads the C039 PASS evidence for the same workspace and requires its selected artifact URL, size and SHA-256. `WPSC_NODE_SIZE=0` and an all-zero SHA-256 are never accepted as production C048 Node identity.
+
 The package acquisition endpoint can be started with `scripts/c048-local-release-https.mjs`. It serves one immutable bundle over HTTPS and does not perform signing or package verification. The certificate must cover the configured test hostname/IP; the private signing key is never used by this server.
 
 The environment-specific composition root is fixed inside the target at:

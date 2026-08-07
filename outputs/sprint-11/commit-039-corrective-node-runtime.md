@@ -32,6 +32,8 @@ storage/installer/c039-node-provision-evidence.json
 
 with schema `wpsc.c039-node-provision` version `1`. It records selected/runtime version, canonical containment, executable state, protected-state equality and idempotent rerun status. It contains no credentials, tokens, secrets or private keys.
 
+The evidence also persists the selected trusted Node artifact URL, byte size and SHA-256. C048 consumes these C039-verified values; it does not accept zero-size or all-zero checksum environment fallbacks.
+
 ## Local Validation
 
 ```text
