@@ -45,23 +45,6 @@ test("C048 first-party VPS composition rejects incomplete package and database c
   await assert.rejects(createC048VpsRuntime({ ...common, database: { fingerprintCommand: ["/bin/true"] }, package: { ...common.package, sha256: "bad" } }), /package metadata is invalid/);
 });
 
-test("C048 blocks before systemd when target runtime configuration is absent", async () => {
-  const root = await mkdtemp(path.join(os.tmpdir(), "wpsc-c048-runtime-preflight-"));
-  await mkdir(path.join(root, "config"), { recursive: true });
-  await writeFile(path.join(root, "config", "core-update-public.pem"), "test-public-key");
-  const runtime = await createC048VpsRuntime({
-    database: { fingerprintCommand: [process.execPath, "-e", "console.log('a'.repeat(64))"] },
-    domain: "shop.example.com",
-    installationId: "production",
-    node: { sha256: "a".repeat(64), size: 1, url: "https://nodejs.org/dist/v20.19.5/node.tar.xz", version: "20.19.5" },
-    package: { sha256: "b".repeat(64), size: 100, url: "https://releases.example.com/wpsc/1.0.0.json", version: "1.0.0" },
-    registryPath: path.join(root, "registry.json"),
-    workspace: root
-  });
-  const result = await runtime.installer.install({ ...runtime.input.installation, installationId: runtime.input.installationId, ownerId: runtime.input.ownerId, workspace: root });
-  assert.equal(result.state, "FAILED");
-  assert.equal(result.diagnostics.errors[0].code, "installation.runtime.prerequisite_missing");
-});
 
 test("C048 database helper fingerprints real file content and distinguishes missing state", async () => {
   const root = await mkdtemp(path.join(os.tmpdir(), "wpsc-c048-database-"));

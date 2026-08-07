@@ -48,7 +48,7 @@ C039 is an explicit prerequisite: before C048 starts any dry-run or installation
 
 The target composition reads the C039 PASS evidence for the same workspace and requires its selected artifact URL, size and SHA-256. `WPSC_NODE_SIZE=0` and an all-zero SHA-256 are never accepted as production C048 Node identity.
 
-The C048 composition now validates `runtime.config.js` and `config/runtime.env` during preflight, before registry/Installation state mutation or systemd activation. A missing Runtime prerequisite returns `installation.runtime.prerequisite_missing` instead of a late opaque systemd activation failure.
+For an Installation-owned clean target, C042 bootstrap creates an empty operator-managed `config/runtime.env` and an absent-only `runtime.config.js` that imports Runtime adapters through `core/active`. C048 preserves any existing operator configuration; C044 systemd therefore receives its required Runtime files only after C042 has published the initial Core.
 
 The package acquisition endpoint can be started with `scripts/c048-local-release-https.mjs`. It serves one immutable bundle over HTTPS and does not perform signing or package verification. The certificate must cover the configured test hostname/IP; the private signing key is never used by this server.
 

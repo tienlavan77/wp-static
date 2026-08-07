@@ -1,6 +1,6 @@
 import { execFile as execFileCallback } from "node:child_process";
 import { promisify } from "node:util";
-import { access, readFile } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import path from "node:path";
 import createSiteRepository from "../../site/createSiteRepository.js";
 import createProductionPackageVerifier from "../package/createProductionPackageVerifier.js";
@@ -50,8 +50,6 @@ export default async function createC048VpsRuntime(options = {}) {
   });
 
   async function preflight() {
-    const runtimePrerequisite = await validateRuntimePrerequisites(workspace);
-    if (!runtimePrerequisite.ok) return runtimePrerequisite;
     const currentRegistry = await saveRegistry(registry, installationId, workspace);
     await installationState.save({ activeCore: `releases/${packageConfig.version}`, coreVersion: packageConfig.version, installationId, nodeVersion: nodeConfig.version, productVersion: packageConfig.version, runtimeUser: runtime.user, state: "INSTALLING", workspace });
     return { diagnostics: { errors: [], warnings: [] }, ok: true, registry: currentRegistry };
@@ -114,17 +112,6 @@ export default async function createC048VpsRuntime(options = {}) {
   });
 }
 
-async function validateRuntimePrerequisites(workspace) {
-  const required = [
-    ["runtime.config.js", path.join(workspace, "runtime.config.js")],
-    ["config/runtime.env", path.join(workspace, "config", "runtime.env")]
-  ];
-  for (const [name, file] of required) {
-    try { await access(file); }
-    catch { return { diagnostics: { errors: [{ code: "installation.runtime.prerequisite_missing", message: `C048 requires ${name} before systemd Runtime installation.`, severity: "error" }], warnings: [] }, ok: false }; }
-  }
-  return { diagnostics: { errors: [], warnings: [] }, ok: true };
-}
 
 async function saveRegistry(service, installationId, workspace) { try { const current = await service.read(); return service.save({ defaultInstallation: current.defaultInstallation ?? installationId, expectedRevision: current.revision, installations: { [installationId]: { workspace } } }); } catch (error) { if (error.code !== "ENOENT") throw error; return service.save({ defaultInstallation: installationId, installations: { [installationId]: { workspace } } }); } }
 function validatePackage(value = {}, workspace, installationId) { const result = { installationId, productId: value.productId ?? "wpsc", publicKeyPath: path.resolve(value.publicKeyPath ?? path.join(workspace, "config", "core-update-public.pem")), sha256: String(value.sha256 ?? ""), size: Number(value.size), targetDir: path.resolve(value.targetDir ?? path.join(workspace, "storage", "installer", "packages", String(value.version))), url: String(value.url ?? ""), version: String(value.version ?? "") }; new URL(result.url); if (!/^\d+\.\d+\.\d+$/.test(result.version) || !/^[a-f0-9]{64}$/.test(result.sha256) || !Number.isSafeInteger(result.size) || result.size <= 0) throw new TypeError("C048 Production package metadata is invalid."); return result; }
