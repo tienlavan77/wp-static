@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import path from "node:path";
+import { pathToFileURL } from "node:url";
 import cleanOutput from "../builder/cleanOutput.js";
 import createInstallConfiguration from "../core/createInstallConfiguration.js";
 import createProjectScaffold, { STARTER_TEMPLATES } from "../core/createProjectScaffold.js";
@@ -39,9 +40,17 @@ import buildReleasePackage from "../release/buildReleasePackage.js";
 import validateReleasePackage from "../release/validateReleasePackage.js";
 import createWebhookServer from "../webhook/createWebhookServer.js";
 import { getPackageInfo } from "../index.js";
+import createProductReleaseIdentity from "../product/createProductReleaseIdentity.js";
 import createLogger from "../shared/createLogger.js";
+import { loadOptionalC049ProductionConfiguration } from "../product/installer/loadC049ProductionConfiguration.js";
 import { formatValidationResults } from "../validation/formatValidationResults.js";
 import validateProjectConfig from "../validation/validateProjectConfig.js";
+import createProductReleaseOperationsCommand from "./createProductReleaseOperationsCommand.js";
+import createReadOnlyReleaseOperationsFacade from "../product/createReadOnlyReleaseOperationsFacade.js";
+import createInstallationRegistryService from "../product/installer/createInstallationRegistryService.js";
+import createInstallationHealthService from "../product/installer/createInstallationHealthService.js";
+import createReleaseUpdateEvidenceStore from "../product/installer/createReleaseUpdateEvidenceStore.js";
+import createProductRolloutCommand from "./createProductRolloutCommand.js";
 
 const args = process.argv.slice(2);
 const logger = createLogger({
@@ -153,6 +162,21 @@ async function main(cliArgs) {
     await releaseValidate(readOptionalArg(cliArgs, "--release-dir") || readProjectArg(cliArgs), {
       format: cliArgs.includes("--json") ? "json" : "text"
     });
+    return;
+  }
+
+  if (cliArgs[0] === "product" && cliArgs[1] === "release" && ["verify", "publish"].includes(cliArgs[2])) {
+    await runProductReleaseOperations(cliArgs);
+    return;
+  }
+
+  if (cliArgs[0] === "product" && cliArgs[1] === "verify-installation") {
+    await runProductInstallationVerification(cliArgs);
+    return;
+  }
+
+  if (cliArgs[0] === "product" && cliArgs[1] === "rollout") {
+    await runProductRollout(cliArgs);
     return;
   }
 
@@ -493,8 +517,10 @@ async function runProductCommand(cliArgs, workspaceArg) {
   const productCli = createProductManagementCli({
     backup: createSiteBackupService({ repository, registry }),
     deployment: createDeploymentOrchestrationService({ artifactService: createDeploymentArtifactService({ repository }), repository }),
+    installationId: process.env.WPSC_INSTALLATION_ID ?? null,
     operations: createSiteOperationsService({ registry }),
     product,
+    releaseUpdate: await loadReleaseUpdateComposition(workspaceDir),
     registry,
     runtime: createRuntimeHardeningService(),
     update: createCoreUpdateCoordinator({ architecture: product.architectureVersion, currentVersion: product.version, publicKey, repository, runtime: product.runtimeVersion, workspaceDir })
@@ -502,6 +528,72 @@ async function runProductCommand(cliArgs, workspaceArg) {
   const result = await productCli.run(removeOption(cliArgs, "--project"));
   console.log(result.output);
   if (result.code !== 0) process.exitCode = result.code;
+}
+
+async function runProductReleaseOperations(cliArgs) {
+  const operation = cliArgs[2];
+  const command = createProductReleaseOperationsCommand({
+    compatibility: { architectureVersion: createProductManifest({ version: getPackageInfo().version }).architectureVersion, productId: "wpsc", runtimeVersion: createProductManifest({ version: getPackageInfo().version }).runtimeVersion, nodeVersion: process.versions.node }
+  });
+  const result = await command.run({
+    artifact: readOptionalArg(cliArgs, "--artifact"),
+    channel: readOptionalArg(cliArgs, "--channel"),
+    configPath: readOptionalArg(cliArgs, "--config"),
+    confirmed: cliArgs.includes("--confirm"),
+    dryRun: cliArgs.includes("--dry-run"),
+    operation,
+    packageDir: readOptionalArg(cliArgs, "--package-dir"),
+    publicKeyPath: readOptionalArg(cliArgs, "--public-key")
+  });
+  console.log(JSON.stringify(result.result, null, 2));
+  if (result.code !== 0) process.exitCode = result.code;
+}
+
+async function runProductInstallationVerification(cliArgs) {
+  const installationId = readRequiredArg(cliArgs, "--installation");
+  const registry = createInstallationRegistryService({ path: process.env.WPSC_INSTALLATION_REGISTRY_PATH });
+  const registered = await registry.read();
+  const workspace = registered.installations?.[installationId]?.workspace;
+  if (!workspace) throw new Error("Installation is not registered.");
+  const health = createInstallationHealthService({ workspace });
+  const evidence = createReleaseUpdateEvidenceStore({ workspace });
+  const facade = createReadOnlyReleaseOperationsFacade({ configuration: { schema: "wpsc.release-operations", schemaVersion: 1, channels: {} }, evidence, health, installationId, registry });
+  const result = await facade.verifyInstallation({ installationId });
+  console.log(JSON.stringify(result, null, 2));
+  if (!result.ok) process.exitCode = 1;
+}
+
+async function runProductRollout(cliArgs) {
+  const installationId = readRequiredArg(cliArgs, "--installation");
+  const registry = createInstallationRegistryService({ path: process.env.WPSC_INSTALLATION_REGISTRY_PATH });
+  const registered = await registry.read();
+  const workspace = registered.installations?.[installationId]?.workspace;
+  if (!workspace) throw new Error("Installation is not registered.");
+  const releaseUpdate = await loadReleaseUpdateComposition(workspace, installationId);
+  if (!releaseUpdate) throw new Error("C049 Installation composition is unavailable.");
+  const command = createProductRolloutCommand({ registry, releaseUpdate });
+  const result = await command.run({ channel: readRequiredArg(cliArgs, "--channel"), configPath: readRequiredArg(cliArgs, "--config"), confirmed: cliArgs.includes("--confirm"), dryRun: cliArgs.includes("--dry-run"), installationId });
+  console.log(JSON.stringify(result.result, null, 2));
+  if (result.code !== 0) process.exitCode = result.code;
+}
+
+async function loadReleaseUpdateComposition(workspaceDir, installationIdOverride = null) {
+  const configPath = path.join(workspaceDir, "config", "c049-release-update-runtime.mjs");
+  try {
+    const module = await import(`${pathToFileURL(configPath).href}?c049=${Date.now()}`);
+    if (typeof module.default !== "function") throw new TypeError("C049 target composition must export a default factory.");
+    const installationId = installationIdOverride ?? process.env.WPSC_INSTALLATION_ID ?? null;
+    const productionConfiguration = installationId ? await loadOptionalC049ProductionConfiguration({ installationId, workspace: workspaceDir }) : null;
+    const value = await module.default({ harnessWorkspace: process.env.WPSC_HARNESS_WORKSPACE ?? null, installationId, productionConfiguration, workspace: workspaceDir });
+    if (!value || typeof value !== "object") throw new TypeError("C049 target composition returned an invalid service.");
+    return value;
+  } catch (error) {
+    if (error.code === "ERR_MODULE_NOT_FOUND" && String(error.message).includes(configPath)) {
+      if (process.env.WPSC_INSTALLATION_ID) throw new Error(`C049 Installation composition is missing: ${configPath}`);
+      return null;
+    }
+    throw error;
+  }
 }
 
 function removeOption(cliArgs, option) {
@@ -520,6 +612,7 @@ async function serveSiteRuntime(options = {}) {
     createHttpServer: createRuntimeHttpServer,
     createRuntimeInstance: createSiteRuntimeInstance,
     loadRuntimeConfig: loadSiteRuntimeConfig,
+    releaseIdentity: createProductReleaseIdentity(getPackageInfo()),
     write: (line) => logger.info(line)
   });
   const result = await command.run(options);
@@ -716,6 +809,10 @@ function printHelp() {
   wpsc release build [--project <project-dir>] [--output-dir <dir>] [--package-name <name>] [--mode vps|shared-hosting] [--clean] [--json]
   wpsc release recover [--release-dir <release-dir>] [--reason <text>] --confirm [--json]
   wpsc release validate [--release-dir <release-dir>] [--json]
+  wpsc product release verify --package-dir <signed-package-dir> --public-key <path> [--json]
+  wpsc product release publish --package-dir <signed-package-dir> --artifact <bundle.json> --config <path> --channel <name> --confirm [--dry-run] [--json]
+  wpsc product verify-installation --installation <id> [--json]
+  wpsc product rollout --installation <id> --channel <name> --config <path> --confirm [--dry-run] [--json]
   wpsc serve [--project <project-dir>] [--port <port>]
   wpsc site:create --site <site-id> [--domain <domain>] [--project <workspace>]
   wpsc platform:provision --site <site-id> --domain <domain> [--project <workspace>] [--runtime-origin <url>] [--webhook-base-url <url>] [--port <port>]
