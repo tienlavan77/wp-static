@@ -1,0 +1,76 @@
+{
+  "schema": "wpsc.c050-rollout-evidence",
+  "schemaVersion": 1,
+  "channel": "development",
+  "installationId": "wpsctest-c048",
+  "workspace": "/home/data/sites/production/wpsctest",
+  "release": {
+    "from": "1.1.0",
+    "to": "1.2.0",
+    "productId": "wpsc",
+    "size": 2482947,
+    "sha256": "c618b1f17f6f913b912e6846a4161f3ea3a40c026e040040c2468d1e6e316af0",
+    "url": "https://wpsc.local/1.2.0/wpsc-1.2.0.bundle.json"
+  },
+  "rollout": {
+    "ok": true,
+    "mutationOwner": "C049",
+    "status": "PASS",
+    "transactionId": "release-update-1786439090214"
+  },
+  "transaction": {
+    "state": "COMPLETED",
+    "revision": 23,
+    "activeOperation": null,
+    "lastError": null,
+    "recovery": null
+  },
+  "identity": {
+    "activeRelease": "1.2.0",
+    "globalCommand": "1.2.0",
+    "runtime": "1.2.0",
+    "nginx": "1.2.0"
+  },
+  "service": {
+    "unit": "wpsc-runtime-wpsctest-c048.service",
+    "active": true,
+    "enabled": true,
+    "mainPid": 2680880,
+    "execMainStatus": 0
+  },
+  "health": {
+    "owner": "C047",
+    "state": "HEALTHY"
+  },
+  "protectedStateEquality": {
+    "credentials": true,
+    "database": true,
+    "publicOutput": true,
+    "siteConfiguration": true
+  },
+  "retainedReleases": [
+    "1.0.0",
+    "1.1.0",
+    "1.2.0"
+  ],
+  "c049Evidence": {
+    "schema": "wpsc.c049-self-update",
+    "status": "PASS",
+    "transactionId": "release-update-1786439090214"
+  },
+  "c050Verification": {
+    "ok": true,
+    "mutation": "NONE"
+  },
+  "safety": {
+    "c048": "NOT_RUN",
+    "manualCopy": "NONE",
+    "manualActivation": "NONE",
+    "manualRuntimeRestart": "NONE",
+    "manualSystemdRestart": "NONE",
+    "directUpdate": "NOT_RUN",
+    "directPublication": "NOT_RUN",
+    "manualRollback": "NOT_RUN",
+    "retiredPathReferences": "NONE"
+  }
+}
