@@ -18,8 +18,63 @@ test("C050 publisher atomically publishes and repeats identical identity idempot
   const second = await publisher.publish({ artifact, channel: "production", release, verified: { accepted: true } });
   assert.equal(first.status, "PUBLISHED");
   assert.equal(second.status, "IDEMPOTENT_SUCCESS");
+  assert.equal(second.mutation, "NONE");
   assert.deepEqual(JSON.parse(await readFile(path.join(root, release.version, "release.json"))), release);
   assert.equal((await stat(path.join(root, release.version, `wpsc-${release.version}.bundle.json`))).size, release.size);
+}));
+
+test("C050 publisher rejects matching metadata when the published bundle is missing without repair", async () => withFixture(async ({ artifact, publisher, release, root }) => {
+  await publisher.publish({ artifact, release, verified: { accepted: true } });
+  const metadata = path.join(root, release.version, "release.json");
+  const bundle = path.join(root, release.version, `wpsc-${release.version}.bundle.json`);
+  const metadataBefore = await readFile(metadata);
+  await rm(bundle);
+  const result = await publisher.publish({ artifact, release, verified: { accepted: true } });
+  assert.equal(result.code, "RELEASE_IDENTITY_CONFLICT");
+  assert.notEqual(result.status, "IDEMPOTENT_SUCCESS");
+  assert.deepEqual(await readFile(metadata), metadataBefore);
+  await assert.rejects(() => stat(bundle));
+}));
+
+test("C050 publisher rejects a truncated published bundle and preserves it", async () => withFixture(async ({ artifact, publisher, release, root }) => {
+  await publisher.publish({ artifact, release, verified: { accepted: true } });
+  const metadata = path.join(root, release.version, "release.json");
+  const bundle = path.join(root, release.version, `wpsc-${release.version}.bundle.json`);
+  const metadataBefore = await readFile(metadata);
+  const truncated = (await readFile(bundle)).subarray(0, release.size - 1);
+  await writeFile(bundle, truncated);
+  const result = await publisher.publish({ artifact, release, verified: { accepted: true } });
+  assert.equal(result.code, "RELEASE_IDENTITY_CONFLICT");
+  assert.deepEqual(await readFile(metadata), metadataBefore);
+  assert.deepEqual(await readFile(bundle), truncated);
+}));
+
+test("C050 publisher rejects same-size altered published bytes and preserves them", async () => withFixture(async ({ artifact, publisher, release, root }) => {
+  await publisher.publish({ artifact, release, verified: { accepted: true } });
+  const metadata = path.join(root, release.version, "release.json");
+  const bundle = path.join(root, release.version, `wpsc-${release.version}.bundle.json`);
+  const metadataBefore = await readFile(metadata);
+  const altered = Buffer.from(await readFile(bundle));
+  altered[0] ^= 0xff;
+  await writeFile(bundle, altered);
+  const result = await publisher.publish({ artifact, release, verified: { accepted: true } });
+  assert.equal(result.code, "RELEASE_IDENTITY_CONFLICT");
+  assert.deepEqual(await readFile(metadata), metadataBefore);
+  assert.deepEqual(await readFile(bundle), altered);
+}));
+
+test("C050 publisher rejects inconsistent metadata without changing the published destination", async () => withFixture(async ({ artifact, publisher, release, root }) => {
+  await publisher.publish({ artifact, release, verified: { accepted: true } });
+  const metadata = path.join(root, release.version, "release.json");
+  const bundle = path.join(root, release.version, `wpsc-${release.version}.bundle.json`);
+  const bundleBefore = await readFile(bundle);
+  const inconsistent = { ...release, sha256: "0".repeat(64) };
+  await writeFile(metadata, `${JSON.stringify(inconsistent, null, 2)}\n`);
+  const metadataBefore = await readFile(metadata);
+  const result = await publisher.publish({ artifact, release, verified: { accepted: true } });
+  assert.equal(result.code, "RELEASE_IDENTITY_CONFLICT");
+  assert.deepEqual(await readFile(metadata), metadataBefore);
+  assert.deepEqual(await readFile(bundle), bundleBefore);
 }));
 
 test("C050 publisher rejects conflicting immutable identity without overwriting", async () => withFixture(async ({ artifact, publisher, release, root }) => {
@@ -52,6 +107,19 @@ test("C050 concurrent conflicting publications allow exactly one immutable winne
   const results = await Promise.all([publisher.publish({ artifact, release, verified: { accepted: true } }), publisher.publish({ artifact: conflictingArtifact, release: conflicting, verified: { accepted: true } })]);
   assert.equal(results.filter((item) => item.status === "PUBLISHED").length, 1);
   assert.equal(results.filter((item) => item.code === "RELEASE_IDENTITY_CONFLICT").length, 1);
+}));
+
+test("C050 concurrent repeats cannot accept a missing published bundle as idempotent", async () => withFixture(async ({ artifact, publisher, release, root }) => {
+  await publisher.publish({ artifact, release, verified: { accepted: true } });
+  const bundle = path.join(root, release.version, `wpsc-${release.version}.bundle.json`);
+  await rm(bundle);
+  const results = await Promise.all([
+    publisher.publish({ artifact, release, verified: { accepted: true } }),
+    publisher.publish({ artifact, release, verified: { accepted: true } })
+  ]);
+  assert.equal(results.every((result) => result.code === "RELEASE_IDENTITY_CONFLICT"), true);
+  assert.equal(results.some((result) => result.status === "IDEMPOTENT_SUCCESS"), false);
+  await assert.rejects(() => stat(bundle));
 }));
 
 async function withFixture(run) {

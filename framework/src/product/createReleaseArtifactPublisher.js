@@ -29,7 +29,7 @@ export default function createReleaseArtifactPublisher(options = {}) {
       lockAcquired = true;
       const existing = await readExisting(fs, metadataPath);
       if (existing) {
-        if (sameIdentity(existing, release)) return result(input, "IDEMPOTENT_SUCCESS", true, destination);
+        if (sameIdentity(existing, release) && await publishedBundleMatches(fs, hash, path.join(destination, artifactName), release)) return result(input, "IDEMPOTENT_SUCCESS", true, destination);
         return failure("RELEASE_IDENTITY_CONFLICT", "An immutable release with this version already exists.");
       }
       const staging = path.join(root, `.staging-${release.version}-${process.pid}-${Date.now()}`);
@@ -54,10 +54,11 @@ export default function createReleaseArtifactPublisher(options = {}) {
 
 function validateRelease(value = {}) { const release = { productId: String(value.productId ?? "wpsc"), version: String(value.version ?? ""), size: Number(value.size), sha256: String(value.sha256 ?? "") }; if (release.productId !== "wpsc" || !/^\d+\.\d+\.\d+$/.test(release.version) || !Number.isSafeInteger(release.size) || release.size <= 0 || !/^[a-f0-9]{64}$/.test(release.sha256)) throw new TypeError("Release metadata is invalid."); return release; }
 function sameIdentity(left, right) { return left.productId === right.productId && left.version === right.version && left.size === right.size && left.sha256 === right.sha256; }
+async function publishedBundleMatches(fs, hash, file, release) { try { const info = await fs.stat(file); return info.isFile() && info.size === release.size && await hash(file) === release.sha256; } catch { return false; } }
 async function readExisting(fs, file) { try { return JSON.parse(await fs.readFile(file, "utf8")); } catch (error) { if (error.code === "ENOENT") return null; throw error; } }
 async function copyFile(source, target) { const { copyFile } = await import("node:fs/promises"); await copyFile(source, target); }
 async function writeMetadata(file, release) { const { writeFile } = await import("node:fs/promises"); await writeFile(file, `${JSON.stringify(release, null, 2)}\n`, { encoding: "utf8", mode: 0o640 }); }
 async function hashFile(file) { const { createReadStream } = await import("node:fs"); return new Promise((resolve, reject) => { const digest = createHash("sha256"); const stream = createReadStream(file); stream.on("data", (chunk) => digest.update(chunk)); stream.on("error", reject); stream.on("end", () => resolve(digest.digest("hex"))); }); }
-function result(input, status, ok, destination = null) { return { channel: input.channel ?? null, destination: destination ? "[REDACTED]" : null, idempotent: status === "IDEMPOTENT_SUCCESS", mutation: status === "DRY_RUN" ? "NONE" : "PUBLICATION", ok: status === "DRY_RUN" ? true : ok, productId: input.release?.productId ?? "wpsc", sha256: input.release?.sha256 ?? null, size: input.release?.size ?? null, status, version: input.release?.version ?? null, verification: "C041" }; }
+function result(input, status, ok, destination = null) { return { channel: input.channel ?? null, destination: destination ? "[REDACTED]" : null, idempotent: status === "IDEMPOTENT_SUCCESS", mutation: ["DRY_RUN", "IDEMPOTENT_SUCCESS"].includes(status) ? "NONE" : "PUBLICATION", ok: status === "DRY_RUN" ? true : ok, productId: input.release?.productId ?? "wpsc", sha256: input.release?.sha256 ?? null, size: input.release?.size ?? null, status, version: input.release?.version ?? null, verification: "C041" }; }
 function failure(code, message) { return { code, diagnostics: { errors: [{ code, message, severity: "error" }], warnings: [] }, ok: false, status: "REJECTED" }; }
 async function acquireLock(fs, lock, retries, retryMs) { for (let attempt = 0; attempt <= retries; attempt += 1) { try { await fs.mkdir(lock); return; } catch (error) { if (error.code !== "EEXIST") throw error; if (attempt === retries) { const conflict = new Error("Another release publication is active."); conflict.code = "PUBLICATION_LOCK_ACTIVE"; throw conflict; } await new Promise((resolve) => setTimeout(resolve, retryMs)); } } }
